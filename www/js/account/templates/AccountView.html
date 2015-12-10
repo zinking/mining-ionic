@@ -1,0 +1,50 @@
+<ion-view view-title="{{'my' | translate}}">
+    <ion-content class="has-header gem-ion-content">
+        <div class="gem-profile-media">
+            <div class="gem-profile-details">
+                <img src="{{viewModel.account.avatarurl}}" alt="" class="gem-circle profile-image">
+                <h4 class="gem-white">{{viewModel.account.name}}</h4>
+            </div>
+
+            <img src="img/bg.png" alt="" class="fluid-image profile-background-image">
+        </div>
+
+        <div class="list">
+            <a class="item item-icon-left" href="#/profile">
+                <i class="icon ion-ios-body calm"></i>
+                {{'profiles' | translate}}
+            </a>
+            <a class="item item-icon-left" href="#/coupons">
+                <i class="icon ion-ios-pricetags calm"></i>
+                {{'coupons' | translate}}
+            </a>
+            <a class="item item-icon-left" href="#/orders">
+                <i class="icon ion-ios-copy calm"></i>
+                {{'orders' | translate}}
+            </a>
+            <a class="item item-icon-left" href="#/appointment">
+                <i class="icon ion-ios-alarm calm"></i>
+                {{'appointment' | translate}}
+            </a>
+        </div>
+
+        <div class="list management" ng-show="viewModel.isStaff">
+            <a class="item item-icon-left" href="#/manageprofile">
+                <i class="icon ion-ios-body calm"></i>
+                {{'manageprofile' | translate}}
+            </a>
+            <a class="item item-icon-left" href="#/listunverifiedappointments">
+                <i class="icon ion-ios-alarm calm"></i>
+                {{'verifyappointments' | translate}}
+            </a>
+            <a class="item item-icon-left" href="#/manageappointments">
+                <i class="icon ion-ios-alarm calm"></i>
+                {{'manageappointments' | translate}}
+            </a>
+            <a class="item item-icon-left" href="#/manageorders">
+                <i class="icon ion-ios-copy calm"></i>
+                {{'manageorders' | translate}}
+            </a>
+        </div>
+    </ion-content>
+</ion-view>

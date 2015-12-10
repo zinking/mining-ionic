@@ -1,0 +1,1 @@
+angular.module('mining.session', ['mining.storage']);

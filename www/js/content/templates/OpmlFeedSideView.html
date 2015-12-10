@@ -1,0 +1,52 @@
+
+
+<ion-side-menus>
+    <!-- Left menu -->
+    <ion-side-menu side="left">
+        <ion-nav-view view-title="">
+            <ion-header-bar class="bar-calm">
+                <h1 class="title">All Feeds (1000+)</h1>
+            </ion-header-bar>
+
+            <ion-content class="has-header gem-ion-content">
+                <ion-list>
+                    <ion-item ng-repeat="opml in viewModel.opmlsList"  >
+                        <i class="icon ion-folder" ng-if="opml.isFolder" ng-click="opml.isOpen = !opml.isOpen"></i>
+                        <i class="icon ion-document" ng-if="!opml.isFolder"></i>
+                        <b ng-click="openOpmlFeed( opml )">{{opml.Title}}</b>
+                        <span class="badge badge-assertive">0</span>
+                        <ion-list ng-show="opml.isOpen">
+                            <ion-item class="item-accordion" ng-repeat="feed in opml.Outline"
+                                      style="border:none">
+                                <i class="icon ion-document"></i>
+                                <b ng-click="openOpmlFeed( feed )">{{feed.Title}}</b>
+                            </ion-item>
+                        </ion-list>
+
+                    </ion-item>
+                </ion-list>
+            </ion-content>
+        </ion-nav-view>
+    </ion-side-menu>
+
+    <ion-side-menu-content>
+        <!-- Main content, usually <ion-nav-view> -->
+        <ion-nav-view view-title="{{'my' | translate}}">
+            <ion-header-bar class="bar-calm">
+                <button class='button icon ion-arrow-left-a' ng-click='toggleLeft()'></button>
+                <h1 class="title">{{viewModel.opmlFeed.Title}}</h1>
+                <button class="button icon-right ion-home" ng-click="window.open( viewModel.opmlFeed.HtmlUrl )"></button>
+            </ion-header-bar>
+
+            <ion-content class="has-header gem-ion-content">
+                <div class="list">
+                    <div ng-repeat="story in viewModel.stories" class="item" ng-click="openStory($index)">
+                        <b>{{story.feed.fTitle}}</b> - {{story.Title}}
+                        <p ng-bind-html="story.Summary | sanitize"></p>
+                    </div>
+                </div>
+            </ion-content>
+        </ion-nav-view>
+    </ion-side-menu-content>
+
+</ion-side-menus>

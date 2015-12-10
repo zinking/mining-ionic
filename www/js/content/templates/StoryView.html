@@ -1,0 +1,23 @@
+<ion-header-bar align-title="left" class="bar-calm">
+    <div class="buttons">
+        <button class='button icon ion-arrow-left-a' ng-click='goToFeed()'></button>
+    </div>
+    <h1 class="title">{{viewModel.story.Title}}</h1>
+    <div class="buttons">
+        <button class="button ion-heart"></button>
+    </div>
+</ion-header-bar>
+
+<ion-content class="has-header gem-ion-content">
+
+    <div class="bar bar-header">
+        <h2 class="title">
+            <b>{{viewModel.story.Author}}</b>
+            <b am-time-ago="viewModel.story.Date" am-preprocess="unix" ></b>
+        </h2>
+    </div>
+    <div>
+        <div ng-bind-html="viewModel.story.Content | sanitize" style="padding:3em;"></div>
+    </div>
+
+</ion-content>
