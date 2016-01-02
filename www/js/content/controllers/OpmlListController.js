@@ -1,5 +1,5 @@
 angular.module('mining.content')
-    .controller('OpmlListCtrl', function($scope, $ionicLoading,$state,
+    .controller('OpmlListCtrl', function($scope, $ionicLoading,$state,$ionicPopup,
                                          AccountDataService,
                                          ContentDataService,
                                          SessionService) {
@@ -39,6 +39,14 @@ angular.module('mining.content')
 
         $scope.openOpmlFeed = function ( fo ){
             $state.go('feed',{opmlFeed:fo})
+        }
+
+        $scope.openAddPanel = function (){
+            $state.go('source')
+        }
+
+        $scope.openAddFeed = function(){
+            $state.go('addfeed')
         }
 
     });

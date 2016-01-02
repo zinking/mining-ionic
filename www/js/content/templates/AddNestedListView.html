@@ -1,0 +1,62 @@
+<ion-view view-title="">
+    <ion-header-bar class="bar-calm">
+        <h1 class="title">Manage Feeds</h1>
+    </ion-header-bar>
+
+    <div class="bar bar-header item-input-inset">
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <input type="text" placeholder="Add Feed" ng-model="viewModel.feedUrl" ng-enter="previewFeedSource()">
+        </label>
+        <button class="button button-clear" ng-click="previewFeedSource()" >
+            Preview
+        </button>
+    </div>
+
+    <div class="bar bar-header item-input-inset" ng-show="viewModel.hasFeedStory" >
+        <button class="button icon-left ion-star button-positive" ng-click="addFeedSource()">Subscribe</button>
+        <button class="button icon-left ion-home button-positive" ng-click="addFeedSource()">Subscribe</button>
+    </div>
+
+    <ion-content class="has-header gem-ion-content" ng-show="viewModel.hasFeedStory">
+        <!--<ion-list >
+            <ion-item class="item-accordion" ng-repeat="feed in viewModel.feedStories" style="border:none">
+                <i class="icon ion-document"></i>
+                <b ng-click="openOpmlFeed( feed )">{{feed.Title}}</b>
+            </ion-item>
+        </ion-list>-->
+
+        <ion-list>
+        <div class="list card" ng-repeat="story in viewModel.feedStories">
+            <div class="item item-avatar">
+                <h2>{{story.Title}}</h2>
+                <p>{{story.Author}}</p>
+                <p>{{story.Updated}}</p>
+            </div>
+            <!--<div class="item item-body">
+                <div ng-bind-html="story.Summary | sanitize">
+                </div>
+            </div>-->
+        </div>
+        </ion-list>
+    </ion-content>
+
+    <!--<ion-content class="has-header gem-ion-content">
+        <ion-list>
+            <ion-item ng-repeat="opml in viewModel.opmlsList"  >
+                <i class="icon ion-folder" ng-if="opml.isFolder" ng-click="opml.isOpen = !opml.isOpen"></i>
+                <i class="icon ion-document" ng-if="!opml.isFolder"></i>
+                <b ng-click="openOpmlFeed( opml )">{{opml.Title}}</b>
+                <span class="badge badge-assertive">0</span>
+                <ion-list ng-show="opml.isOpen">
+                    <ion-item class="item-accordion" ng-repeat="feed in opml.Outline"
+                            style="border:none">
+                        <i class="icon ion-document"></i>
+                        <b ng-click="openOpmlFeed( feed )">{{feed.Title}}</b>
+                    </ion-item>
+                </ion-list>
+
+            </ion-item>
+        </ion-list>
+    </ion-content> -->
+</ion-view>

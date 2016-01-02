@@ -44,12 +44,23 @@ angular.module('mining', [
                 controller: 'LoginCtrl',
                 templateUrl: "js/account/templates/LoginView.html"
             })
+            .state('register', {
+                url: "/register",
+                controller: 'RegisterCtrl',
+                templateUrl: "js/account/templates/RegisterView.html"
+            })
             .state('feed', {
                 url: '/feed',
                 cache: false,
                 templateUrl: 'js/content/templates/FeedView.html',
                 params: { opmlFeed:null },
                 controller: 'FeedCtrl'
+            })
+            .state('addfeed', {
+                url: '/addfeed',
+                cache: false,
+                templateUrl: 'js/content/templates/AddNestedListView.html',
+                controller: 'AddFeedCtrl'
             })
             .state('story', {
                 url: '/story',

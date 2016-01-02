@@ -1,5 +1,5 @@
 angular.module('mining.content')
-    .controller('OpmlFeedSideCtrl', function($scope, $ionicLoading,$state,$ionicSideMenuDelegate,
+    .controller('OpmlFeedSideCtrl', function($scope, $ionicLoading,$state,$ionicSideMenuDelegate,$ionicPopup,
                                          AccountDataService,
                                          ContentDataService,
                                          SessionService) {

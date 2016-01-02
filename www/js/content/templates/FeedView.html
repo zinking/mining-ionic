@@ -1,8 +1,33 @@
 <ion-view view-title="{{'my' | translate}}">
+    <script id="feed-menu-popover.html" type="text/ng-template">
+        <ion-popover-view>
+            <ion-header-bar>
+                <h1 class="title">Actions</h1>
+            </ion-header-bar>
+            <ion-content>
+                <div class="list">
+                    <div class="item item-button-right" >
+                        Home
+                        <button class="button button-positive" ng-click="window.open( viewModel.opmlFeed.HtmlUrl )">
+                            <i class="icon ion-home"></i>
+                        </button>
+                    </div>
+
+                    <div class="item item-button-right" >
+                        UnSubsribe
+                        <button class="button button-positive" ng-click="removeFeedSource()">
+                            <i class="icon ion-minus-circled"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </ion-content>
+        </ion-popover-view>
+    </script>
     <ion-header-bar class="bar-calm">
         <button class='button icon ion-arrow-left-a' ng-click='goToOpmlList()'></button>
         <h1 class="title">{{viewModel.opmlFeed.Title}}</h1>
-        <button class="button icon-right ion-home" ng-click="window.open( viewModel.opmlFeed.HtmlUrl )"></button>
+        <button class="button icon ion-navicon" ng-click="openPopover($event)"></button>
     </ion-header-bar>
 
     <ion-content class="has-header gem-ion-content">

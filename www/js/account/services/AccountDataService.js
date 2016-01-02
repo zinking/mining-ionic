@@ -5,6 +5,7 @@ angular.module('mining.account')
                                             SessionService,
     										BASE_SERVER_URL) {
         var USER_LOGIN_PATH  = BASE_SERVER_URL + '/loginApi'
+        var USER_REGISTER_PATH  = BASE_SERVER_URL + '/registerApi'
 
         return {
         	_data : {},
@@ -41,6 +42,29 @@ angular.module('mining.account')
                     }).
                     error(function () {
                         window.localStorage['userData'] = '';
+                        deferred.reject();
+                    });
+
+                return promise;
+            },
+            register : function ( email, pass ) {
+                var deferred = $q.defer();
+                var promise = deferred.promise;
+                var me = this;
+                var registerData = {"email":email,"pass":pass}
+
+                var req = {
+                    method: 'POST',
+                    url: USER_REGISTER_PATH,
+                    data: registerData,
+                    timeout: 5000
+                }
+
+                $http(req).
+                    success(function (d) {
+                        deferred.resolve(d);
+                    }).
+                    error(function () {
                         deferred.reject();
                     });
 

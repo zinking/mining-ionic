@@ -22,4 +22,8 @@ angular.module('mining.account')
                 }
             )
         }
+
+        $scope.goRegister = function(){
+            $state.go('register')
+        }
     });

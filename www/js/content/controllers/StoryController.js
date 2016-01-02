@@ -7,6 +7,10 @@ angular.module('mining.content')
             storyContent : ""
         };
 
+        if ($stateParams.story==null || $stateParams.opmlFeed==null){
+            $state.go('tab.contents')
+        }
+
         $scope.viewModel.story = $stateParams.story;
         $scope.viewModel.opmlFeed = $stateParams.opmlFeed;
 
@@ -14,17 +18,18 @@ angular.module('mining.content')
             $state.go('feed',{opmlFeed:$scope.viewModel.opmlFeed})
         }
 
-        $scope.loadStoryContent = function(storyLink){
+        $scope.loadStoryContent = function(story){
             //first try local cache
+            var storyId = $scope.viewModel.story.Id;
+            var storyLink = $scope.viewModel.story.Link;
             var localContent = ContentDataService.loadStoryContentFromCache(storyLink);
             if( localContent !== null ){
                 $scope.viewModel.story.Content = localContent;
             }
             else{
-                ContentDataService.loadStoryContentFromServer([storyLink]).then(
+                ContentDataService.loadStoryContentFromServer([storyId]).then(
                     function(){
-                        $scope.viewModel.story.Content = miningUserData.storylink2ContentMap[storyLink];
-                        var a=1;
+                        $scope.viewModel.story.Content = miningUserData.storylink2ContentMap[storyId];
                     },
                     function(){
                         $ionicPopup.alert({
@@ -35,5 +40,5 @@ angular.module('mining.content')
             }
         }
 
-        $scope.loadStoryContent( $scope.viewModel.story.Link )
+        $scope.loadStoryContent( $scope.viewModel.story )
     });
