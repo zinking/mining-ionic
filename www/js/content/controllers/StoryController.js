@@ -3,8 +3,8 @@ angular.module('mining.content')
                                       ContentDataService, SessionService) {
         $scope.viewModel = {
             story : {},
-            opmlFeed : {},
-            storyContent : ""
+            isBusy : false,
+            opmlFeed : {}
         };
 
         if ($stateParams.story==null || $stateParams.opmlFeed==null){
@@ -27,11 +27,17 @@ angular.module('mining.content')
                 $scope.viewModel.story.Content = localContent;
             }
             else{
+                $scope.viewModel.isBusy = true
                 ContentDataService.loadStoryContentFromServer([storyId]).then(
                     function(){
+                        $scope.viewModel.isBusy = false
                         $scope.viewModel.story.Content = miningUserData.storylink2ContentMap[storyId];
+                        if ($scope.viewModel.story.Content==""){
+                            $scope.viewModel.story.Content=$scope.viewModel.story.Summary
+                        }
                     },
                     function(){
+                        $scope.viewModel.isBusy = false
                         $ionicPopup.alert({
                             title: 'Loading Story Failed.'
                         });

@@ -1,21 +1,22 @@
-<ion-view view-title="">
+<ion-view view-title="Add Feed">
     <ion-header-bar class="bar-calm">
         <h1 class="title">Manage Feeds</h1>
     </ion-header-bar>
 
     <div class="bar bar-header item-input-inset">
+        <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
         <label class="item-input-wrapper">
             <i class="icon ion-ios-search placeholder-icon"></i>
-            <input type="text" placeholder="Add Feed" ng-model="viewModel.feedUrl" ng-enter="previewFeedSource()">
+            <input type="text" placeholder="Add Feed" ng-model="viewModel.feedUrl" ng-enter="previewFeedSource($event)">
         </label>
-        <button class="button button-clear" ng-click="previewFeedSource()" >
+        <button class="button button-clear" ng-click="previewFeedSource($event)" >
             Preview
         </button>
     </div>
 
     <div class="bar bar-header item-input-inset" ng-show="viewModel.hasFeedStory" >
         <button class="button icon-left ion-star button-positive" ng-click="addFeedSource()">Subscribe</button>
-        <button class="button icon-left ion-home button-positive" ng-click="addFeedSource()">Subscribe</button>
+        <button class="button icon-left ion-home button-positive" ng-click="goHome()">Home</button>
     </div>
 
     <ion-content class="has-header gem-ion-content" ng-show="viewModel.hasFeedStory">

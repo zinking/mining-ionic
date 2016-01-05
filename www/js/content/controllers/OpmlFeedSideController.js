@@ -6,6 +6,7 @@ angular.module('mining.content')
         $scope.viewModel = {
             omplsList : null,
             stories : [],
+            isBusy : false,
             opmlFeed :{}
         };
 
@@ -40,7 +41,7 @@ angular.module('mining.content')
                 $ionicPopup.alert({
                     title: 'Loading Failed,fallback on cache'
                 });
-                ContentDataService.loadCachedListFeed();
+                ContentDataService.localLoadCachedListFeed();
                 $scope.viewModel.opmlsList = miningUserData.OpmlsList;
             }
         )
@@ -76,9 +77,9 @@ angular.module('mining.content')
                         s.feed = feed;
                         s.Summary = stripSummary(s.Summary)
 
-                    })
+                    });
                     $scope.viewModel.stories = $scope.viewModel.stories.concat(feedStories)
-                })
+                });
 
                 _.sortBy( $scope.viewModel.stories, function(s){
                     return s.Date
@@ -92,7 +93,7 @@ angular.module('mining.content')
                     s.feed = opmlFeed;
                     s.Summary = stripSummary(s.Summary)
 
-                })
+                });
                 $scope.viewModel.stories = feedStories;
             }
         }

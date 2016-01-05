@@ -1,7 +1,23 @@
 {
-  "name": "HelloIonic",
-  "private": "true",
+  "name": "Mining ionic",
+  "private": true,
   "devDependencies": {
     "ionic": "driftyco/ionic-bower#1.1.0"
-  }
+  },
+  "homepage": "https://github.com/zinking/mining-ionic",
+  "authors": [
+    "zhen"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "www/lib",
+    "test",
+    "tests"
+  ]
 }

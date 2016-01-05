@@ -5,6 +5,7 @@ angular.module('mining.content')
         $scope.viewModel = {
             stories : [],
             opmlFeed :{},
+            isBusy:false,
             feedIndex : 0
         };
 
@@ -49,8 +50,10 @@ angular.module('mining.content')
 
         $scope.doRemoveFeedSource = function(){
             var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
+            $scope.viewModel.isBusy = true;
             ContentDataService.removeFeedSource(feedUrl).then(
                 function(data){
+                    $scope.viewModel.isBusy = false;
                     if (data.error!=null){
                         $ionicPopup.alert({
                             title: 'UnSubscribe Feed issue',
@@ -65,6 +68,7 @@ angular.module('mining.content')
                     }
                 },
                 function(){
+                    $scope.viewModel.isBusy = false;
                     $ionicPopup.alert({
                         title: 'UnSubscribe Faild, retry later'
                     });

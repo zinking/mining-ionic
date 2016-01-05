@@ -62,7 +62,7 @@ angular.module('mining.content')
                 window.localStorage['userData.OpmlList'] = JSON.stringify(miningUserData.OpmlsList);
                 window.localStorage['userData.StoriesMap'] = JSON.stringify(miningUserData.StoriesMap);
             },
-            loadCachedListFeed: function () {
+            localLoadCachedListFeed: function () {
                 var OpmlList = window.localStorage['userData.OpmlList'];
                 miningUserData.OpmlsList = JSON.parse(OpmlList);
                 var StoriesMap = window.localStorage['userData.StoriesMap'];

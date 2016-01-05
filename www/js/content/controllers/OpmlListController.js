@@ -4,6 +4,7 @@ angular.module('mining.content')
                                          ContentDataService,
                                          SessionService) {
         $scope.viewModel = {
+            isBusy:false,
             omplsList : null
         };
 
@@ -19,8 +20,10 @@ angular.module('mining.content')
 
         }
 
+        $scope.viewModel.isBusy = true;
         ContentDataService.listFeed().then(
             function(){
+                $scope.viewModel.isBusy = false;
                 var opmlList = miningUserData.OpmlsList;
                 _.each(opmlList, function(opml){
                     opml.isFolder = 'Outline' in opml;
@@ -29,6 +32,7 @@ angular.module('mining.content')
                 $scope.viewModel.opmlsList = opmlList
             },
             function(){
+                $scope.viewModel.isBusy = false;
                 $ionicPopup.alert({
                     title: 'Loading Failed,fallback on cache'
                 });

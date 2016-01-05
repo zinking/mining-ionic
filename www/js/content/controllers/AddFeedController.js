@@ -1,11 +1,12 @@
 angular.module('mining.content')
-    .controller('AddFeedCtrl', function($scope, $ionicLoading,$state,$ionicPopup,
+    .controller('AddFeedCtrl', function($scope, $ionicLoading,$state,$ionicPopup,$ionicPopover,
                                          AccountDataService,
                                          ContentDataService,
                                          SessionService) {
         $scope.viewModel = {
             feedUrl: "",
             hasFeedStory : false,
+            isBusy: false,
             feedStories : []
         };
 
@@ -18,12 +19,17 @@ angular.module('mining.content')
             //create a global userdata structure
             miningUserData = userData;
             miningUserData.storylink2ContentMap = {}
+        }
 
+        $scope.goHome = function(){
+            $state.go('tab.contents')
         }
 
         $scope.addFeedSource = function(){
+            $scope.viewModel.isBusy = true
             ContentDataService.addFeedSource($scope.viewModel.feedUrl).then(
                 function(data){
+                    $scope.viewModel.isBusy = false
                     if (data.error!=null){
                         $ionicPopup.alert({
                             title: 'Subscribe Feed issue',
@@ -41,6 +47,7 @@ angular.module('mining.content')
                     }
                 },
                 function(){
+                    $scope.viewModel.isBusy = false
                     $ionicPopup.alert({
                         title: 'Subscribe Faild, retry later'
                     });
@@ -48,33 +55,52 @@ angular.module('mining.content')
             )
         }
 
-        $scope.previewFeedSource = function (){
-            ContentDataService.previewFeedSource($scope.viewModel.feedUrl).then(
-                function(data){
-                    if (data.error!=null){
-                        $ionicPopup.alert({
-                            title: 'Preview Feed issue',
-                            subtitle:data.error
-                        });
-                    }
-                    else{
-                        if (data.Stories.length==0){
+        function isValidUrl(s) {
+            var regexp1 = /^HTTP|HTTP|http(s)?:\/\/(www\.)?[A-Za-z0-9]+([\-\.]{1}[A-Za-z0-9]+)*\.[A-Za-z]{2,40}(:[0-9]{1,40})?(\/.*)?$/;
+            var regexp2 = /^(www\.)?[A-Za-z0-9]+([\-\.]{1}[A-Za-z0-9]+)*\.[A-Za-z]{2,40}(:[0-9]{1,40})?(\/.*)?$/;
+            return regexp1.test(s) || regexp2.test(s);
+        }
+
+        $scope.previewFeedSource = function ($event){
+            var feedUrl = $scope.viewModel.feedUrl;
+            if (isValidUrl(feedUrl)){
+                if (feedUrl.substr(0,4)!='http')feedUrl='http://'+feedUrl
+                $scope.viewModel.isBusy = true
+                ContentDataService.previewFeedSource(feedUrl).then(
+                    function(data){
+                        $scope.viewModel.isBusy = false
+                        if (data.error!=null){
                             $ionicPopup.alert({
-                                title: 'No stories for this feed'
+                                title: 'Preview Feed issue',
+                                subtitle:data.error
                             });
                         }
                         else{
-                            $scope.viewModel.feedStories = data.Stories;
-                            $scope.viewModel.hasFeedStory = true;
+                            if (data.Stories.length==0){
+                                $ionicPopup.alert({
+                                    title: 'No stories for this feed'
+                                });
+                            }
+                            else{
+                                $scope.viewModel.feedStories = data.Stories;
+                                $scope.viewModel.hasFeedStory = true;
+                            }
                         }
+                    },
+                    function(){
+                        $scope.viewModel.isBusy = false
+                        $ionicPopup.alert({
+                            title: 'Loading Prview Faild, retry later'
+                        });
                     }
-                },
-                function(){
-                    $ionicPopup.alert({
-                        title: 'Loading Prview Faild, retry later'
-                    });
-                }
-            )
+                )
+            }
+            else{
+                $ionicPopup.alert({
+                    title: 'Invalid Url'
+                });
+            }
+
         }
 
     });
