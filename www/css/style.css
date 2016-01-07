@@ -13,3 +13,8 @@
 .list .item.item-accordion.ng-hide-remove {
     display: block !important;
 }
+
+div.story .spinner svg {
+    width: 15px;
+    height: 15px;
+}

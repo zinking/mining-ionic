@@ -1,4 +1,63 @@
 angular.module('mining.content')
+    .directive('story', ['$compile', 'ContentDataService', function($compile, ContentDataService) {
+        return {
+            restrict: 'E',
+            templateUrl: 'story-template.html',
+            replace: true,
+            transclude: true,
+            scope: {
+                story: '=story',
+                open: '&'
+            },
+            controller: function($scope, $element) {
+                $scope.viewModel = {
+                    isBusy : false,
+                    level : 0,
+                    content0 : $scope.story.Summary,
+                    content1 : "",
+                    content2 : ""
+                };
+                $scope.loadStoryContent = function(story, callback){
+                    //first try local cache
+                    var storyId = $scope.story.Id;
+                    var storyLink = $scope.story.Link;
+                    var localContent = ContentDataService.loadStoryContentFromCache(storyLink);
+                    if( localContent !== null ){
+                        $scope.story.Content = localContent;
+                    }
+                    else{
+                        $scope.viewModel.isBusy = true;
+                        ContentDataService.loadStoryContentFromServer([storyId]).then(
+                            function(){
+                                $scope.viewModel.isBusy = false;
+                                $scope.story.Content = miningUserData.storylink2ContentMap[storyId];
+                                if ($scope.story.Content==""){
+                                    $scope.story.Content=$scope.story.Summary
+                                }
+                                callback();
+                            },
+                            function(){
+                                $scope.viewModel.isBusy = false;
+                                $ionicPopup.alert({
+                                    title: 'Loading Story Failed.'
+                                });
+                            }
+                        )
+                    }
+                };
+                $scope.expand = function(){
+                    $scope.loadStoryContent($scope.story, function(){
+                        $scope.viewModel.content1 = $scope.story.Content.substring(0,1000);
+                        $scope.viewModel.content2 = $scope.story.Content;
+                        $scope.viewModel.level = ($scope.viewModel.level+1)%3
+                    });
+                };
+                $scope.collapse = function(){
+                    $scope.viewModel.level = 0;
+                };
+            }
+        }
+    }])
     .controller('FeedCtrl', function($scope, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
                                      ContentDataService,
                                      AccountDataService, SessionService) {

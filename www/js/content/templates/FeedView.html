@@ -24,6 +24,18 @@
             </ion-content>
         </ion-popover-view>
     </script>
+    <script id="story-template.html" type="text/ng-template">
+        <div class="item story">
+            <b ng-click="open()">{{story.Title}} </b>
+            <p ng-show="viewModel.level==0" ng-bind-html="viewModel.content0 | sanitize">
+            <p ng-show="viewModel.level==1" ng-bind-html="viewModel.content1 | sanitize">
+            <p ng-show="viewModel.level==2" ng-bind-html="viewModel.content2 | sanitize">
+            </p>
+            <i class="icon ion-plus-circled" style="position:relative;" ng-click="expand()"></i>
+            <i class="icon ion-minus-circled" style="position:relative;" ng-click="collapse()"></i>
+            <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
+        </div>
+    </script>
     <ion-header-bar class="bar-calm">
         <button class='button icon ion-arrow-left-a' ng-click='goToOpmlList()'></button>
         <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
@@ -33,10 +45,12 @@
 
     <ion-content class="has-header gem-ion-content">
         <div class="list">
-            <div ng-repeat="story in viewModel.stories" class="item" ng-click="openStory($index)">
+            <!--<div ng-repeat="story in viewModel.stories" class="item" ng-click="openStory($index)">
                 <b>{{story.Title}}</b>
                 <p ng-bind-html="story.Summary | sanitize"></p>
-            </div>
+            </div>-->
+            <story story="story" open="openStory($index)"
+                   ng-repeat="story in viewModel.stories"></story>
         </div>
     </ion-content>
 </ion-view>
