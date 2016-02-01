@@ -123,6 +123,7 @@ angular.module('mining.content')
             var newStories = _.map(storiesData, function (storyData, i) {
                 return new StoryModel().fromJSONObject(storyData);
             });
+            //console.log("new stories fetched: ", newStories);
             if (newStories.length>0) {
                 var sampleStory = newStories[0];
                 var feedId = sampleStory.FeedId;
@@ -134,7 +135,7 @@ angular.module('mining.content')
                 _.each(me.StoriesMap[feedUrl], function (story, i) {
                     storiesIdSet[story.Id] = 1;
                 });
-
+                //console.log("existing stories: ", storiesIdSet);
                 var addedStories = [];
                 _.each(newStories, function(newStory, i){
                     if (storiesIdSet[newStory.id] != 1) {
@@ -143,6 +144,7 @@ angular.module('mining.content')
                         addedStories.push(newStory);
                     }
                 });
+                //console.log("trimmed stories: ", addedStories);
                 return addedStories;
             } else {
                 return [];

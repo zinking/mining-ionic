@@ -13,7 +13,7 @@ angular.module('mining.content')
             model.Image         = data.Image;
             model.Text          = data.Text;
             model.hasOutline    = false;
-            model.currentPage   = 1;
+            model.currentPage   = 0;
             if ('Outline' in data){
 
                 model.Outline   = _.map(data.Outline, function(omplData,i){

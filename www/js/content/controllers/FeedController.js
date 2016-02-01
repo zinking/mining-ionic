@@ -66,7 +66,7 @@ angular.module('mining.content')
             opmlFeed : {},
             isBusy : false,
             hasMoreStories : true,
-            currentPage : 1
+            currentPage : 0
         };
 
         if ($stateParams.opmlFeed == null ){
@@ -140,6 +140,7 @@ angular.module('mining.content')
         $scope.loadMoreStories = function(){
             var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
             $scope.viewModel.isBusy = true;
+            //console.log("stories before: ", $scope.viewModel.stories);
             ContentDataService.loadMoreStories(feedUrl,$scope.viewModel.currentPage+1).then(
                 function(data){
                     $scope.viewModel.isBusy = false;
@@ -155,10 +156,8 @@ angular.module('mining.content')
                         var newStories = globalUserData.addStories(data.Stories);
                         if (newStories.length>0) {
                             //$scope.viewModel.stories = $scope.viewModel.stories.concat(newStories);
-                            _.each(newStories, function(newStory,i){
-                                $scope.viewModel.stories.push(newStory);
-                            });
-
+                            //console.log("stories after: ", $scope.viewModel.stories);
+                            //console.log("delta trimmed stories to be added:", newStories);
                             $scope.$broadcast('scroll.infiniteScrollComplete');
                             $scope.$broadcast('scroll.resize');
                         } else {
