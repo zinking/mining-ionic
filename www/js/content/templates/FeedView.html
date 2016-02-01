@@ -49,11 +49,10 @@
                 <b>{{story.Title}}</b>
                 <p ng-bind-html="story.Summary | sanitize"></p>
             </div>-->
-            <story story="story" open="openStory($index)"
-                   ng-repeat="story in viewModel.stories"></story>
+            <story story="story" open="openStory($index)" ng-repeat="story in viewModel.stories track by $index"></story>
         </ion-list>
-        <ion-infinite-scroll
-            on-infinite="loadMore()"
+        <ion-infinite-scroll ng-if="viewModel.hasMoreStories"
+            on-infinite="loadMoreStories()"
             distance="1%">
         </ion-infinite-scroll>
     </ion-content>

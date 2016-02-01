@@ -1,8 +1,5 @@
 angular.module('mining.content')
-    .factory('ContentDataService', function($http,
-                                            $q,
-                                            SessionService,
-    										BASE_SERVER_URL) {
+    .factory('ContentDataService', function($http, $q, SessionService, BASE_SERVER_URL, UserDataModel) {
 
         var LIST_FEEDS_PATH             = BASE_SERVER_URL + '/user/list-feeds';
         var GET_MORE_FEEDS_PATH         = BASE_SERVER_URL + '/user/get-feed';
@@ -13,107 +10,50 @@ angular.module('mining.content')
 
         return {
             listFeed: function(){
-                var apiToken = miningUserData.apiKey;
+                var req = SessionService.getUserGetRequest(LIST_FEEDS_PATH);
                 var deferred = $q.defer();
-                var promise = deferred.promise;
-
-                var req = {
-                    method: 'GET',
-                    url: LIST_FEEDS_PATH,
-                    headers: {'mining':apiToken},
-                    timeout: 60000
-                };
-
                 $http(req).
                     success(function (d) {
-                        var me = miningUserData;
-                        me.OpmlsList = d.Opml;
-                        me.StoriesMap = {};
-                        me.FeedsMap = {};
-                        me.FeedId2Url={};
-
-                        var i=0, len=0;
-                        for(i=0, len=d.FeedIds.length; i < len; i++){
-                            var idItem = d.FeedIds[i];
-                            //build the feedId to XmlUrl map
-                            me.FeedId2Url[idItem.Id] = idItem.XmlUrl;
-                        }
-                        for(i=0, len=d.Stories.length; i < len; i++){
-                            //build the XmlUrl2Stories map
-                            var story = d.Stories[i];
-                            var feedId = story.FeedId;
-                            var feedUrl = me.FeedId2Url[feedId];
-                            if (!(feedUrl in me.StoriesMap)){
-                                me.StoriesMap[feedUrl] = [];
-                            }
-                            me.StoriesMap[feedUrl].push(story)
-                        }
-                        for(i=0, len=d.Feeds.length; i < len; i++){
-                            var feed = d.Feeds[i];
-                            me.FeedsMap[feed.XmlUrl] =feed;
-                        }
+                        globalUserData.cleanFeedStructure();
+                        globalUserData.setFeedStructure(d);
                         deferred.resolve();
                     }).
                     error(function () {
                         deferred.reject();
                     });
-                return promise;
+                return deferred.promise;
             },
-            cacheListedFeed: function(){
-                window.localStorage['userData.OpmlList'] = JSON.stringify(miningUserData.OpmlsList);
-                window.localStorage['userData.StoriesMap'] = JSON.stringify(miningUserData.StoriesMap);
+            saveLocalUserData: function(){
+                var gUserData = globalUserData.toJSONObject();
+                window.localStorage['userData.global'] = JSON.stringify(gUserData);
             },
-            localLoadCachedListFeed: function () {
-                var OpmlList = window.localStorage['userData.OpmlList'];
-                miningUserData.OpmlsList = JSON.parse(OpmlList);
-                var StoriesMap = window.localStorage['userData.StoriesMap'];
-                miningUserData.StoriesMap = JSON.parse(StoriesMap);
-            },
-            loadStoryContentFromCache: function(storyLink) {
-                if( storyLink in miningUserData.storylink2ContentMap){
-                    return miningUserData.storylink2ContentMap[storyLink];
-                }
-                return null;
+            loadLocalUserData: function () {
+                var globalData = window.localStorage['userData.global'];
+                var gUserData = JSON.parse(globalData);
+                globalUserData = UserDataModel.fromJSONObject(gUserData);
             },
             loadStoryContentFromServer: function(storyIds) {
-                var apiToken = miningUserData.apiKey;
-                var deferred = $q.defer();
-                var promise = deferred.promise;
-
                 var requestData = _.map(storyIds, function(sl){ return {'StoryId':sl} });
-
-                var req = {
-                    method: 'POST',
-                    url: LOAD_STORY_CONTENT_PATH,
-                    headers: {'mining':apiToken},
-                    data:requestData,
-                    timeout: 60000
-                };
+                var req = SessionService.getUserPostRequest(LOAD_STORY_CONTENT_PATH,requestData);
+                var deferred = $q.defer();
 
                 $http(req).
                     success(function (d) {
+                        _.each(storyIds, function (storyId, i) {
+                            var sc = { 'storyId':storyId, 'content':d[i] };
+                            globalUserData.addStoryContent(sc);
+                        });
                         deferred.resolve();
-                        _.each(storyIds, function(sid,i,l){
-                            miningUserData.storylink2ContentMap[sid]=d[i];
-                        })
                     }).
                     error(function () {
                         deferred.reject();
                     });
-                return promise;
+                return deferred.promise;
             },
             previewFeedSource: function(feedUrl) {
-                var apiToken = miningUserData.apiKey;
+                var requestData = {'url':feedUrl};
+                var req = SessionService.getUserPostRequest(PREVIEW_FEED_SOURCE_PATH,requestData);
                 var deferred = $q.defer();
-                var promise = deferred.promise;
-                var requestData = {'url':feedUrl}
-                var req = {
-                    method: 'POST',
-                    url: PREVIEW_FEED_SOURCE_PATH,
-                    headers: {'mining':apiToken},
-                    data:requestData,
-                    timeout: 60000
-                };
 
                 $http(req).
                     success(function (d) {
@@ -122,42 +62,12 @@ angular.module('mining.content')
                     error(function () {
                         deferred.reject();
                     });
-                return promise;
+                return deferred.promise;
             },
             addFeedSource: function(feedUrl) {
-                var apiToken = miningUserData.apiKey;
-                var deferred = $q.defer();
-                var promise = deferred.promise;
                 var requestData = {'url':feedUrl};
-                var req = {
-                    method: 'POST',
-                    url: ADD_FEED_SOURCE_PATH,
-                    headers: {'mining':apiToken},
-                    data:requestData,
-                    timeout: 60000
-                };
-
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return promise;
-            },
-            getMoreFeedSource: function(feedUrl, pageNo) {
-                var apiToken = miningUserData.apiKey;
+                var req = SessionService.getUserPostRequest(ADD_FEED_SOURCE_PATH,requestData);
                 var deferred = $q.defer();
-                var promise = deferred.promise;
-                var requestData = {'F':feedUrl, 'C':pageNo};
-                var req = {
-                    method: 'POST',
-                    url: GET_MORE_FEEDS_PATH,
-                    headers: {'mining':apiToken},
-                    data:requestData,
-                    timeout: 60000
-                };
 
                 $http(req).
                     success(function (d) {
@@ -166,20 +76,25 @@ angular.module('mining.content')
                     error(function () {
                         deferred.reject();
                     });
-                return promise;
+                return deferred.promise;
+            },
+            loadMoreStories: function(feedUrl, pageNo) {
+                var requestData = {'F':feedUrl, 'C':pageNo};
+                var req = SessionService.getUserPostRequest(GET_MORE_FEEDS_PATH,requestData);
+                var deferred = $q.defer();
+                $http(req).
+                    success(function (d) {
+                        deferred.resolve(d);
+                    }).
+                    error(function () {
+                        deferred.reject();
+                    });
+                return deferred.promise;
             },
             removeFeedSource: function(feedUrl) {
-                var apiToken = miningUserData.apiKey;
+                var requestData = {'url':feedUrl};
+                var req = SessionService.getUserPostRequest(REMOVE_FEED_SOURCE_PATH,requestData);
                 var deferred = $q.defer();
-                var promise = deferred.promise;
-                var requestData = {'url':feedUrl}
-                var req = {
-                    method: 'POST',
-                    url: REMOVE_FEED_SOURCE_PATH,
-                    headers: {'mining':apiToken},
-                    data:requestData,
-                    timeout: 60000
-                };
 
                 $http(req).
                     success(function (d) {
@@ -188,10 +103,8 @@ angular.module('mining.content')
                     error(function () {
                         deferred.reject();
                     });
-                return promise;
+                return deferred.promise;
             }
 
         };
-
-
     });

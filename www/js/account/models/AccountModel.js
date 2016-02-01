@@ -32,7 +32,7 @@ angular.module('mining.account')
             model.city      = data.city;
             model.avatarurl = data.avatarurl;
             return model;
-        }
+        };
 
         AccountModel.prototype.fromJSONObject = function(data) {
         	var me = this;

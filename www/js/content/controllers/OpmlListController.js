@@ -1,30 +1,27 @@
 angular.module('mining.content')
-    .controller('OpmlListCtrl', function($scope, $ionicLoading,$state,$ionicPopup,
-                                         AccountDataService,
-                                         ContentDataService,
-                                         SessionService) {
+    .controller('OpmlListCtrl', function($scope, $ionicLoading,$state,$ionicPopup, AccountDataService,
+                                         ContentDataService, SessionService, UserDataModel) {
         $scope.viewModel = {
             isBusy:false,
-            omplsList : null
+            omplsList : []
         };
 
         //verify user credential exists
-        var userData = AccountDataService.getUserData();
-        if( userData == "" ){
+        var userAuthData = AccountDataService.getUserData();
+        if( userAuthData == null ){
             $state.go('login');
         }
         else{
             //create a global userdata structure
-            miningUserData = userData;
-            miningUserData.storylink2ContentMap = {}
-
+            globalUserData = new UserDataModel();
+            globalUserData.setUserAuth(userAuthData);
         }
 
         $scope.viewModel.isBusy = true;
         ContentDataService.listFeed().then(
             function(){
                 $scope.viewModel.isBusy = false;
-                var opmlList = miningUserData.OpmlsList;
+                var opmlList = globalUserData.Opmls;
                 _.each(opmlList, function(opml){
                     opml.isFolder = 'Outline' in opml;
                     opml.isOpen = false;
@@ -37,7 +34,7 @@ angular.module('mining.content')
                     title: 'Loading Failed,fallback on cache'
                 });
                 ContentDataService.loadCachedListFeed();
-                $scope.viewModel.opmlsList = miningUserData.OpmlsList;
+                $scope.viewModel.opmlsList = globalUserData.Opmls;
             }
         );
 

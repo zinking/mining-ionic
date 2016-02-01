@@ -1,8 +1,6 @@
 angular.module('mining.content')
     .controller('OpmlFeedSideCtrl', function($scope, $ionicLoading,$state,$ionicSideMenuDelegate,$ionicPopup,
-                                         AccountDataService,
-                                         ContentDataService,
-                                         SessionService) {
+                                         AccountDataService, ContentDataService, SessionService) {
         $scope.viewModel = {
             omplsList : null,
             stories : [],
@@ -15,24 +13,15 @@ angular.module('mining.content')
         if( userData == "" ){
             $state.go('login');
         }
-        else{
-            //create a global userdata structure
-            miningUserData = userData;
-            miningUserData.storylink2ContentMap = {};
-
-        }
-
-
 
         ContentDataService.listFeed().then(
             function(){
-                var opmlList = miningUserData.OpmlsList;
+                var opmlList = globalUserData.Opmls;
                 _.each(opmlList, function(opml){
                     opml.isFolder = 'Outline' in opml;
                     opml.isOpen = false;
                 });
                 $scope.viewModel.opmlsList = opmlList;
-                //
                 var opmlFeed = opmlList[0];
                 $scope.viewModel.opmlFeed = opmlFeed;
                 loadOpmlFeedContent(opmlFeed);
@@ -41,8 +30,8 @@ angular.module('mining.content')
                 $ionicPopup.alert({
                     title: 'Loading Failed,fallback on cache'
                 });
-                ContentDataService.localLoadCachedListFeed();
-                $scope.viewModel.opmlsList = miningUserData.OpmlsList;
+                ContentDataService.loadLocalUserData();
+                $scope.viewModel.opmlsList = globalUserData.Opmls;
             }
         );
 
@@ -71,7 +60,7 @@ angular.module('mining.content')
             if( "Outline" in opmlFeed ){
                 _.each(opmlFeed.Outline,function(feed,i){
                     //every element of outline should be opmlFeed
-                    var feedStories = miningUserData.StoriesMap[feed.XmlUrl];
+                    var feedStories = globalUserData.StoriesMap[feed.XmlUrl];
                     fitFeedTitle(feed,30);
                     _.each(feedStories, function(s,i){
                         s.feed = feed;
@@ -87,7 +76,7 @@ angular.module('mining.content')
             }
             else{
                 var feedXmlUrl = opmlFeed.XmlUrl;
-                var feedStories = miningUserData.StoriesMap[feedXmlUrl];
+                var feedStories = globalUserData.StoriesMap[feedXmlUrl];
                 fitFeedTitle(opmlFeed,30);
                 _.each(feedStories, function(s,i){
                     s.feed = opmlFeed;

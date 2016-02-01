@@ -22,7 +22,7 @@ angular.module('mining.content')
             //first try local cache
             var storyId = $scope.viewModel.story.Id;
             var storyLink = $scope.viewModel.story.Link;
-            var localContent = ContentDataService.loadStoryContentFromCache(storyLink);
+            var localContent = globalUserData.getStoryContentById(storyId);
             if( localContent !== null ){
                 $scope.viewModel.story.Content = localContent;
             }
@@ -31,7 +31,7 @@ angular.module('mining.content')
                 ContentDataService.loadStoryContentFromServer([storyId]).then(
                     function(){
                         $scope.viewModel.isBusy = false;
-                        $scope.viewModel.story.Content = miningUserData.storylink2ContentMap[storyId];
+                        $scope.viewModel.story.Content = globalUserData.getStoryContentById(storyId);
                         if ($scope.viewModel.story.Content==""){
                             $scope.viewModel.story.Content=$scope.viewModel.story.Summary
                         }

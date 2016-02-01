@@ -15,11 +15,6 @@ angular.module('mining.content')
         if( userData == "" ){
             $state.go('login');
         }
-        else{
-            //create a global userdata structure
-            miningUserData = userData;
-            miningUserData.storylink2ContentMap = {}
-        }
 
         $scope.goHome = function(){
             $state.go('tab.contents')
