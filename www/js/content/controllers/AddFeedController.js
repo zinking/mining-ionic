@@ -23,13 +23,13 @@ angular.module('mining.content')
 
         $scope.goHome = function(){
             $state.go('tab.contents')
-        }
+        };
 
         $scope.addFeedSource = function(){
-            $scope.viewModel.isBusy = true
+            $scope.viewModel.isBusy = true;
             ContentDataService.addFeedSource($scope.viewModel.feedUrl).then(
                 function(data){
-                    $scope.viewModel.isBusy = false
+                    $scope.viewModel.isBusy = false;
                     if (data.error!=null){
                         $ionicPopup.alert({
                             title: 'Subscribe Feed issue',
@@ -42,18 +42,18 @@ angular.module('mining.content')
                         });
 
                         //load latest content
-                        ContentDataService.listFeed()
+                        ContentDataService.listFeed();
                         $state.go('tab.contents')
                     }
                 },
                 function(){
-                    $scope.viewModel.isBusy = false
+                    $scope.viewModel.isBusy = false;
                     $ionicPopup.alert({
                         title: 'Subscribe Faild, retry later'
                     });
                 }
             )
-        }
+        };
 
         function isValidUrl(s) {
             var regexp1 = /^HTTP|HTTP|http(s)?:\/\/(www\.)?[A-Za-z0-9]+([\-\.]{1}[A-Za-z0-9]+)*\.[A-Za-z]{2,40}(:[0-9]{1,40})?(\/.*)?$/;
@@ -64,11 +64,14 @@ angular.module('mining.content')
         $scope.previewFeedSource = function ($event){
             var feedUrl = $scope.viewModel.feedUrl;
             if (isValidUrl(feedUrl)){
-                if (feedUrl.substr(0,4)!='http')feedUrl='http://'+feedUrl
-                $scope.viewModel.isBusy = true
+                if (feedUrl.substr(0,4)!='http'){
+                    feedUrl='http://'+feedUrl;
+                    $scope.viewModel.feedUrl = feedUrl;
+                }
+                $scope.viewModel.isBusy = true;
                 ContentDataService.previewFeedSource(feedUrl).then(
                     function(data){
-                        $scope.viewModel.isBusy = false
+                        $scope.viewModel.isBusy = false;
                         if (data.error!=null){
                             $ionicPopup.alert({
                                 title: 'Preview Feed issue',
@@ -88,7 +91,7 @@ angular.module('mining.content')
                         }
                     },
                     function(){
-                        $scope.viewModel.isBusy = false
+                        $scope.viewModel.isBusy = false;
                         $ionicPopup.alert({
                             title: 'Loading Prview Faild, retry later'
                         });

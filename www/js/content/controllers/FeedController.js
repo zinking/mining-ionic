@@ -59,8 +59,7 @@ angular.module('mining.content')
         }
     }])
     .controller('FeedCtrl', function($scope, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
-                                     ContentDataService,
-                                     AccountDataService, SessionService) {
+                                     ContentDataService, AccountDataService, SessionService) {
         $scope.viewModel = {
             stories : [],
             opmlFeed :{},

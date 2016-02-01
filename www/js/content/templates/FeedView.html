@@ -44,13 +44,17 @@
     </ion-header-bar>
 
     <ion-content class="has-header gem-ion-content">
-        <div class="list">
+        <ion-list>
             <!--<div ng-repeat="story in viewModel.stories" class="item" ng-click="openStory($index)">
                 <b>{{story.Title}}</b>
                 <p ng-bind-html="story.Summary | sanitize"></p>
             </div>-->
             <story story="story" open="openStory($index)"
                    ng-repeat="story in viewModel.stories"></story>
-        </div>
+        </ion-list>
+        <ion-infinite-scroll
+            on-infinite="loadMore()"
+            distance="1%">
+        </ion-infinite-scroll>
     </ion-content>
 </ion-view>

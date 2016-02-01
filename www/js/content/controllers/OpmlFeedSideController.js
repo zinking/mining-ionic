@@ -18,7 +18,7 @@ angular.module('mining.content')
         else{
             //create a global userdata structure
             miningUserData = userData;
-            miningUserData.storylink2ContentMap = {}
+            miningUserData.storylink2ContentMap = {};
 
         }
 
@@ -30,8 +30,8 @@ angular.module('mining.content')
                 _.each(opmlList, function(opml){
                     opml.isFolder = 'Outline' in opml;
                     opml.isOpen = false;
-                })
-                $scope.viewModel.opmlsList = opmlList
+                });
+                $scope.viewModel.opmlsList = opmlList;
                 //
                 var opmlFeed = opmlList[0];
                 $scope.viewModel.opmlFeed = opmlFeed;
@@ -44,7 +44,7 @@ angular.module('mining.content')
                 ContentDataService.localLoadCachedListFeed();
                 $scope.viewModel.opmlsList = miningUserData.OpmlsList;
             }
-        )
+        );
 
 
 
@@ -61,7 +61,7 @@ angular.module('mining.content')
                 feedTitle = feedTitle.substring(0,len-3) + "...";
             }
             else if( feedTitle.length < len ){
-                feedTitle = feedTitle+Array(len-feedTitle.length).join(" ");
+                feedTitle = feedTitle+new Array(len-feedTitle.length).join(" ");
             }
             feed.fTitle = feedTitle;
         }
@@ -87,7 +87,7 @@ angular.module('mining.content')
             }
             else{
                 var feedXmlUrl = opmlFeed.XmlUrl;
-                var feedStories = miningUserData.StoriesMap[feedXmlUrl]
+                var feedStories = miningUserData.StoriesMap[feedXmlUrl];
                 fitFeedTitle(opmlFeed,30);
                 _.each(feedStories, function(s,i){
                     s.feed = opmlFeed;
@@ -103,11 +103,11 @@ angular.module('mining.content')
         $scope.openStory = function (index){
             var s = $scope.viewModel.stories[index];
             $state.go('story',{story:s,opmlFeed: $scope.viewModel.opmlFeed})
-        }
+        };
 
         $scope.toggleLeft = function() {
             $ionicSideMenuDelegate.toggleLeft();
-        }
+        };
 
 
     });

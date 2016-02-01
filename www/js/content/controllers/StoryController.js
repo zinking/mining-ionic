@@ -16,7 +16,7 @@ angular.module('mining.content')
 
         $scope.goToFeed = function(){
             $state.go('feed',{opmlFeed:$scope.viewModel.opmlFeed})
-        }
+        };
 
         $scope.loadStoryContent = function(story){
             //first try local cache
@@ -27,24 +27,24 @@ angular.module('mining.content')
                 $scope.viewModel.story.Content = localContent;
             }
             else{
-                $scope.viewModel.isBusy = true
+                $scope.viewModel.isBusy = true;
                 ContentDataService.loadStoryContentFromServer([storyId]).then(
                     function(){
-                        $scope.viewModel.isBusy = false
+                        $scope.viewModel.isBusy = false;
                         $scope.viewModel.story.Content = miningUserData.storylink2ContentMap[storyId];
                         if ($scope.viewModel.story.Content==""){
                             $scope.viewModel.story.Content=$scope.viewModel.story.Summary
                         }
                     },
                     function(){
-                        $scope.viewModel.isBusy = false
+                        $scope.viewModel.isBusy = false;
                         $ionicPopup.alert({
                             title: 'Loading Story Failed.'
                         });
                     }
                 )
             }
-        }
+        };
 
         $scope.loadStoryContent( $scope.viewModel.story )
     });

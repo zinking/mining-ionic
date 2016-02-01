@@ -28,7 +28,7 @@ angular.module('mining.content')
                 _.each(opmlList, function(opml){
                     opml.isFolder = 'Outline' in opml;
                     opml.isOpen = false;
-                })
+                });
                 $scope.viewModel.opmlsList = opmlList
             },
             function(){
@@ -39,18 +39,18 @@ angular.module('mining.content')
                 ContentDataService.loadCachedListFeed();
                 $scope.viewModel.opmlsList = miningUserData.OpmlsList;
             }
-        )
+        );
 
         $scope.openOpmlFeed = function ( fo ){
             $state.go('feed',{opmlFeed:fo})
-        }
+        };
 
         $scope.openAddPanel = function (){
             $state.go('source')
-        }
+        };
 
         $scope.openAddFeed = function(){
             $state.go('addfeed')
-        }
+        };
 
     });

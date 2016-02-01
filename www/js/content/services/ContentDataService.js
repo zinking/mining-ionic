@@ -4,11 +4,12 @@ angular.module('mining.content')
                                             SessionService,
     										BASE_SERVER_URL) {
 
-        var LIST_FEEDS_PATH  = BASE_SERVER_URL + '/user/list-feeds';
-        var LOAD_STORY_CONTENT_PATH  = BASE_SERVER_URL + '/user/get-contents';
-        var ADD_FEED_SOURCE_PATH  = BASE_SERVER_URL + '/user/add-subscription';
-        var REMOVE_FEED_SOURCE_PATH  = BASE_SERVER_URL + '/user/remove-subscription';
-        var PREVIEW_FEED_SOURCE_PATH  = BASE_SERVER_URL + '/user/preview-subscription';
+        var LIST_FEEDS_PATH             = BASE_SERVER_URL + '/user/list-feeds';
+        var GET_MORE_FEEDS_PATH         = BASE_SERVER_URL + '/user/get-feed';
+        var LOAD_STORY_CONTENT_PATH     = BASE_SERVER_URL + '/user/get-contents';
+        var ADD_FEED_SOURCE_PATH        = BASE_SERVER_URL + '/user/add-subscription';
+        var REMOVE_FEED_SOURCE_PATH     = BASE_SERVER_URL + '/user/remove-subscription';
+        var PREVIEW_FEED_SOURCE_PATH    = BASE_SERVER_URL + '/user/preview-subscription';
 
         return {
             listFeed: function(){
@@ -112,7 +113,7 @@ angular.module('mining.content')
                     headers: {'mining':apiToken},
                     data:requestData,
                     timeout: 60000
-                }
+                };
 
                 $http(req).
                     success(function (d) {
@@ -127,14 +128,36 @@ angular.module('mining.content')
                 var apiToken = miningUserData.apiKey;
                 var deferred = $q.defer();
                 var promise = deferred.promise;
-                var requestData = {'url':feedUrl}
+                var requestData = {'url':feedUrl};
                 var req = {
                     method: 'POST',
                     url: ADD_FEED_SOURCE_PATH,
                     headers: {'mining':apiToken},
                     data:requestData,
                     timeout: 60000
-                }
+                };
+
+                $http(req).
+                    success(function (d) {
+                        deferred.resolve(d);
+                    }).
+                    error(function () {
+                        deferred.reject();
+                    });
+                return promise;
+            },
+            getMoreFeedSource: function(feedUrl, pageNo) {
+                var apiToken = miningUserData.apiKey;
+                var deferred = $q.defer();
+                var promise = deferred.promise;
+                var requestData = {'F':feedUrl, 'C':pageNo};
+                var req = {
+                    method: 'POST',
+                    url: GET_MORE_FEEDS_PATH,
+                    headers: {'mining':apiToken},
+                    data:requestData,
+                    timeout: 60000
+                };
 
                 $http(req).
                     success(function (d) {
@@ -156,7 +179,7 @@ angular.module('mining.content')
                     headers: {'mining':apiToken},
                     data:requestData,
                     timeout: 60000
-                }
+                };
 
                 $http(req).
                     success(function (d) {

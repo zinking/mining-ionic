@@ -22,15 +22,15 @@ angular.module('mining.account')
         	var model = new AccountModel();
         	model.id        = data.id;
         	model.name      = data.name;
-            model.telephone = data.telephone
-            model.school    = data.school
-            model.address   = data.address
-            model.gender    = data.gender
-            model.language  = data.language
-            model.country   = data.country
-            model.province  = data.province
-            model.city      = data.city
-            model.avatarurl = data.avatarurl
+            model.telephone = data.telephone;
+            model.school    = data.school;
+            model.address   = data.address;
+            model.gender    = data.gender;
+            model.language  = data.language;
+            model.country   = data.country;
+            model.province  = data.province;
+            model.city      = data.city;
+            model.avatarurl = data.avatarurl;
             return model;
         }
 
