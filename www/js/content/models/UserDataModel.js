@@ -10,7 +10,7 @@ angular.module('mining.content')
 
         UserDataModel.prototype.cleanFeedStructure = function() {
             //strucutres to be persisted
-            this.Opmls = [];
+            this.Opml = [];
             this.Stories = [];
             this.Feeds = [];
             this.FeedIds = [];
@@ -18,6 +18,7 @@ angular.module('mining.content')
             //structurs to be used efficiently
             this.StoriesMap = {};  //feed xml url to stories list
             this.FeedsMap = {};    //feed xml url to feed conent
+            this.AddedStories = {};
             this.FeedId2Url = {};
             this.storyId2ContentMap = {};
         };
@@ -32,7 +33,7 @@ angular.module('mining.content')
 
         UserDataModel.prototype.toJSONObject = function() {
             return {
-                "Opmls" : _.map(this.Opmls, function(Opml,i,l){
+                "Opml" : _.map(this.Opml, function(Opml,i,l){
                     return Opml.toJSONObject();
                 }),
                 'Storis': _.map(this.Stories, function(Story,i,l){
@@ -64,7 +65,7 @@ angular.module('mining.content')
         };
 
         UserDataModel.prototype.setFeedContent = function(feedContent) {
-            me = this;
+            var me = this;
             if ('StoryContents' in feedContent) {
                 _.each(feedContent.StoryContents, function(storycontent,i,l){
                     me.addStoryContent(storycontent);
@@ -73,13 +74,14 @@ angular.module('mining.content')
         };
 
         UserDataModel.prototype.setFeedStructure = function(feedStructure) {
+            var me = this;
             var d = feedStructure;
             var i=0, len=0;
-            //this.Opmls = d.Opml;
-            for(i=0, len=d.Opmls.length; i < len; i++){
-                var opmlJson = d.Opmls[i];
+            //this.Opml = d.Opml;
+            for(i=0, len=d.Opml.length; i < len; i++){
+                var opmlJson = d.Opml[i];
                 var opml = new OpmlModel().fromJSONObject(opmlJson);
-                this.Opmls.push(opml);
+                this.Opml.push(opml);
             }
 
             for(i=0, len=d.FeedIds.length; i < len; i++){
@@ -89,25 +91,38 @@ angular.module('mining.content')
                 this.FeedIds.push(idItem);
             }
 
-            for(i=0, len=d.Stories.length; i < len; i++){
-                //build the XmlUrl2Stories map
-                var storyData = d.Stories[i];
-                var story = new StoryModel().fromJSONObject(storyData);
-                var feedId = story.FeedId;
-                var feedUrl = this.FeedId2Url[feedId];
-                if (!(feedUrl in this.StoriesMap)){
-                    this.StoriesMap[feedUrl] = [];
-                }
-                this.StoriesMap[feedUrl].push(story);
-                this.Stories.push(story);
-            }
-
             for(i=0, len=d.Feeds.length; i < len; i++){
                 var feedData = d.Feeds[i];
                 var feed = new FeedModel().fromJSONObject(feedData);
                 this.FeedsMap[feed.XmlUrl] = feed;
                 this.Feeds.push(feed);
             }
+
+            for(i=0, len=d.Stories.length; i < len; i++){
+                //build the XmlUrl2Stories map
+                var storyData = d.Stories[i];
+                me.populateStoryData(storyData);
+            }
+        };
+
+        UserDataModel.prototype.populateStoryData = function(storyData) {
+            var me = this;
+            var story = new StoryModel().fromJSONObject(storyData);
+            if (me.AddedStories[story.Id]!=null) {
+                return null;
+            }
+            var feedId = story.FeedId;
+            var feedUrl = me.FeedId2Url[feedId];
+            var feed = me.FeedsMap[feedUrl];
+            story.FeedTitle = feed.Title;
+
+            if (!(feedUrl in me.StoriesMap)){
+                this.StoriesMap[feedUrl] = [];
+            }
+            me.StoriesMap[feedUrl].push(story);
+            me.Stories.push(story);
+            me.AddedStories[story.Id] = story;
+            return story;
         };
 
         UserDataModel.prototype.getStoryContentById = function(storyId) {
@@ -119,36 +134,17 @@ angular.module('mining.content')
 
         UserDataModel.prototype.addStories = function(storiesData) {
             var me = this;
-
-            var newStories = _.map(storiesData, function (storyData, i) {
-                return new StoryModel().fromJSONObject(storyData);
-            });
-            //console.log("new stories fetched: ", newStories);
-            if (newStories.length>0) {
-                var sampleStory = newStories[0];
-                var feedId = sampleStory.FeedId;
-                var feedUrl = me.FeedId2Url[feedId];
-                if (!(feedUrl in me.StoriesMap)) {
-                    me.StoriesMap[feedUrl] = [];
+            var newAddedStories = [];
+            _.each(storiesData, function(newStoryData,i){
+                var addedStory = me.populateStoryData(newStoryData);
+                if (addedStory!=null) {
+                    newAddedStories.push(addedStory);
                 }
-                var storiesIdSet = {};
-                _.each(me.StoriesMap[feedUrl], function (story, i) {
-                    storiesIdSet[story.Id] = 1;
-                });
-                //console.log("existing stories: ", storiesIdSet);
-                var addedStories = [];
-                _.each(newStories, function(newStory, i){
-                    if (storiesIdSet[newStory.id] != 1) {
-                        me.StoriesMap[feedUrl].push(newStory);
-                        me.Stories.push(newStory);
-                        addedStories.push(newStory);
-                    }
-                });
-                //console.log("trimmed stories: ", addedStories);
-                return addedStories;
-            } else {
-                return [];
-            }
+            });
+            _.sortBy(newAddedStories, function(story){
+                return story.Published
+            });
+            return newAddedStories;
         };
 
         UserDataModel.prototype.getStoriesByOpml = function(opmlFeed) {
@@ -158,7 +154,9 @@ angular.module('mining.content')
                 _.each(opmlFeed.Outline,function(subOpmlFeed,i){
                     //every element of outline should be opmlFeed
                     var feedStories = me.StoriesMap[subOpmlFeed.XmlUrl];
-                    outlineStories.concat(feedStories);
+                    if (feedStories instanceof Array) {
+                        outlineStories = outlineStories.concat(feedStories);
+                    }
                 });
                 _.sortBy( outlineStories, function(s){
                     return s.Published

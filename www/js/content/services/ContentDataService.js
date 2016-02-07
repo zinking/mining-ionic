@@ -2,7 +2,7 @@ angular.module('mining.content')
     .factory('ContentDataService', function($http, $q, SessionService, BASE_SERVER_URL, UserDataModel) {
 
         var LIST_FEEDS_PATH             = BASE_SERVER_URL + '/user/list-feeds';
-        var GET_MORE_FEEDS_PATH         = BASE_SERVER_URL + '/user/get-feed';
+        var GET_MORE_FEEDS_PATH         = BASE_SERVER_URL + '/user/get-feedsstories';
         var LOAD_STORY_CONTENT_PATH     = BASE_SERVER_URL + '/user/get-contents';
         var ADD_FEED_SOURCE_PATH        = BASE_SERVER_URL + '/user/add-subscription';
         var REMOVE_FEED_SOURCE_PATH     = BASE_SERVER_URL + '/user/remove-subscription';
@@ -78,8 +78,8 @@ angular.module('mining.content')
                     });
                 return deferred.promise;
             },
-            loadMoreStories: function(feedUrl, pageNo) {
-                var requestData = {'F':feedUrl, 'C':pageNo};
+            loadMoreStories: function(feedUrls, pageNo) {
+                var requestData = {'FS':feedUrls, 'C':pageNo};
                 var req = SessionService.getUserPostRequest(GET_MORE_FEEDS_PATH,requestData);
                 var deferred = $q.defer();
                 $http(req).

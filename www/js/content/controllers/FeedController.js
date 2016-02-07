@@ -69,13 +69,18 @@ angular.module('mining.content')
             currentPage : 0
         };
 
-        if ($stateParams.opmlFeed == null ){
+
+        $scope.goHome = function(){
             $state.go('tab.contents')
+        };
+
+        if (typeof globalUserData === "undefined" || $stateParams.opmlFeed == null) {
+            $scope.goHome();
         }
+
         var opmlFeed = $stateParams.opmlFeed;
         $scope.viewModel.opmlFeed = opmlFeed;
         $scope.viewModel.opmlFeed.currentPage = opmlFeed.currentPage;
-
         $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
 
 
@@ -138,10 +143,11 @@ angular.module('mining.content')
         };
 
         $scope.loadMoreStories = function(){
-            var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
+            //var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
+            var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
             $scope.viewModel.isBusy = true;
             //console.log("stories before: ", $scope.viewModel.stories);
-            ContentDataService.loadMoreStories(feedUrl,$scope.viewModel.currentPage+1).then(
+            ContentDataService.loadMoreStories(feedUrls,$scope.viewModel.currentPage+1).then(
                 function(data){
                     $scope.viewModel.isBusy = false;
                     if (data.error!=null){
@@ -178,10 +184,6 @@ angular.module('mining.content')
         $scope.openStory = function (index){
             var s = $scope.viewModel.stories[index];
             $state.go('story',{story:s,opmlFeed: $scope.viewModel.opmlFeed})
-        };
-
-        $scope.goToOpmlList = function(){
-            $state.go('tab.contents')
         };
 
     });

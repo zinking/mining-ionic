@@ -7,8 +7,15 @@ angular.module('mining.content')
             opmlFeed : {}
         };
 
-        if ($stateParams.story==null || $stateParams.opmlFeed==null){
+        $scope.goHome = function(){
             $state.go('tab.contents')
+        };
+
+        if (typeof globalUserData === "undefined" ||
+            typeof $stateParams.story === "undefined" ||
+            typeof $stateParams.opmlFeed === "undefined" ) {
+
+            $scope.goHome();
         }
 
         $scope.viewModel.story = $stateParams.story;

@@ -3,4 +3,4 @@ angular.module('mining.content', ['ionic-datepicker',
                                   'angularMoment',
                                   'mining.filters',
                                   'mining.session',
-                                  'mining.storage'])
+                                  'mining.storage']);

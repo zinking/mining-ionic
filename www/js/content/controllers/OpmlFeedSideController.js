@@ -8,15 +8,17 @@ angular.module('mining.content')
             opmlFeed :{}
         };
 
-        //verify user credential exists
-        var userData = AccountDataService.getUserData();
-        if( userData == "" ){
-            $state.go('login');
+        $scope.goHome = function(){
+            $state.go('tab.contents')
+        };
+
+        if (typeof globalUserData === "undefined") {
+            $scope.goHome();
         }
 
         ContentDataService.listFeed().then(
             function(){
-                var opmlList = globalUserData.Opmls;
+                var opmlList = globalUserData.Opml;
                 _.each(opmlList, function(opml){
                     opml.isFolder = 'Outline' in opml;
                     opml.isOpen = false;
@@ -31,7 +33,7 @@ angular.module('mining.content')
                     title: 'Loading Failed,fallback on cache'
                 });
                 ContentDataService.loadLocalUserData();
-                $scope.viewModel.opmlsList = globalUserData.Opmls;
+                $scope.viewModel.opmlsList = globalUserData.Opml;
             }
         );
 

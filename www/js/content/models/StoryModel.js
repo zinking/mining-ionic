@@ -8,6 +8,7 @@ angular.module('mining.content')
             var model = new StoryModel();
             model.Id        = data.Id;
             model.FeedId    = data.FeedId;
+            model.FeedTitle = "";
             model.Title     = data.Title;
             model.Link      = data.Link;
             model.Updated   = data.Updated;

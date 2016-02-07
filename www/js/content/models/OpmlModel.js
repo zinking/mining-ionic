@@ -17,13 +17,24 @@ angular.module('mining.content')
             if ('Outline' in data){
 
                 model.Outline   = _.map(data.Outline, function(omplData,i){
-                    return OpmlModel.fromJSONObject(omplData);
+                    return OpmlModel.prototype.fromJSONObject(omplData);
                 });
                 if (model.Outline.length>0) {
                     model.hasOutline = true;
                 }
             }
             return model;
+        };
+
+        OpmlModel.prototype.getFeedsUrls = function() {
+            var me = this;
+            if (me.hasOutline) {
+                return _.map(me.Outline, function(opmlOutline,i){
+                    return opmlOutline.XmlUrl;
+                });
+            } else {
+                return [me.XmlUrl];
+            }
         };
 
         OpmlModel.prototype.fromJSONObject = function(data) {

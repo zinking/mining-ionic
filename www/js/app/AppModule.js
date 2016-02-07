@@ -62,6 +62,12 @@ angular.module('mining', [
                 templateUrl: 'js/content/templates/AddNestedListView.html',
                 controller: 'AddFeedCtrl'
             })
+            .state('bulkfeed', {
+                url: '/bulkfeed',
+                cache: false,
+                templateUrl: 'js/content/templates/BulkFeedView.html',
+                controller: 'BulkFeedCtrl'
+            })
             .state('story', {
                 url: '/story',
                 templateUrl: 'js/content/templates/StoryView.html',

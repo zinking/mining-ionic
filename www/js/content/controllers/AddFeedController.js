@@ -10,15 +10,14 @@ angular.module('mining.content')
             feedStories : []
         };
 
-        //verify user credential exists
-        var userData = AccountDataService.getUserData();
-        if( userData == "" ){
-            $state.go('login');
-        }
 
         $scope.goHome = function(){
             $state.go('tab.contents')
         };
+
+        if (typeof globalUserData === "undefined") {
+            $scope.goHome();
+        }
 
         $scope.addFeedSource = function(){
             $scope.viewModel.isBusy = true;
