@@ -5,7 +5,8 @@
     </div>
     <h1 class="title">{{viewModel.story.Title}}</h1>
     <div class="buttons">
-        <button class="button icon ion-heart"></button>
+        <button class="button icon ion-heart" ng-show="!viewModel.story.isStar" ng-click="markStoryStar()"></button>
+        <button class="button icon ion-ios-heart" ng-show="viewModel.story.isStar" ng-click="markStoryStar()"></button>
     </div>
 </ion-header-bar>
 

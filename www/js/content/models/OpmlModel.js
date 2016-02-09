@@ -13,6 +13,7 @@ angular.module('mining.content')
             model.Image         = data.Image;
             model.Text          = data.Text;
             model.hasOutline    = false;
+            model.unReadCount    = 0;
             model.currentPage   = 0;
             if ('Outline' in data){
 
@@ -34,6 +35,17 @@ angular.module('mining.content')
                 });
             } else {
                 return [me.XmlUrl];
+            }
+        };
+
+        OpmlModel.prototype.getOutlines = function() {
+            var me = this;
+            if (me.hasOutline) {
+                return _.map(me.Outline, function(suboutline,i){
+                    return suboutline;
+                });
+            } else {
+                return [me];
             }
         };
 

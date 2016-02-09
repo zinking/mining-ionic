@@ -71,7 +71,14 @@ angular.module('mining.content')
 
 
         $scope.goHome = function(){
-            $state.go('tab.contents')
+            var mineUrl = "http://readmine.co";
+            var xmlUrlPre = $scope.viewModel.opmlFeed.XmlUrl.substring(0,mineUrl.length);
+            if (xmlUrlPre === mineUrl) {
+                $state.go('tab.stars')
+            } else {
+                $state.go('tab.contents')
+            }
+
         };
 
         if (typeof globalUserData === "undefined" || $stateParams.opmlFeed == null) {
@@ -142,6 +149,31 @@ angular.module('mining.content')
             )
         };
 
+
+        $scope.markFeedRead = function() {
+            var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
+            var feed = globalUserData.FeedsMap[feedUrl];
+            var feedId = feed.Id;
+            ContentDataService.markFeedRead(feedId).then(
+                function(data){
+                    if (data.error!=null){
+                        console.info("mark feed read failed ", feedId, storyId, data.error);
+                        $ionicPopup.alert({
+                            title: 'mark feed read failed',
+                            subtitle:data.error
+                        });
+                    }
+                },
+                function(){
+                    console.info("mark feed read failed with exception ");
+                    $ionicPopup.alert({
+                        title: 'mark feed read failed with exception',
+                        subtitle:"retry later"
+                    });
+                }
+            )
+        };
+
         $scope.loadMoreStories = function(){
             //var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
             var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
@@ -159,7 +191,7 @@ angular.module('mining.content')
                     else{
                         //{Cursor,Stories,Star}
                         $scope.viewModel.currentPage += 1;
-                        var newStories = globalUserData.addStories(data.Stories);
+                        var newStories = globalUserData.addStories(data.Stories,data.UserReadStoryIds);
                         if (newStories.length>0) {
                             //$scope.viewModel.stories = $scope.viewModel.stories.concat(newStories);
                             //console.log("stories after: ", $scope.viewModel.stories);

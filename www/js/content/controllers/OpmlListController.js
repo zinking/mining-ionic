@@ -3,6 +3,7 @@ angular.module('mining.content')
                                          ContentDataService, SessionService, UserDataModel) {
         $scope.viewModel = {
             isBusy:false,
+            totalUnReadCount: 0,
             omplsList : []
         };
 
@@ -36,6 +37,7 @@ angular.module('mining.content')
         }
 
         $scope.viewModel.isBusy = true;
+
         ContentDataService.listFeed().then(
             function(){
                 $scope.viewModel.isBusy = false;
@@ -45,6 +47,7 @@ angular.module('mining.content')
                     opml.isOpen = false;
                 });
                 $scope.viewModel.opmlsList = opmlList;
+                $scope.viewModel.totalUnReadCount = globalUserData.totalUnReadCount;
             },
             function(){
                 $scope.viewModel.isBusy = false;

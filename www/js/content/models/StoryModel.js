@@ -14,8 +14,9 @@ angular.module('mining.content')
             model.Updated   = data.Updated;
             model.Published = data.Published;
             model.Author    = data.Author;
-            model.Summary   = this.stripSummary(data.Summary);
-            model.Content   = model.Summary;
+            model.Summary   = data.Summary;
+            model.isRead    = false;
+            model.isStar    = false;
             return model;
         };
 
@@ -35,6 +36,11 @@ angular.module('mining.content')
             }
 
             return ret;
+        };
+
+        StoryModel.prototype.setSummary = function (summary) {
+            this.Summary   = this.stripSummary(summary);
+            this.Content   = this.Summary;
         };
 
         StoryModel.prototype.stripSummary = function (html)

@@ -33,6 +33,15 @@ angular.module('mining', [
                     }
                 }
             })
+            .state('tab.stars', {
+                url: '/stars',
+                views: {
+                    'tab-stars': {
+                        templateUrl: 'js/content/templates/OpmlStarNestedListView.html',
+                        controller: 'OpmlStarListCtrl'
+                    }
+                }
+            })
             .state('side', {
                 url: '/side',
                 cache: false,
