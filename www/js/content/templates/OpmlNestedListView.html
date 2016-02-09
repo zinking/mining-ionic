@@ -1,23 +1,50 @@
 <ion-view view-title="">
+
+    <script id="home-menu-popover.html" type="text/ng-template">
+        <ion-popover-view>
+            <ion-header-bar>
+                <h1 class="title">Actions</h1>
+            </ion-header-bar>
+            <ion-content>
+                <div class="list">
+                    <div class="item item-button-right" >
+                        Import Opml
+                        <button class="button button-positive" ng-click="openBulkFeed()">
+                            <i class="icon ion-minus-circled"></i>
+                        </button>
+                    </div>
+
+                    <div class="item item-button-right" >
+                        Export Opml
+                        <button class="button button-positive" ng-click="openBulkFeed()">
+                            <i class="icon ion-minus-circled"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </ion-content>
+        </ion-popover-view>
+    </script>
     <ion-header-bar class="bar-calm">
-        <button class="button button-icon icon ion-navicon"></button>
+        <button class="button button-icon icon ion-navicon" ng-click="openPopover($event)"></button>
         <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
-        <h1 class="title">All Feeds (1000+)</h1>
+        <h1 class="title">All Feeds ({{viewModel.totalUnReadCount}})</h1>
         <button class="button button-icon icon ion-plus-circled" ng-click="openAddFeed()"></button>
     </ion-header-bar>
 
     <ion-content class="has-header gem-ion-content">
         <ion-list>
             <ion-item ng-repeat="opml in viewModel.opmlsList"  >
-                <i class="icon ion-folder" ng-if="opml.isFolder" ng-click="opml.isOpen = !opml.isOpen"></i>
-                <i class="icon ion-document" ng-if="!opml.isFolder"></i>
+                <i class="icon ion-folder" ng-if="opml.hasOutline" ng-click="openFolder(opml)"></i>
+                <i class="icon ion-document" ng-if="!opml.hasOutline"></i>
                 <b ng-click="openOpmlFeed( opml )">{{opml.Title}}</b>
-                <span class="badge badge-assertive">0</span>
+                <span class="badge badge-assertive" ng-show="opml.unReadCount!=0">{{opml.unReadCount}}</span>
                 <ion-list ng-show="opml.isOpen">
                     <ion-item class="item-accordion" ng-repeat="feed in opml.Outline"
                             style="border:none">
                         <i class="icon ion-document"></i>
                         <b ng-click="openOpmlFeed( feed )" style="width:90%">{{feed.Title}}</b>
+                        <span class="badge badge-assertive" ng-show="feed.unReadCount!=0">{{feed.unReadCount}}</span>
                     </ion-item>
                 </ion-list>
 

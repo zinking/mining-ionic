@@ -21,7 +21,7 @@ angular.module('mining.content')
                     //first try local cache
                     var storyId = $scope.story.Id;
                     var storyLink = $scope.story.Link;
-                    var localContent = ContentDataService.loadStoryContentFromCache(storyLink);
+                    var localContent = globalUserData.getStoryContentById(storyId);
                     if( localContent !== null ){
                         $scope.story.Content = localContent;
                     }
@@ -30,7 +30,7 @@ angular.module('mining.content')
                         ContentDataService.loadStoryContentFromServer([storyId]).then(
                             function(){
                                 $scope.viewModel.isBusy = false;
-                                $scope.story.Content = miningUserData.storylink2ContentMap[storyId];
+                                $scope.story.Content = globalUserData.getStoryContentById(storyId);
                                 if ($scope.story.Content==""){
                                     $scope.story.Content=$scope.story.Summary
                                 }
@@ -49,7 +49,8 @@ angular.module('mining.content')
                     $scope.loadStoryContent($scope.story, function(){
                         $scope.viewModel.content1 = $scope.story.Content.substring(0,1000);
                         $scope.viewModel.content2 = $scope.story.Content;
-                        $scope.viewModel.level = ($scope.viewModel.level+1)%3
+                        $scope.viewModel.level = ($scope.viewModel.level+1)%3;
+                        $scope.$broadcast('scroll.resize');
                     });
                 };
                 $scope.collapse = function(){
@@ -59,20 +60,36 @@ angular.module('mining.content')
         }
     }])
     .controller('FeedCtrl', function($scope, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
-                                     ContentDataService,
-                                     AccountDataService, SessionService) {
+                                     ContentDataService, AccountDataService, SessionService) {
         $scope.viewModel = {
             stories : [],
-            opmlFeed :{},
-            isBusy:false,
-            feedIndex : 0
+            opmlFeed : {},
+            isBusy : false,
+            hasMoreStories : true,
+            currentPage : 0
         };
 
-        if ($stateParams.opmlFeed == null ){
-            $state.go('tab.contents')
+
+        $scope.goHome = function(){
+            var mineUrl = "http://readmine.co";
+            var xmlUrlPre = $scope.viewModel.opmlFeed.XmlUrl.substring(0,mineUrl.length);
+            if (xmlUrlPre === mineUrl) {
+                $state.go('tab.stars')
+            } else {
+                $state.go('tab.contents')
+            }
+
+        };
+
+        if (typeof globalUserData === "undefined" || $stateParams.opmlFeed == null) {
+            $scope.goHome();
         }
+
         var opmlFeed = $stateParams.opmlFeed;
         $scope.viewModel.opmlFeed = opmlFeed;
+        $scope.viewModel.opmlFeed.currentPage = opmlFeed.currentPage;
+        $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
+
 
         $ionicPopover.fromTemplateUrl('feed-menu-popover.html', {
             scope: $scope
@@ -100,9 +117,6 @@ angular.module('mining.content')
             confirmPopup.then(function(res) {
                 if(res) {
                     $scope.doRemoveFeedSource();
-                    console.log('You are sure to remove');
-                } else {
-                    console.log('You are not sure');
                 }
             });
         };
@@ -136,63 +150,72 @@ angular.module('mining.content')
         };
 
 
-        function stripSummary(html)
-        {
-            var tmp = document.createElement("DIV");
-            tmp.innerHTML = html;
-            return tmp.textContent || tmp.innerText || "";
-        }
+        $scope.markFeedRead = function() {
+            var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
+            var feed = globalUserData.FeedsMap[feedUrl];
+            var feedId = feed.Id;
+            ContentDataService.markFeedRead(feedId).then(
+                function(data){
+                    if (data.error!=null){
+                        console.info("mark feed read failed ", feedId, storyId, data.error);
+                        $ionicPopup.alert({
+                            title: 'mark feed read failed',
+                            subtitle:data.error
+                        });
+                    }
+                },
+                function(){
+                    console.info("mark feed read failed with exception ");
+                    $ionicPopup.alert({
+                        title: 'mark feed read failed with exception',
+                        subtitle:"retry later"
+                    });
+                }
+            )
+        };
 
-        function fitFeedTitle(feed,len){
-            var feedTitle = feed.Title;
-            if( feedTitle.length > len ){
-                feedTitle = feedTitle.substring(0,len-3) + "...";
-            }
-            else if( feedTitle.length < len ){
-                feedTitle = feedTitle+new Array(len-feedTitle.length).join(" ");
-            }
-            feed.fTitle = feedTitle;
-        }
+        $scope.loadMoreStories = function(){
+            //var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
+            var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
+            $scope.viewModel.isBusy = true;
+            //console.log("stories before: ", $scope.viewModel.stories);
+            ContentDataService.loadMoreStories(feedUrls,$scope.viewModel.currentPage+1).then(
+                function(data){
+                    $scope.viewModel.isBusy = false;
+                    if (data.error!=null){
+                        $ionicPopup.alert({
+                            title: 'load more stories encountered issue',
+                            subtitle:data.error
+                        });
+                    }
+                    else{
+                        //{Cursor,Stories,Star}
+                        $scope.viewModel.currentPage += 1;
+                        var newStories = globalUserData.addStories(data.Stories,data.UserReadStoryIds);
+                        if (newStories.length>0) {
+                            //$scope.viewModel.stories = $scope.viewModel.stories.concat(newStories);
+                            //console.log("stories after: ", $scope.viewModel.stories);
+                            //console.log("delta trimmed stories to be added:", newStories);
+                            $scope.$broadcast('scroll.infiniteScrollComplete');
+                            $scope.$broadcast('scroll.resize');
+                        } else {
+                            $scope.viewModel.hasMoreStories = false;
+                        }
 
-
-
-        if( "Outline" in opmlFeed && opmlFeed["Outline"].length>0 ){
-            _.each(opmlFeed.Outline,function(feed,i){
-                //every element of outline should be opmlFeed
-                var feedStories = miningUserData.StoriesMap[feed.XmlUrl];
-                fitFeedTitle(feed,30);
-                _.each(feedStories, function(s,i){
-                    s.feed = feed;
-                    s.Summary = stripSummary(s.Summary)
-
-                });
-                $scope.viewModel.stories = $scope.viewModel.stories.concat(feedStories)
-            });
-
-            _.sortBy( $scope.viewModel.stories, function(s){
-                return s.Date
-            })
-        }
-        else{
-            var feedXmlUrl = opmlFeed.XmlUrl;
-            var feedStories = miningUserData.StoriesMap[feedXmlUrl];
-            fitFeedTitle(opmlFeed,30);
-            _.each(feedStories, function(s,i){
-                s.feed = opmlFeed;
-                s.Summary = stripSummary(s.Summary)
-
-            });
-            $scope.viewModel.stories = feedStories;
-        }
-
+                    }
+                },
+                function(){
+                    $scope.viewModel.isBusy = false;
+                    $ionicPopup.alert({
+                        title: 'load more storis Faild, retry later'
+                    });
+                }
+            )
+        };
 
         $scope.openStory = function (index){
             var s = $scope.viewModel.stories[index];
             $state.go('story',{story:s,opmlFeed: $scope.viewModel.opmlFeed})
-        };
-
-        $scope.goToOpmlList = function(){
-            $state.go('tab.contents')
         };
 
     });

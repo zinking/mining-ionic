@@ -1,16 +1,13 @@
 angular.module('mining.session')
-    //.constant('BASE_SERVER_URL', 'http://0.0.0.0:9000')
-    .constant('BASE_SERVER_URL', 'http://readmine.co:9000')
+    .constant('BASE_SERVER_URL', 'http://0.0.0.0:9000')
+    //.constant('BASE_SERVER_URL', 'http://readmine.co:9000')
     .factory('SessionService', function(SessionsStorage) {
-
-
         return {
         	getAll : function () {
         		var defaultToken = null;
                 var cookieStr = decodeURI(this.get('user_data'));
                 if (cookieStr) {
                     defaultToken = angular.fromJson(cookieStr);
-                    defaultToken.openid = defaultToken.openid
                 }
                 return defaultToken;
             },
@@ -40,6 +37,25 @@ angular.module('mining.session')
             },
             getProfile : function() {
                 SessionsStorage.getProfile();
+            },
+
+            getUserPostRequest : function(path,data) {
+                return {
+                    method: 'POST',
+                    url: path,
+                    headers: {'mining': globalUserData.apiKey},
+                    data: data,
+                    timeout: 60000
+                };
+            },
+
+            getUserGetRequest : function(path) {
+                return {
+                    method: 'GET',
+                    url: path,
+                    headers: {'mining': globalUserData.apiKey},
+                    timeout: 60000
+                };
             }
         };
     });

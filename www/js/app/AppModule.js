@@ -33,6 +33,15 @@ angular.module('mining', [
                     }
                 }
             })
+            .state('tab.stars', {
+                url: '/stars',
+                views: {
+                    'tab-stars': {
+                        templateUrl: 'js/content/templates/OpmlStarNestedListView.html',
+                        controller: 'OpmlStarListCtrl'
+                    }
+                }
+            })
             .state('side', {
                 url: '/side',
                 cache: false,
@@ -61,6 +70,12 @@ angular.module('mining', [
                 cache: false,
                 templateUrl: 'js/content/templates/AddNestedListView.html',
                 controller: 'AddFeedCtrl'
+            })
+            .state('bulkfeed', {
+                url: '/bulkfeed',
+                cache: false,
+                templateUrl: 'js/content/templates/BulkFeedView.html',
+                controller: 'BulkFeedCtrl'
             })
             .state('story', {
                 url: '/story',

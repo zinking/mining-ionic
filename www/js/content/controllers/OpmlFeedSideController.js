@@ -1,8 +1,6 @@
 angular.module('mining.content')
     .controller('OpmlFeedSideCtrl', function($scope, $ionicLoading,$state,$ionicSideMenuDelegate,$ionicPopup,
-                                         AccountDataService,
-                                         ContentDataService,
-                                         SessionService) {
+                                         AccountDataService, ContentDataService, SessionService) {
         $scope.viewModel = {
             omplsList : null,
             stories : [],
@@ -10,29 +8,22 @@ angular.module('mining.content')
             opmlFeed :{}
         };
 
-        //verify user credential exists
-        var userData = AccountDataService.getUserData();
-        if( userData == "" ){
-            $state.go('login');
+        $scope.goHome = function(){
+            $state.go('tab.contents')
+        };
+
+        if (typeof globalUserData === "undefined") {
+            $scope.goHome();
         }
-        else{
-            //create a global userdata structure
-            miningUserData = userData;
-            miningUserData.storylink2ContentMap = {}
-
-        }
-
-
 
         ContentDataService.listFeed().then(
             function(){
-                var opmlList = miningUserData.OpmlsList;
+                var opmlList = globalUserData.Opml;
                 _.each(opmlList, function(opml){
                     opml.isFolder = 'Outline' in opml;
                     opml.isOpen = false;
-                })
-                $scope.viewModel.opmlsList = opmlList
-                //
+                });
+                $scope.viewModel.opmlsList = opmlList;
                 var opmlFeed = opmlList[0];
                 $scope.viewModel.opmlFeed = opmlFeed;
                 loadOpmlFeedContent(opmlFeed);
@@ -41,10 +32,10 @@ angular.module('mining.content')
                 $ionicPopup.alert({
                     title: 'Loading Failed,fallback on cache'
                 });
-                ContentDataService.localLoadCachedListFeed();
-                $scope.viewModel.opmlsList = miningUserData.OpmlsList;
+                ContentDataService.loadLocalUserData();
+                $scope.viewModel.opmlsList = globalUserData.Opml;
             }
-        )
+        );
 
 
 
@@ -61,7 +52,7 @@ angular.module('mining.content')
                 feedTitle = feedTitle.substring(0,len-3) + "...";
             }
             else if( feedTitle.length < len ){
-                feedTitle = feedTitle+Array(len-feedTitle.length).join(" ");
+                feedTitle = feedTitle+new Array(len-feedTitle.length).join(" ");
             }
             feed.fTitle = feedTitle;
         }
@@ -71,7 +62,7 @@ angular.module('mining.content')
             if( "Outline" in opmlFeed ){
                 _.each(opmlFeed.Outline,function(feed,i){
                     //every element of outline should be opmlFeed
-                    var feedStories = miningUserData.StoriesMap[feed.XmlUrl];
+                    var feedStories = globalUserData.StoriesMap[feed.XmlUrl];
                     fitFeedTitle(feed,30);
                     _.each(feedStories, function(s,i){
                         s.feed = feed;
@@ -87,7 +78,7 @@ angular.module('mining.content')
             }
             else{
                 var feedXmlUrl = opmlFeed.XmlUrl;
-                var feedStories = miningUserData.StoriesMap[feedXmlUrl]
+                var feedStories = globalUserData.StoriesMap[feedXmlUrl];
                 fitFeedTitle(opmlFeed,30);
                 _.each(feedStories, function(s,i){
                     s.feed = opmlFeed;
@@ -103,11 +94,11 @@ angular.module('mining.content')
         $scope.openStory = function (index){
             var s = $scope.viewModel.stories[index];
             $state.go('story',{story:s,opmlFeed: $scope.viewModel.opmlFeed})
-        }
+        };
 
         $scope.toggleLeft = function() {
             $ionicSideMenuDelegate.toggleLeft();
-        }
+        };
 
 
     });
