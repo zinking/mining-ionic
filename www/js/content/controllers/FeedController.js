@@ -66,7 +66,7 @@ angular.module('mining.content')
             opmlFeed : {},
             isBusy : false,
             hasMoreStories : true,
-            currentPage : 0
+            currentPage : -1
         };
 
 
@@ -88,7 +88,8 @@ angular.module('mining.content')
         var opmlFeed = $stateParams.opmlFeed;
         $scope.viewModel.opmlFeed = opmlFeed;
         $scope.viewModel.opmlFeed.currentPage = opmlFeed.currentPage;
-        $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
+
+
 
 
         $ionicPopover.fromTemplateUrl('feed-menu-popover.html', {
@@ -174,6 +175,8 @@ angular.module('mining.content')
             )
         };
 
+
+
         $scope.loadMoreStories = function(){
             //var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
             var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
@@ -192,6 +195,7 @@ angular.module('mining.content')
                         //{Cursor,Stories,Star}
                         $scope.viewModel.currentPage += 1;
                         var newStories = globalUserData.addStories(data.Stories,data.UserReadStoryIds);
+                        $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
                         if (newStories.length>0) {
                             //$scope.viewModel.stories = $scope.viewModel.stories.concat(newStories);
                             //console.log("stories after: ", $scope.viewModel.stories);
@@ -212,6 +216,7 @@ angular.module('mining.content')
                 }
             )
         };
+
 
         $scope.openStory = function (index){
             var s = $scope.viewModel.stories[index];

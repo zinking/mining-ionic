@@ -160,34 +160,45 @@ angular.module('mining.content')
                 me.FeedsMap[feed.XmlUrl] = feed;
                 me.Feeds.push(feed);
             }
-
-            for(i=0, len=d.Stories.length; i < len; i++){
-                //build the XmlUrl2Stories map
-                var storyData = d.Stories[i];
-                me.populateStoryData(storyData);
-            }
-
-            //deal with user feed read stat
-            me.totalUnReadCount = 0;
-            for(i=0, len=d.UserReadFeedStats.length; i < len; i++) {
-                var userReadFeedStat = d.UserReadFeedStats[i];
-                var feedId = userReadFeedStat.FeedId;
-                var feedUrl = me.FeedId2Url[feedId];
-                var feed = me.FeedsMap[feedUrl];
-                feed.unReadCount = userReadFeedStat.UnreadCount;
-                feed.startFrom = userReadFeedStat.StartFrom;
-                me.totalUnReadCount += feed.unReadCount;
-                me.updateStoryReadStatusUseStartFromTime(feedUrl,feed.startFrom);
-            }
             me.createFeed2OpmlMap();
-            me.updateOpmlUnReadCount();
 
-            //deal with read stories
-            for(i=0, len=d.UserReadStoryIds.length; i < len; i++) {
-                var storyId = d.UserReadStoryIds[i];
-                var story = me.AddedStories[storyId];
-                story.isRead = true;
+            if ('Stories' in d) {
+                for(i=0, len=d.Stories.length; i < len; i++){
+                    //build the XmlUrl2Stories map
+                    var storyData = d.Stories[i];
+                    me.populateStoryData(storyData);
+                }
             }
+
+            if ('UserReadFeedStats' in d) {
+                //deal with user feed read stat
+                me.totalUnReadCount = 0;
+                for(i=0, len=d.UserReadFeedStats.length; i < len; i++) {
+                    var userReadFeedStat = d.UserReadFeedStats[i];
+                    var feedId = userReadFeedStat.FeedId;
+                    var feedUrl = me.FeedId2Url[feedId];
+                    if (feedUrl in me.FeedsMap) {
+                        var feed = me.FeedsMap[feedUrl];
+                        feed.unReadCount = userReadFeedStat.UnreadCount;
+                        feed.startFrom = userReadFeedStat.StartFrom;
+                        me.totalUnReadCount += feed.unReadCount;
+                        me.updateStoryReadStatusUseStartFromTime(feedUrl,feed.startFrom);
+                    }
+                }
+
+                me.updateOpmlUnReadCount();
+            }
+
+            if ('UserReadStoryIds' in d) {
+                //deal with read stories
+                for(i=0, len=d.UserReadStoryIds.length; i < len; i++) {
+                    var storyId = d.UserReadStoryIds[i];
+                    var story = me.AddedStories[storyId];
+                    story.isRead = true;
+                }
+            }
+
+
         };
 
         UserDataModel.prototype.updateStoryReadStatusUseStartFromTime = function( feedUrl, startFrom){
