@@ -34,17 +34,18 @@
 
     <ion-content class="has-header gem-ion-content">
         <ion-list>
-            <ion-item ng-repeat="opml in viewModel.opmlsList"  >
-                <i class="icon ion-folder" ng-if="opml.hasOutline" ng-click="openFolder(opml)"></i>
-                <i class="icon ion-document" ng-if="!opml.hasOutline"></i>
-                <b ng-click="openOpmlFeed( opml )">{{opml.Title}}</b>
-                <span class="badge badge-assertive" ng-show="opml.unReadCount!=0">{{opml.unReadCount}}</span>
+            <ion-item ng-repeat="opml in viewModel.opmlsList"  class="folder-item">
+                <i class="icon ion-folder folder-item-icon" ng-if="opml.hasOutline" ng-click="openFolder(opml)"></i>
+                <i class="icon ion-document folder-item-icon" ng-if="!opml.hasOutline"></i>
+                <b ng-click="openOpmlFeed( opml )" style="padding-right:50%">{{opml.Title}}</b>
+                <span class="badge badge-assertive badge-unread" style="top:7px"
+                      ng-show="opml.unReadCount!=0">{{opml.unReadCount}}</span>
                 <ion-list ng-show="opml.isOpen">
-                    <ion-item class="item-accordion" ng-repeat="feed in opml.Outline"
-                            style="border:none">
+                    <ion-item class="item-accordion outline-item" ng-repeat="feed in opml.Outline" >
                         <i class="icon ion-document"></i>
-                        <b ng-click="openOpmlFeed( feed )" style="width:90%">{{feed.Title}}</b>
-                        <span class="badge badge-assertive" ng-show="feed.unReadCount!=0">{{feed.unReadCount}}</span>
+                        <b ng-click="openOpmlFeed( feed )" style="padding-right:50%">{{feed.Title}}</b>
+                        <span class="badge badge-assertive" style="top:7px"
+                              ng-show="feed.unReadCount!=0">{{feed.unReadCount}}</span>
                     </ion-item>
                 </ion-list>
 

@@ -105,11 +105,13 @@ angular.module('mining.content')
                 me.Feeds.push(feed);
             }
 
-            for(i=0, len=d.Stories.length; i < len; i++){
-                //build the XmlUrl2Stories map
-                var storyData = d.Stories[i];
-                me.populateStoryData(storyData);
-            };
+            if ('Stories' in d) {
+                for (i = 0, len = d.Stories.length; i < len; i++) {
+                    //build the XmlUrl2Stories map
+                    var storyData = d.Stories[i];
+                    me.populateStoryData(storyData);
+                }
+            }
 
             //deal with user feed read stat
             /*me.totalUnReadCount = 0;
@@ -127,10 +129,12 @@ angular.module('mining.content')
             me.updateOpmlUnReadCount();
 
             //deal with read stories
-            for(i=0, len=d.UserReadStoryIds.length; i < len; i++) {
-                var storyId = d.UserReadStoryIds[i];
-                var story = me.AddedStories[storyId];
-                story.isRead = true;
+            if ('UserReadStoryIds' in d) {
+                for (i = 0, len = d.UserReadStoryIds.length; i < len; i++) {
+                    var storyId = d.UserReadStoryIds[i];
+                    var story = me.AddedStories[storyId];
+                    story.isRead = true;
+                }
             }
         };
 

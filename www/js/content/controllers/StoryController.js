@@ -70,7 +70,7 @@ angular.module('mining.content')
             var storyId = $scope.viewModel.story.Id;
             var storyLink = $scope.viewModel.story.Link;
             var localContent = globalUserData.getStoryContentById(storyId);
-            if( localContent !== null ){
+            if( localContent !== null && localContent !== ""){
                 $scope.viewModel.story.Content = localContent;
                 $scope.markStoryRead();
             }

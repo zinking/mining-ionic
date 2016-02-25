@@ -185,7 +185,7 @@ angular.module('mining.content')
             ContentDataService.loadMoreStories(feedUrls,$scope.viewModel.currentPage+1).then(
                 function(data){
                     $scope.viewModel.isBusy = false;
-                    if (data.error!=null){
+                    if (data.error != null){
                         $ionicPopup.alert({
                             title: 'load more stories encountered issue',
                             subtitle:data.error
