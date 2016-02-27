@@ -1,4 +1,4 @@
-<ion-view view-title="{{'my' | translate}}">
+<ion-view view-title="{{viewModel.opmlFeed.Title}}" hide-nav-bar="true">
     <script id="feed-menu-popover.html" type="text/ng-template">
         <ion-popover-view>
             <ion-header-bar>
@@ -33,30 +33,26 @@
     </script>
     <script id="story-template.html" type="text/ng-template">
         <div class="item story">
-            <b ng-click="open()" ng-show="!story.isRead">{{story.Title}} - {{story.FeedTitle}} </b>
-            <span ng-click="open()" ng-show="story.isRead">{{story.Title}} - {{story.FeedTitle}} </span>
+            <b ng-click="open()" ng-show="!story.isRead">[{{story.Published}}] {{story.Title}} - {{story.FeedTitle}} </b>
+            <span ng-click="open()" ng-show="story.isRead">[{{story.Published}}] {{story.Title}} - {{story.FeedTitle}} </span>
             <p ng-show="viewModel.level==0" ng-bind-html="viewModel.content0 | sanitize">
             <p ng-show="viewModel.level==1" ng-bind-html="viewModel.content1 | sanitize">
             <p ng-show="viewModel.level==2" ng-bind-html="viewModel.content2 | sanitize">
             </p>
-            <i class="icon ion-plus-circled" style="position:relative;" ng-click="expand()"></i>
-            <i class="icon ion-minus-circled" style="position:relative;" ng-click="collapse()"></i>
+            <i class="icon ion-plus-circled" style="position:relative; font-size:1.7em;" ng-click="expand()"></i>
+            <i class="icon ion-minus-circled" style="position:relative; font-size:1.7em;" ng-click="collapse()"></i>
             <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
         </div>
     </script>
-    <ion-header-bar class="bar-calm">
+    <ion-footer-bar class="bar-calm">
         <button class='button icon ion-arrow-left-a' ng-click='goHome()'></button>
         <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
         <h1 class="title">{{viewModel.opmlFeed.Title}} ({{viewModel.opmlFeed.unReadCount}})</h1>
         <button class="button icon ion-navicon" ng-click="openPopover($event)"></button>
-    </ion-header-bar>
+    </ion-footer-bar>
 
-    <ion-content class="has-header gem-ion-content">
+    <ion-content class="gem-ion-content">
         <ion-list>
-            <!--<div ng-repeat="story in viewModel.stories" class="item" ng-click="openStory($index)">
-                <b>{{story.Title}}</b>
-                <p ng-bind-html="story.Summary | sanitize"></p>
-            </div>-->
             <story story="story" open="openStory($index)" ng-repeat="story in viewModel.stories"></story>
         </ion-list>
         <div class="item" ng-show="!viewModeel.hasMoreStories">End Of Feed</div>

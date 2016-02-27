@@ -13,7 +13,7 @@ angular.module('mining.content')
                 $scope.viewModel = {
                     isBusy : false,
                     level : 0,
-                    content0 : $scope.story.Summary,
+                    content0 : "",
                     content1 : "",
                     content2 : ""
                 };
@@ -34,6 +34,7 @@ angular.module('mining.content')
                                 if ($scope.story.Content==""){
                                     $scope.story.Content=$scope.story.Summary
                                 }
+
                                 callback();
                             },
                             function(){
@@ -45,13 +46,29 @@ angular.module('mining.content')
                         )
                     }
                 };
+
+                function hasContent() {
+                    var content = $scope.story.Content;
+                    return typeof content === "undefined" && content != null && content !== "";
+                }
+
                 $scope.expand = function(){
-                    $scope.loadStoryContent($scope.story, function(){
+                    if (!hasContent()) {
+                        $scope.loadStoryContent($scope.story, function(){
+                            $scope.viewModel.content0 = $scope.story.Content.substring(0,400);
+                            $scope.viewModel.content1 = $scope.story.Content.substring(0,1000);
+                            $scope.viewModel.content2 = $scope.story.Content;
+                            $scope.viewModel.level = ($scope.viewModel.level+1)%3;
+                            $scope.$broadcast('scroll.resize');
+                        });
+                    } else {
+                        $scope.viewModel.content0 = $scope.story.Content.substring(0,400);
                         $scope.viewModel.content1 = $scope.story.Content.substring(0,1000);
                         $scope.viewModel.content2 = $scope.story.Content;
                         $scope.viewModel.level = ($scope.viewModel.level+1)%3;
                         $scope.$broadcast('scroll.resize');
-                    });
+                    }
+
                 };
                 $scope.collapse = function(){
                     $scope.viewModel.level = 0;
@@ -69,20 +86,27 @@ angular.module('mining.content')
             currentPage : -1
         };
 
+        function isUrlStartWithMine(xmlUrl) {
+            var mineUrl = "http://readmine.co";
+            var xmlUrlPre = xmlUrl.substring(0, mineUrl.length);
+            return (xmlUrlPre === mineUrl)
+        }
+
 
         $scope.goHome = function(){
-            var mineUrl = "http://readmine.co";
-            var xmlUrlPre = $scope.viewModel.opmlFeed.XmlUrl.substring(0,mineUrl.length);
-            if (xmlUrlPre === mineUrl) {
-                $state.go('tab.stars')
+            if (isUrlStartWithMine($scope.viewModel.opmlFeed.XmlUrl)) {
+                $state.go('tab.stars');
             } else {
-                $state.go('tab.contents')
+                $state.go('tab.contents');
             }
 
+            //return is necessary here to prevent execution of invalid block
+            return;
         };
 
         if (typeof globalUserData === "undefined" || $stateParams.opmlFeed == null) {
-            $scope.goHome();
+            $state.go('tab.contents');
+            return;
         }
 
         var opmlFeed = $stateParams.opmlFeed;
@@ -91,13 +115,12 @@ angular.module('mining.content')
 
 
 
-
+        /* pop over setup section*/
         $ionicPopover.fromTemplateUrl('feed-menu-popover.html', {
             scope: $scope
         }).then(function(popover) {
             $scope.popover = popover;
         });
-
 
         $scope.openPopover = function($event) {
             $scope.popover.show($event);
@@ -150,7 +173,6 @@ angular.module('mining.content')
             )
         };
 
-
         $scope.markFeedRead = function() {
             var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
             var feed = globalUserData.FeedsMap[feedUrl];
@@ -175,14 +197,35 @@ angular.module('mining.content')
             )
         };
 
-
+        function generalLoadMoreStories(feedUrls, pageNo) {
+            var feedUrl = feedUrls[0]; //take one sample
+            if (!isUrlStartWithMine(feedUrl)) {
+                return ContentDataService.loadMoreStories(feedUrls,pageNo);
+            } else {
+                return ContentDataService.loadMoreStarStories(feedUrls,pageNo);
+            }
+        }
 
         $scope.loadMoreStories = function(){
             //var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
             var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
             $scope.viewModel.isBusy = true;
             //console.log("stories before: ", $scope.viewModel.stories);
-            ContentDataService.loadMoreStories(feedUrls,$scope.viewModel.currentPage+1).then(
+            var requestPageNo = $scope.viewModel.currentPage+1;
+
+            console.log("let's try from cache first");
+            var cachedStories = globalUserData.getLocalStories(feedUrls, requestPageNo);
+            if (cachedStories.length>0) {
+                $scope.viewModel.currentPage += 1;
+                $scope.viewModel.stories = $scope.viewModel.stories.concat(cachedStories);
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+                $scope.$broadcast('scroll.resize');
+                $scope.viewModel.isBusy = false;
+                return;
+            }
+
+            console.log("oops, let's go requesting");
+            generalLoadMoreStories(feedUrls, requestPageNo).then(
                 function(data){
                     $scope.viewModel.isBusy = false;
                     if (data.error != null){
@@ -194,7 +237,11 @@ angular.module('mining.content')
                     else{
                         //{Cursor,Stories,Star}
                         $scope.viewModel.currentPage += 1;
-                        var newStories = globalUserData.addStories(data.Stories,data.UserReadStoryIds);
+                        var newStories = globalUserData.addStories(
+                            data.Stories,
+                            data.UserReadStoryIds,
+                            data.UserStarStoryIds
+                        );
                         $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
                         if (newStories.length>0) {
                             //$scope.viewModel.stories = $scope.viewModel.stories.concat(newStories);

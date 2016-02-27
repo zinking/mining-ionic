@@ -4,6 +4,7 @@ angular.module('mining.content')
         var LIST_FEEDS_PATH             = BASE_SERVER_URL + '/user/list-feeds';
         var LIST_STAR_FEEDS_PATH        = BASE_SERVER_URL + '/user/list-starfeeds';
         var GET_MORE_FEEDS_PATH         = BASE_SERVER_URL + '/user/get-feedsstories';
+        var GET_MORE_STARFEEDS_PATH     = BASE_SERVER_URL + '/user/get-starstories';
         var LOAD_STORY_CONTENT_PATH     = BASE_SERVER_URL + '/user/get-contents';
         var ADD_FEED_SOURCE_PATH        = BASE_SERVER_URL + '/user/add-subscription';
         var REMOVE_FEED_SOURCE_PATH     = BASE_SERVER_URL + '/user/remove-subscription';
@@ -102,6 +103,20 @@ angular.module('mining.content')
             loadMoreStories: function(feedUrls, pageNo) {
                 var requestData = {'FS':feedUrls, 'C':pageNo};
                 var req = SessionService.getUserPostRequest(GET_MORE_FEEDS_PATH,requestData);
+                var deferred = $q.defer();
+                $http(req).
+                    success(function (d) {
+                        deferred.resolve(d);
+                    }).
+                    error(function () {
+                        deferred.reject();
+                    });
+                return deferred.promise;
+            },
+
+            loadMoreStarStories: function(feedUrls, pageNo) {
+                var requestData = {'FS':feedUrls, 'C':pageNo};
+                var req = SessionService.getUserPostRequest(GET_MORE_STARFEEDS_PATH,requestData);
                 var deferred = $q.defer();
                 $http(req).
                     success(function (d) {

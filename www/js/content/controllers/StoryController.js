@@ -16,6 +16,7 @@ angular.module('mining.content')
             typeof $stateParams.opmlFeed === "undefined" ) {
 
             $scope.goHome();
+            return;
         }
 
         $scope.viewModel.story = $stateParams.story;
@@ -56,7 +57,7 @@ angular.module('mining.content')
                     if (data.error!=null){
                         console.info("mark story Star failed ", feedId, storyId, data.error)
                     } else {
-                        globalUserData.markStoryRead($scope.viewModel.story);
+                        globalUserData.markStoryStar($scope.viewModel.story);
                     }
                 },
                 function(){

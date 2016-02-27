@@ -17,6 +17,7 @@ angular.module('mining.content')
 
         if (typeof globalUserData === "undefined") {
             $scope.goHome();
+            return;
         }
 
         $scope.addFeedSource = function(){

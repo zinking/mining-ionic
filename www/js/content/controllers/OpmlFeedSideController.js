@@ -14,6 +14,7 @@ angular.module('mining.content')
 
         if (typeof globalUserData === "undefined") {
             $scope.goHome();
+            return;
         }
 
         ContentDataService.listFeed().then(

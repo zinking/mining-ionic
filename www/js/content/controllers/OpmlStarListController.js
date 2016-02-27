@@ -7,6 +7,10 @@ angular.module('mining.content')
             omplsList : []
         };
 
+        if (typeof globalUserData === "undefined") {
+            $state.go('tab.contents');
+            return;
+        }
 
         $scope.viewModel.isBusy = true;
 

@@ -272,13 +272,15 @@ angular.module('mining.content')
             if (!(feedUrl in me.StoriesMap)){
                 this.StoriesMap[feedUrl] = [];
             }
-            me.StoriesMap[feedUrl].push(story);
 
+            // if the story is already added then do nothing
             if (me.AddedStories[story.Id]!=null) {
                 return null;
             } else {
+                //else add it to the collection and feed
                 me.Stories.push(story);
                 me.AddedStories[story.Id] = story;
+                me.StoriesMap[feedUrl].push(story);
             }
 
             return story;
@@ -299,7 +301,7 @@ angular.module('mining.content')
         };
 
 
-        UserDataModel.prototype.addStories = function(storiesData,UserReadStoryIds) {
+        UserDataModel.prototype.addStories = function(storiesData,UserReadStoryIds,UserStarStoryIds) {
             var me = this;
             var newAddedStories = [];
             _.each(storiesData, function(newStoryData,i){
@@ -318,7 +320,52 @@ angular.module('mining.content')
                 story.isRead = true;
             }
 
+            for(i=0, len=UserStarStoryIds.length; i < len; i++) {
+                var storyId = UserStarStoryIds[i];
+                var story = me.AddedStories[storyId];
+                story.isStar = true;
+            }
+
             return newAddedStories;
+        };
+
+        //get local cached story for the specified feed
+        UserDataModel.prototype.getLocalStoriesPerFeed = function(xmlUrl, pageNo) {
+            var me = this;
+            //let's use the current page size say 10
+            var feedStories = me.StoriesMap[xmlUrl];
+            if (feedStories instanceof Array) {
+                var pageNo = pageNo || 0,
+                    per_page = 10,
+                    offset = pageNo * per_page,
+                    stories = _.rest(feedStories, offset).slice(0, per_page);
+                if (stories.length < per_page) {
+                    return [];
+                } else {
+                    return stories;
+                }
+            }
+
+            return [];
+        };
+
+        //get local cached stories for the specified feeds *feeds*
+        //if one of the feed cache returned empty, then the whole call return empty
+        UserDataModel.prototype.getLocalStories = function(xmlUrls, pageNo) {
+            var me = this;
+            var allFeedsStories = [];
+            _.each(xmlUrls, function(xmlUrl,i){
+                var feedStories = me.getLocalStoriesPerFeed(xmlUrl, pageNo);
+                if (feedStories.length == 0) {
+                    return [];
+                } else {
+                    allFeedsStories = allFeedsStories.concat(feedStories);
+                }
+            });
+            _.sortBy( allFeedsStories, function(s){
+                return s.Published
+            });
+            return allFeedsStories;
         };
 
         UserDataModel.prototype.getStoriesByOpml = function(opmlFeed) {

@@ -15,6 +15,7 @@ angular.module('mining.content',['ionic'])
 
         if (typeof globalUserData === "undefined") {
             $scope.goHome();
+            return;
         }
 
         $scope.openFileDialog=function() {

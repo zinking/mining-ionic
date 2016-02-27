@@ -29,6 +29,7 @@ angular.module('mining.content')
         var userAuthData = AccountDataService.getUserData();
         if( userAuthData == null ){
             $state.go('login');
+            return;
         }
         else{
             //create a global userdata structure

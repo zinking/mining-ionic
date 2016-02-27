@@ -62,11 +62,11 @@ div.story .spinner svg {
 }
 
 .folder-item {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px;
+    padding-left: 10px;
 }
 .folder-item-icon {
-    font-size: 1.5em;
+    font-size: 1.7em;
 }
 .outline-item {
     border:none;
