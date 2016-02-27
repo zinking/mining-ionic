@@ -185,6 +185,9 @@ angular.module('mining.content')
                             title: 'mark feed read failed',
                             subtitle:data.error
                         });
+                    } else {
+                        globalUserData.markFeedStoriesRead(feedUrl);
+                        $scope.popover.remove();
                     }
                 },
                 function(){
@@ -213,7 +216,7 @@ angular.module('mining.content')
             //console.log("stories before: ", $scope.viewModel.stories);
             var requestPageNo = $scope.viewModel.currentPage+1;
 
-            console.log("let's try from cache first");
+            //console.log("let's try from cache first");
             var cachedStories = globalUserData.getLocalStories(feedUrls, requestPageNo);
             if (cachedStories.length>0) {
                 $scope.viewModel.currentPage += 1;
@@ -224,7 +227,7 @@ angular.module('mining.content')
                 return;
             }
 
-            console.log("oops, let's go requesting");
+            //console.log("oops, let's go requesting");
             generalLoadMoreStories(feedUrls, requestPageNo).then(
                 function(data){
                     $scope.viewModel.isBusy = false;
@@ -244,9 +247,6 @@ angular.module('mining.content')
                         );
                         $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
                         if (newStories.length>0) {
-                            //$scope.viewModel.stories = $scope.viewModel.stories.concat(newStories);
-                            //console.log("stories after: ", $scope.viewModel.stories);
-                            //console.log("delta trimmed stories to be added:", newStories);
                             $scope.$broadcast('scroll.infiniteScrollComplete');
                             $scope.$broadcast('scroll.resize');
                         } else {

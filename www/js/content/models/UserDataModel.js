@@ -174,6 +174,17 @@ angular.module('mining.content')
                 }
             }
 
+
+
+            if ('UserReadStoryIds' in d) {
+                //deal with read stories
+                for(i=0, len=d.UserReadStoryIds.length; i < len; i++) {
+                    var storyId = d.UserReadStoryIds[i];
+                    var story = me.AddedStories[storyId];
+                    story.isRead = true;
+                }
+            }
+
             if ('UserReadFeedStats' in d) {
                 //deal with user feed read stat
                 me.totalUnReadCount = 0;
@@ -186,33 +197,22 @@ angular.module('mining.content')
                         feed.unReadCount = userReadFeedStat.UnreadCount;
                         feed.startFrom = userReadFeedStat.StartFrom;
                         me.totalUnReadCount += feed.unReadCount;
-                        me.updateStoryReadStatusUseStartFromTime(feedUrl,feed.startFrom);
+                        //because story data is nolonger populated from start
+                        //me.updateStoryReadStatusUseStartFromTime(feedUrl,feed.startFrom);
                     }
                 }
-
                 me.updateOpmlUnReadCount();
             }
-
-            if ('UserReadStoryIds' in d) {
-                //deal with read stories
-                for(i=0, len=d.UserReadStoryIds.length; i < len; i++) {
-                    var storyId = d.UserReadStoryIds[i];
-                    var story = me.AddedStories[storyId];
-                    story.isRead = true;
-                }
-            }
-
-
         };
 
-        UserDataModel.prototype.updateStoryReadStatusUseStartFromTime = function( feedUrl, startFrom){
-            var stories = this.StoriesMap[feedUrl];
-            _.each(stories, function(story,i){
-                if (story.Published>startFrom) {
-                    story.isRead = true;
-                }
-            });
-        };
+        //UserDataModel.prototype.updateStoryReadStatusUseStartFromTime = function( feedUrl, startFrom){
+        //    var stories = this.StoriesMap[feedUrl];
+        //    _.each(stories, function(story,i){
+        //        if (story.Published<startFrom) { //if the story is published before user's focus, mark it read
+        //            story.isRead = true;
+        //        }
+        //    });
+        //};
 
         UserDataModel.prototype.createFeed2OpmlMap = function() {
             var me = this;
@@ -278,6 +278,9 @@ angular.module('mining.content')
                 return null;
             } else {
                 //else add it to the collection and feed
+                if (story.Published<feed.startFrom) {
+                    story.isRead = true;
+                }
                 me.Stories.push(story);
                 me.AddedStories[story.Id] = story;
                 me.StoriesMap[feedUrl].push(story);
@@ -327,6 +330,16 @@ angular.module('mining.content')
             }
 
             return newAddedStories;
+        };
+
+        //mark stories in the specified feed as read
+        UserDataModel.prototype.markFeedStoriesRead = function(xmlUrl) {
+            //var feed = this.FeedsMap[xmlUrl];
+            // probably update the feed stats as well??
+            var stories = this.StoriesMap[xmlUrl];
+            _.each(stories, function(story,i){
+                story.isRead = true;
+            })
         };
 
         //get local cached story for the specified feed

@@ -1,4 +1,5 @@
 angular.module('mining', [
+    'angularMoment',
     'mining.session',
     'mining.content',
     'mining.account'

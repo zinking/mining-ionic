@@ -17,6 +17,9 @@ angular.module('mining.content')
             model.Summary   = data.Summary;
             model.isRead    = false;
             model.isStar    = false;
+
+            model.PublishedTime = new Date(model.Published);
+
             return model;
         };
 
