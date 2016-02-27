@@ -173,6 +173,41 @@ angular.module('mining.content')
             )
         };
 
+        $scope.markFeedsRead = function() {
+            var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
+            var feedIds = _.map(feedUrls, function(feedUrl,i){
+                var feed = globalUserData.FeedsMap[feedUrl];
+                var feedId = feed.Id;
+                return feedId;
+            });
+            $scope.viewModel.isBusy = true;
+
+            ContentDataService.markFeedsRead(feedIds).then(
+                function(data){
+                    if (data.error!=null){
+                        $scope.viewModel.isBusy = false;
+                        console.info("mark feeds read failed ", feedId, storyId, data.error);
+                        $ionicPopup.alert({
+                            title: 'mark feeds read failed',
+                            subtitle:data.error
+                        });
+                    } else {
+                        $scope.viewModel.isBusy = false;
+                        globalUserData.markFeedsStoriesRead(feedUrls);
+                        $scope.popover.remove();
+                    }
+                },
+                function(){
+                    console.info("mark feeds read failed with exception ");
+                    $ionicPopup.alert({
+                        title: 'mark feeds read failed with exception',
+                        subtitle:"retry later"
+                    });
+                }
+            )
+        };
+
+        //to be deprecated
         $scope.markFeedRead = function() {
             var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
             var feed = globalUserData.FeedsMap[feedUrl];

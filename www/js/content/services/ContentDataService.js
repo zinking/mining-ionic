@@ -12,6 +12,7 @@ angular.module('mining.content')
         var MARK_STORY_READ_PATH        = BASE_SERVER_URL + '/user/mark-read';
         var MARK_STORY_STAR_PATH        = BASE_SERVER_URL + '/user/mark-star';
         var MARK_FEED_READ_PATH         = BASE_SERVER_URL + '/user/mark-feedread';
+        var MARK_FEEDS_READ_PATH         = BASE_SERVER_URL + '/user/mark-feedsread';
 
         return {
             listFeed: function(){
@@ -160,6 +161,20 @@ angular.module('mining.content')
             markFeedRead: function(feedId) {
                 var requestData = {'FeedId':feedId};
                 var req = SessionService.getUserPostRequest(MARK_FEED_READ_PATH,requestData);
+                var deferred = $q.defer();
+
+                $http(req).
+                    success(function (d) {
+                        deferred.resolve(d);
+                    }).
+                    error(function () {
+                        deferred.reject();
+                    });
+                return deferred.promise;
+            },
+            markFeedsRead: function(feedIds) {
+                var requestData = feedIds;
+                var req = SessionService.getUserPostRequest(MARK_FEEDS_READ_PATH,requestData);
                 var deferred = $q.defer();
 
                 $http(req).

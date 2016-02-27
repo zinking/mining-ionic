@@ -341,6 +341,12 @@ angular.module('mining.content')
                 story.isRead = true;
             })
         };
+        UserDataModel.prototype.markFeedsStoriesRead = function(xmlUrls) {
+            var me = this;
+            _.forEach(xmlUrls,function(xmlUrl,i){
+                me.markFeedStoriesRead(xmlUrl);
+            });
+        };
 
         //get local cached story for the specified feed
         UserDataModel.prototype.getLocalStoriesPerFeed = function(xmlUrl, pageNo) {
