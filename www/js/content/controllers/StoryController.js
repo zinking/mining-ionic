@@ -1,5 +1,23 @@
 angular.module('mining.content')
-    .controller('StoryCtrl', function($scope, $ionicLoading, $state,$stateParams,$ionicPopup,
+.directive('ngcDone', function ($timeout) {
+    return function (scope, element, attrs) {
+        scope.$watch(attrs.ngcDone, function (callback) {
+            //console.log("hello there");
+            if (scope.$last === undefined) {
+                scope.$watch('htmlElement', function () {
+                    if (scope.htmlElement !== undefined) {
+                        $timeout(eval(callback), 1);
+                    }
+                });
+            }
+
+            if (scope.$last) {
+                eval(callback)();
+            }
+        });
+    }
+})
+.controller('StoryCtrl', function($scope, $ionicLoading, $state,$stateParams,$ionicPopup,
                                       ContentDataService, SessionService) {
         $scope.viewModel = {
             story : {},
@@ -66,6 +84,13 @@ angular.module('mining.content')
             )
         };
 
+        $scope.onContentLoaded = function() {
+            //console.log("yeah content loaded");
+
+            $('#storyContainer img').css('max-width','100%');
+            $('#storyContainer embed').css('max-width','100%');
+        };
+
         $scope.loadStoryContent = function(story){
             //first try local cache
             var storyId = $scope.viewModel.story.Id;
@@ -86,6 +111,10 @@ angular.module('mining.content')
                             $scope.viewModel.story = globalUserData.getStoryById(storyId);
                             $scope.viewModel.story.Content=$scope.viewModel.story.Summary;
                         }
+
+
+
+                        //TODO: oh really, loaded means read ?
                         $scope.markStoryRead();
                     },
                     function(){

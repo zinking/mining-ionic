@@ -1,5 +1,4 @@
-angular.module('mining.content', [  'angularMoment',
-                                    'ionic-datepicker',
+angular.module('mining.content', [  'ionic-datepicker',
                                     'mining.globalization',
                                     'mining.filters',
                                     'mining.session',

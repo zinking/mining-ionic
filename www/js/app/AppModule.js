@@ -87,6 +87,7 @@ angular.module('mining', [
             ;
         $urlRouterProvider.otherwise('/tab/contents');
     })
+
     .controller('TabCtrl', function ($scope) {
 
     });

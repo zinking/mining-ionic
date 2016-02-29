@@ -14,7 +14,7 @@ angular.module('mining.content')
             model.Text          = data.Text;
             model.hasOutline    = false;
             model.unReadCount    = 0;
-            model.currentPage   = 0;
+            model.currentPage   = -1;
             if ('Outline' in data){
 
                 model.Outline   = _.map(data.Outline, function(omplData,i){

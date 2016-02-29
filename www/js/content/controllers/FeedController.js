@@ -77,13 +77,12 @@ angular.module('mining.content')
         }
     }])
     .controller('FeedCtrl', function($scope, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
-                                     ContentDataService, AccountDataService, SessionService) {
+                                     $ionicScrollDelegate, ContentDataService, AccountDataService, SessionService) {
         $scope.viewModel = {
             stories : [],
             opmlFeed : {},
             isBusy : false,
-            hasMoreStories : true,
-            currentPage : -1
+            hasMoreStories : true
         };
 
         function isUrlStartWithMine(xmlUrl) {
@@ -92,14 +91,13 @@ angular.module('mining.content')
             return (xmlUrlPre === mineUrl)
         }
 
-
         $scope.goHome = function(){
             if (isUrlStartWithMine($scope.viewModel.opmlFeed.XmlUrl)) {
                 $state.go('tab.stars');
             } else {
                 $state.go('tab.contents');
             }
-
+            $scope.rememberScrollPos();
             //return is necessary here to prevent execution of invalid block
             return;
         };
@@ -111,8 +109,6 @@ angular.module('mining.content')
 
         var opmlFeed = $stateParams.opmlFeed;
         $scope.viewModel.opmlFeed = opmlFeed;
-        $scope.viewModel.opmlFeed.currentPage = opmlFeed.currentPage;
-
 
 
         /* pop over setup section*/
@@ -249,15 +245,17 @@ angular.module('mining.content')
             var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
             $scope.viewModel.isBusy = true;
             //console.log("stories before: ", $scope.viewModel.stories);
-            var requestPageNo = $scope.viewModel.currentPage+1;
+            var requestPageNo = $scope.viewModel.opmlFeed.currentPage+1;
 
             //console.log("let's try from cache first");
             var cachedStories = globalUserData.getLocalStories(feedUrls, requestPageNo);
             if (cachedStories.length>0) {
-                $scope.viewModel.currentPage += 1;
+                $scope.viewModel.opmlFeed.currentPage += 1;
                 $scope.viewModel.stories = $scope.viewModel.stories.concat(cachedStories);
                 $scope.$broadcast('scroll.infiniteScrollComplete');
                 $scope.$broadcast('scroll.resize');
+
+                $scope.scrollToLastRemembered();
                 $scope.viewModel.isBusy = false;
                 return;
             }
@@ -274,7 +272,7 @@ angular.module('mining.content')
                     }
                     else{
                         //{Cursor,Stories,Star}
-                        $scope.viewModel.currentPage += 1;
+                        $scope.viewModel.opmlFeed.currentPage += 1;
                         var newStories = globalUserData.addStories(
                             data.Stories,
                             data.UserReadStoryIds,
@@ -284,6 +282,8 @@ angular.module('mining.content')
                         if (newStories.length>0) {
                             $scope.$broadcast('scroll.infiniteScrollComplete');
                             $scope.$broadcast('scroll.resize');
+
+                            $scope.scrollToLastRemembered();
                         } else {
                             $scope.viewModel.hasMoreStories = false;
                         }
@@ -299,9 +299,21 @@ angular.module('mining.content')
             )
         };
 
+        $scope.scrollToLastRemembered = function() {
+            if (typeof $scope.viewModel.opmlFeed.lastPos !== "undefined") {
+                var lastPos = $scope.viewModel.opmlFeed.lastPos;
+                $ionicScrollDelegate.scrollTo(lastPos.left, lastPos.top);
+            }
+        };
+        $scope.rememberScrollPos = function() {
+            var scrollPos = $ionicScrollDelegate.getScrollPosition();
+            $scope.viewModel.opmlFeed.lastPos = scrollPos;
+        };
+
 
         $scope.openStory = function (index){
             var s = $scope.viewModel.stories[index];
+            $scope.rememberScrollPos();
             $state.go('story',{story:s,opmlFeed: $scope.viewModel.opmlFeed})
         };
 
