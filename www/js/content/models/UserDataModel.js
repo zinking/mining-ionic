@@ -58,9 +58,14 @@ angular.module('mining.content')
 
         UserDataModel.prototype.addStoryContent = function(sc) { //story content
             this.StoryContents.push(sc);
-            this.storyId2ContentMap[sc.storyId]=sc.content;
             var story = this.AddedStories[sc.storyId];
-            story.setSummary(sc.summary);
+            if (sc.content === "" ) {
+                //TODO: probably remove the concept of story content
+                this.storyId2ContentMap[sc.storyId]=sc.summary;
+            } else {
+                this.storyId2ContentMap[sc.storyId]=sc.content;
+            }
+            story.setSummary(sc.Summary);
         };
 
         //recover the user data structure from persisted json format
@@ -386,6 +391,7 @@ angular.module('mining.content')
             });
             return allFeedsStories;
         };
+
 
         UserDataModel.prototype.getStoriesByOpml = function(opmlFeed) {
             var me = this;

@@ -26,7 +26,7 @@ angular.module('mining.content')
             model.Image         = data.Image;
             model.Text          = data.Text;
             model.fTitle        = this.fitFeedTitle(model.Title,30);
-            model.startFrom      = 0;
+            model.startFrom     = 0;
             model.unReadCount   = 0;
             return model;
         };

@@ -32,7 +32,7 @@
         </ion-popover-view>
     </script>
     <script id="story-template.html" type="text/ng-template">
-        <div class="item story">
+        <div class="item story" >
             <b ng-click="open()" ng-show="!story.isRead">[<span am-time-ago="story.PublishedTime"></span>] {{story.Title}} - {{story.FeedTitle}} </b>
             <span ng-click="open()" ng-show="story.isRead">[<span am-time-ago="story.PublishedTime"></span>] {{story.Title}} - {{story.FeedTitle}} </span>
             <p ng-show="viewModel.level==0" ng-bind-html="viewModel.content0 | sanitize">
@@ -47,17 +47,20 @@
     <ion-footer-bar class="bar-calm">
         <button class='button icon ion-arrow-left-a' ng-click='goHome()'></button>
         <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
-        <h1 class="title">{{viewModel.opmlFeed.Title}} ({{viewModel.opmlFeed.unReadCount}})</h1>
+        <h1 class="title">{{viewModel.opmlFeed.Title}} ({{viewModel.opmlFeed.unReadCount}}) [{{viewModel.opmlFeed.currentPage}}]</h1>
+        <button class="button icon ion-magnet" ng-click="toggleReadFilter()"></button>
         <button class="button icon ion-navicon" ng-click="openPopover($event)"></button>
     </ion-footer-bar>
 
     <ion-content class="gem-ion-content">
         <ion-list>
-            <story story="story" open="openStory($index)" ng-repeat="story in viewModel.stories"></story>
+            <story story="story" open="openStory($index)"
+                   collection-repeat="story in viewModel.stories | filterRead:viewModel.filterHasRead"></story>
         </ion-list>
-        <div class="item" ng-show="!viewModeel.hasMoreStories">End Of Feed</div>
+        <div class="item" ng-show="!viewModel.hasMoreStories">End Of Feed</div>
         <ion-infinite-scroll ng-if="viewModel.hasMoreStories"
             on-infinite="loadMoreStories()"
+                             immediate-check="false"
             distance="1%">
         </ion-infinite-scroll>
     </ion-content>

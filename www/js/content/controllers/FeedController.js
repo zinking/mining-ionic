@@ -76,12 +76,25 @@ angular.module('mining.content')
             }
         }
     }])
+    .filter('filterRead', function(){
+        return function (stories, filterRead) {
+            var filtered = [];
+            for (var i = 0; i < stories.length; i++) {
+                var story = stories[i];
+                if (!(story.isRead&&filterRead)){
+                    filtered.push(story);
+                }
+            }
+            return filtered;
+        };
+    })
     .controller('FeedCtrl', function($scope, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
                                      $ionicScrollDelegate, ContentDataService, AccountDataService, SessionService) {
         $scope.viewModel = {
             stories : [],
             opmlFeed : {},
             isBusy : false,
+            filterHasRead: false,
             hasMoreStories : true
         };
 
@@ -90,6 +103,10 @@ angular.module('mining.content')
             var xmlUrlPre = xmlUrl.substring(0, mineUrl.length);
             return (xmlUrlPre === mineUrl)
         }
+
+        $scope.toggleReadFilter = function() {
+            $scope.viewModel.filterHasRead = !$scope.viewModel.filterHasRead;
+        };
 
         $scope.goHome = function(){
             if (isUrlStartWithMine($scope.viewModel.opmlFeed.XmlUrl)) {
@@ -241,26 +258,9 @@ angular.module('mining.content')
         }
 
         $scope.loadMoreStories = function(){
-            //var feedUrl = $scope.viewModel.opmlFeed.XmlUrl;
+            var requestPageNo = $scope.viewModel.opmlFeed.currentPage;
             var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
             $scope.viewModel.isBusy = true;
-            //console.log("stories before: ", $scope.viewModel.stories);
-            var requestPageNo = $scope.viewModel.opmlFeed.currentPage+1;
-
-            //console.log("let's try from cache first");
-            var cachedStories = globalUserData.getLocalStories(feedUrls, requestPageNo);
-            if (cachedStories.length>0) {
-                $scope.viewModel.opmlFeed.currentPage += 1;
-                $scope.viewModel.stories = $scope.viewModel.stories.concat(cachedStories);
-                $scope.$broadcast('scroll.infiniteScrollComplete');
-                $scope.$broadcast('scroll.resize');
-
-                $scope.scrollToLastRemembered();
-                $scope.viewModel.isBusy = false;
-                return;
-            }
-
-            //console.log("oops, let's go requesting");
             generalLoadMoreStories(feedUrls, requestPageNo).then(
                 function(data){
                     $scope.viewModel.isBusy = false;
@@ -272,7 +272,7 @@ angular.module('mining.content')
                     }
                     else{
                         //{Cursor,Stories,Star}
-                        $scope.viewModel.opmlFeed.currentPage += 1;
+                        $scope.viewModel.opmlFeed.currentPage = requestPageNo+1;
                         var newStories = globalUserData.addStories(
                             data.Stories,
                             data.UserReadStoryIds,
@@ -282,7 +282,6 @@ angular.module('mining.content')
                         if (newStories.length>0) {
                             $scope.$broadcast('scroll.infiniteScrollComplete');
                             $scope.$broadcast('scroll.resize');
-
                             $scope.scrollToLastRemembered();
                         } else {
                             $scope.viewModel.hasMoreStories = false;
@@ -305,6 +304,31 @@ angular.module('mining.content')
                 $ionicScrollDelegate.scrollTo(lastPos.left, lastPos.top);
             }
         };
+
+
+        $scope.displayCurrentStories = function() {
+            $scope.viewModel.pageLoaded = true;
+            var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
+            var requestPageNo = $scope.viewModel.opmlFeed.currentPage;
+            var cachedStories = globalUserData.getLocalStories(feedUrls, requestPageNo);
+            if (cachedStories.length>0) {
+                //console.log("intial loadded stories:",cachedStories.length);
+                $scope.viewModel.stories = $scope.viewModel.stories.concat(cachedStories);
+                $scope.$broadcast('scroll.infiniteScrollComplete');
+                $scope.$broadcast('scroll.resize');
+                $scope.scrollToLastRemembered();
+                return;
+            } else {
+                //console.log("intial loadded need request stories:",requestPageNo);
+                $scope.loadMoreStories();
+            }
+        };
+
+        //need to bring up current stories when loading the page
+        $scope.displayCurrentStories();
+
+
+
         $scope.rememberScrollPos = function() {
             var scrollPos = $ionicScrollDelegate.getScrollPosition();
             $scope.viewModel.opmlFeed.lastPos = scrollPos;

@@ -17,7 +17,8 @@ angular.module('mining.content')
         });
     }
 })
-.controller('StoryCtrl', function($scope, $ionicLoading, $state,$stateParams,$ionicPopup,
+.filter('unsafe', function($sce) { return $sce.trustAsHtml; })
+.controller('StoryCtrl', function($scope, $sce, $ionicLoading, $state,$stateParams,$ionicPopup,
                                       ContentDataService, SessionService) {
         $scope.viewModel = {
             story : {},
@@ -106,14 +107,6 @@ angular.module('mining.content')
                     function(){
                         $scope.viewModel.isBusy = false;
                         $scope.viewModel.story.Content = globalUserData.getStoryContentById(storyId);
-                        if ($scope.viewModel.story.Content==""){
-                            //var story = globalUserData.getStorySummaryById(storyId)
-                            $scope.viewModel.story = globalUserData.getStoryById(storyId);
-                            $scope.viewModel.story.Content=$scope.viewModel.story.Summary;
-                        }
-
-
-
                         //TODO: oh really, loaded means read ?
                         $scope.markStoryRead();
                     },
