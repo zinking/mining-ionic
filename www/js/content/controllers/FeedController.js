@@ -89,7 +89,7 @@ angular.module('mining.content')
         };
     })
     .controller('FeedCtrl', function($scope, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
-                                     $ionicScrollDelegate, ContentDataService, AccountDataService, SessionService) {
+                                     $ionicScrollDelegate, $q, ContentDataService, AccountDataService, SessionService) {
         $scope.viewModel = {
             stories : [],
             opmlFeed : {},
@@ -250,7 +250,7 @@ angular.module('mining.content')
             )
         };
 
-        function generalLoadMoreStories(feedUrls, pageNo) {
+        function generalLoadRequestedStories(feedUrls, pageNo) {
             var feedUrl = feedUrls[0]; //take one sample
             if (!isUrlStartWithMine(feedUrl)) {
                 return ContentDataService.loadMoreStories(feedUrls,pageNo);
@@ -259,11 +259,11 @@ angular.module('mining.content')
             }
         }
 
-        $scope.loadMoreStories = function(){
-            var requestPageNo = $scope.viewModel.opmlFeed.currentPage;
-            var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
+        $scope.loadRequestedStories = function(opmlFeed, pageToLoad){
+            var feedUrls = opmlFeed.getFeedsUrls();
             $scope.viewModel.isBusy = true;
-            generalLoadMoreStories(feedUrls, requestPageNo).then(
+            var deferred = $q.defer();
+            generalLoadRequestedStories(feedUrls, pageToLoad).then(
                 function(data){
                     $scope.viewModel.isBusy = false;
                     if (data.error != null){
@@ -271,69 +271,101 @@ angular.module('mining.content')
                             title: 'load more stories encountered issue',
                             subtitle:data.error
                         });
+                        deferred.reject();
                     }
                     else{
                         //{Cursor,Stories,Star}
-                        $scope.viewModel.opmlFeed.currentPage = requestPageNo+1;
                         var newStories = globalUserData.addStories(
                             data.Stories,
                             data.UserReadStoryIds,
                             data.UserStarStoryIds
                         );
-                        $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
-                        if (newStories.length>0) {
-                            $scope.$broadcast('scroll.infiniteScrollComplete');
-                            $scope.$broadcast('scroll.resize');
-                            $scope.scrollToLastRemembered();
-                        } else {
-                            $scope.viewModel.hasMoreStories = false;
-                        }
 
+                        if (data.Stories.length == 0){
+                            // if no data
+                            $scope.viewModel.hasMoreStories = false;
+                            data.status = 'LAST_PAGE';
+                            data.feedUrls = feedUrls;
+                            deferred.resolve(data);
+                        } else {
+                            deferred.resolve(data);
+                        }
                     }
+                    //return deferred.promise;
                 },
                 function(){
                     $scope.viewModel.isBusy = false;
                     $ionicPopup.alert({
                         title: 'load more storis Faild, retry later'
                     });
+                    deferred.reject();
+
+                }
+            );
+            return deferred.promise;
+        };
+
+        $scope.loadMoreStories = function() {
+            var opmlFeed = $scope.viewModel.opmlFeed;
+            var pageToLoad = opmlFeed.currentPage+1;
+            $scope.loadRequestedStories(opmlFeed,pageToLoad).then(
+                function(data){
+                    // on success
+                    // hooray
+                    if (data.status != 'LAST_PAGE') {
+                        opmlFeed.currentPage+=1;
+                    }
+                    $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
+                    $scope.$broadcast('scroll.infiniteScrollComplete');
+                    $scope.$broadcast('scroll.resize');
+                },
+                function(){
+                    //oops, you didn't flip the page
                 }
             )
         };
 
+
         $scope.scrollToLastRemembered = function() {
             if (typeof $scope.viewModel.opmlFeed.lastPos !== "undefined") {
                 var lastPos = $scope.viewModel.opmlFeed.lastPos;
-                $ionicScrollDelegate.scrollTo(lastPos.left, lastPos.top);
+                setTimeout(function() { //has no clue why this is needed
+                    $ionicScrollDelegate.scrollTo(lastPos.left, lastPos.top);
+                },10);
+                return
             }
         };
 
 
         $scope.displayCurrentStories = function() {
             $scope.viewModel.pageLoaded = true;
-            var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
-            var requestPageNo = $scope.viewModel.opmlFeed.currentPage;
-            var cachedStories = globalUserData.getLocalStories(feedUrls, requestPageNo);
+            var opmlFeed = $scope.viewModel.opmlFeed;
+            var feedUrls = opmlFeed.getFeedsUrls();
+            var pageToLoad = opmlFeed.currentPage;
+            //var cachedStories = globalUserData.getLocalFeedStoriesOfPage(feedUrls, pageToLoad);
+            var cachedStories = globalUserData.getStoriesByOpml(opmlFeed);
             if (cachedStories.length>0) {
-                //console.log("intial loadded stories:",cachedStories.length);
-                $scope.viewModel.stories = $scope.viewModel.stories.concat(cachedStories);
-                $scope.$broadcast('scroll.infiniteScrollComplete');
-                $scope.$broadcast('scroll.resize');
+                $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
                 $scope.scrollToLastRemembered();
+
                 return;
             } else {
-                //console.log("intial loadded need request stories:",requestPageNo);
-                $scope.loadMoreStories();
+                //if requested current page is not downloaded yet
+                $scope.loadRequestedStories(opmlFeed,pageToLoad).then(
+                    function(data){
+                        $scope.viewModel.stories = globalUserData.getStoriesByOpml(opmlFeed);
+                        $scope.scrollToLastRemembered();
+                    },
+                    function(){
+                        //oops, you didn't flip the page
+                    }
+                );
+                return;
             }
         };
 
         //need to bring up current stories when loading the page
-
-
-        if ($stateParams.source == 'storyPage') {
-            $scope.displayCurrentStories();
-        } else {
-            $scope.displayCurrentStories();
-        }
+        $scope.displayCurrentStories();
 
 
 

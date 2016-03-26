@@ -392,9 +392,16 @@ angular.module('mining.content')
             return [];
         };
 
-        //get local cached stories for the specified feeds *feeds*
-        //if one of the feed cache returned empty, then the whole call return empty
-        UserDataModel.prototype.getLocalStories = function(xmlUrls, pageNo) {
+
+        /**
+         * get Feed Stories of specified page,
+         * get local cached stories for the specified feeds *feeds*
+         * if one of the feed cache returned empty, then the whole call return empty
+         * @param xmlUrls
+         * @param pageNo
+         * @returns {Array}
+         */
+        UserDataModel.prototype.getLocalFeedStoriesOfPage = function(xmlUrls, pageNo) {
             var me = this;
             var allFeedsStories = [];
             _.each(xmlUrls, function(xmlUrl,i){
@@ -411,7 +418,11 @@ angular.module('mining.content')
             return allFeedsStories;
         };
 
-
+        /**
+         * return all the stories that are available locally
+         * @param opmlFeed
+         * @returns {*}
+         */
         UserDataModel.prototype.getStoriesByOpml = function(opmlFeed) {
             var me = this;
             if (opmlFeed.hasOutline) {
@@ -428,7 +439,11 @@ angular.module('mining.content')
                 });
                 return outlineStories;
             } else{
-                return this.StoriesMap[opmlFeed.XmlUrl];
+                if (opmlFeed.XmlUrl in this.StoriesMap) {
+                    return this.StoriesMap[opmlFeed.XmlUrl];
+                } else {
+                    return [];
+                }
             }
         };
 

@@ -80,6 +80,7 @@ angular.module('mining', [
             })
             .state('story', {
                 url: '/story',
+                cache: false,
                 templateUrl: 'js/content/templates/StoryView.html',
                 params: { story: null,opmlFeed: null },
                 controller: 'StoryCtrl'
