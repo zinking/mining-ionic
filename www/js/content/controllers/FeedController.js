@@ -94,7 +94,8 @@ angular.module('mining.content')
             stories : [],
             opmlFeed : {},
             isBusy : false,
-            filterHasRead: false,
+            //filterHasRead: false,
+            source : '',
             hasMoreStories : true
         };
 
@@ -105,7 +106,7 @@ angular.module('mining.content')
         }
 
         $scope.toggleReadFilter = function() {
-            $scope.viewModel.filterHasRead = !$scope.viewModel.filterHasRead;
+            $scope.viewModel.opmlFeed.fiterHasRead = !$scope.viewModel.opmlFeed.filterHasRead;
         };
 
         $scope.goHome = function(){
@@ -124,8 +125,9 @@ angular.module('mining.content')
             return;
         }
 
-        var opmlFeed = $stateParams.opmlFeed;
-        $scope.viewModel.opmlFeed = opmlFeed;
+        var opmlFeed =
+        $scope.viewModel.opmlFeed = $stateParams.opmlFeed;
+        $scope.viewModel.source = $stateParams.source;
 
 
         /* pop over setup section*/
@@ -325,7 +327,13 @@ angular.module('mining.content')
         };
 
         //need to bring up current stories when loading the page
-        $scope.displayCurrentStories();
+
+
+        if ($stateParams.source == 'storyPage') {
+            $scope.displayCurrentStories();
+        } else {
+            $scope.displayCurrentStories();
+        }
 
 
 

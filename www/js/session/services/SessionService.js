@@ -1,6 +1,6 @@
 angular.module('mining.session')
-    //.constant('BASE_SERVER_URL', 'http://0.0.0.0:9000')
-    .constant('BASE_SERVER_URL', 'http://120.24.209.215:9000')
+    .constant('BASE_SERVER_URL', 'http://0.0.0.0:9000')
+    //.constant('BASE_SERVER_URL', 'http://120.24.209.215:9000')
     //.constant('BASE_SERVER_URL', 'http://readmine.co:9000')
     .factory('SessionService', function(SessionsStorage) {
         return {

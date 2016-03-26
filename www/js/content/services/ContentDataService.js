@@ -1,5 +1,5 @@
 angular.module('mining.content')
-    .factory('ContentDataService', function($http, $q, SessionService, BASE_SERVER_URL, UserDataModel) {
+    .factory('ContentDataService', function($http, $q, $interval, SessionService, BASE_SERVER_URL, UserDataModel) {
 
         var LIST_FEEDS_PATH             = BASE_SERVER_URL + '/user/list-feeds';
         var LIST_STAR_FEEDS_PATH        = BASE_SERVER_URL + '/user/list-starfeeds';
@@ -12,7 +12,27 @@ angular.module('mining.content')
         var MARK_STORY_READ_PATH        = BASE_SERVER_URL + '/user/mark-read';
         var MARK_STORY_STAR_PATH        = BASE_SERVER_URL + '/user/mark-star';
         var MARK_FEED_READ_PATH         = BASE_SERVER_URL + '/user/mark-feedread';
-        var MARK_FEEDS_READ_PATH         = BASE_SERVER_URL + '/user/mark-feedsread';
+        var MARK_FEEDS_READ_PATH        = BASE_SERVER_URL + '/user/mark-feedsread';
+        var APPEND_STORY_STATS_PATH     = BASE_SERVER_URL + '/user/append-stats';
+
+
+        //push the stats collected to server every 1 minute
+        var statsPusher = $interval(function(){
+            if (globalUserData.UserActStats.length > 0) {
+                var data = globalUserData.UserActStats;
+                var req = SessionService.getUserPostRequest(APPEND_STORY_STATS_PATH, data);
+                $http(req).
+                    success(function (d) {
+                        //maybe check the return val is 1
+                        globalUserData.clearStats();
+                    }).
+                    error(function () {
+                        console.log("error sending stats to server")
+                    });
+            }
+
+        }, 1000*60*1);
+
 
         return {
             listFeed: function(){

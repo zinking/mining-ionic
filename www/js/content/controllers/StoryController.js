@@ -23,6 +23,7 @@ angular.module('mining.content')
         $scope.viewModel = {
             story : {},
             isBusy : false,
+            startTimeStamp: 0,
             opmlFeed : {}
         };
 
@@ -41,8 +42,26 @@ angular.module('mining.content')
         $scope.viewModel.story = $stateParams.story;
         $scope.viewModel.opmlFeed = $stateParams.opmlFeed;
 
+
+        $scope.viewModel.startTimeStamp = new Date().getTime();
+
         $scope.goToFeed = function(){
-            $state.go('feed',{opmlFeed:$scope.viewModel.opmlFeed})
+
+            var endTimeStamp = new Date().getTime();
+            var duration = endTimeStamp - $scope.viewModel.startTimeStamp;
+
+            globalUserData.appendUserStats(
+                $scope.viewModel.startTimeStamp,
+                'READ_STORY',
+                $scope.viewModel.story.FeedId,
+                $scope.viewModel.story.Id,
+                'Duration:'+duration
+            );
+
+            $state.go('feed',{
+                opmlFeed:$scope.viewModel.opmlFeed,
+                source:'storyPage'
+            })
         };
 
         $scope.markStoryRead = function() {

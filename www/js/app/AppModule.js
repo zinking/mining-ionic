@@ -63,7 +63,7 @@ angular.module('mining', [
                 url: '/feed',
                 cache: false,
                 templateUrl: 'js/content/templates/FeedView.html',
-                params: { opmlFeed:null },
+                params: { opmlFeed:null, source:null },
                 controller: 'FeedCtrl'
             })
             .state('addfeed', {

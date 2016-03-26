@@ -11,6 +11,7 @@ angular.module('mining.account')
             AccountDataService.login($scope.viewModel.email,$scope.viewModel.pass).then(
                 function(){
                     $state.go('tab.contents');
+                    return
                 },
                 function(){
                     $ionicPopup.alert({
@@ -21,7 +22,7 @@ angular.module('mining.account')
 
                 }
             )
-        }
+        };
 
         $scope.goRegister = function(){
             $state.go('register')

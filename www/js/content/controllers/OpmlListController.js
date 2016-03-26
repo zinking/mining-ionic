@@ -67,7 +67,10 @@ angular.module('mining.content')
         };
 
         $scope.openOpmlFeed = function ( fo ){
-            $state.go('feed',{opmlFeed:fo});
+            $state.go('feed',{
+                opmlFeed:fo,
+                source:'OPMLLIST'
+            });
         };
 
         $scope.openAddPanel = function (){

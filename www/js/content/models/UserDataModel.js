@@ -5,7 +5,26 @@ angular.module('mining.content')
             this.email = "";
             this.apiKey = "";
 
+            this.UserActStats = [];
+
             this.cleanFeedStructure();
+        };
+
+        UserDataModel.prototype.clearStats = function() {
+            this.UserActStats = [];
+        };
+
+        UserDataModel.prototype.appendUserStats = function(timestamp, action, feedId, storyId, content) {
+            //new Date().getTime();
+            var userStat = {
+                'TimeStamp':timestamp,
+                'Action':action,
+                'FeedId':feedId,
+                'StoryId':storyId,
+                'Content':content
+            };
+
+            this.UserActStats.push(userStat);
         };
 
         UserDataModel.prototype.cleanFeedStructure = function() {

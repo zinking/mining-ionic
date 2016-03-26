@@ -55,7 +55,7 @@
     <ion-content class="gem-ion-content">
         <ion-list>
             <story story="story" open="openStory($index)"
-                   collection-repeat="story in viewModel.stories | filterRead:viewModel.filterHasRead"></story>
+                   collection-repeat="story in viewModel.stories | filterRead:viewModel.opmlFeed.filterHasRead"></story>
         </ion-list>
         <div class="item" ng-show="!viewModel.hasMoreStories">End Of Feed</div>
         <ion-infinite-scroll ng-if="viewModel.hasMoreStories"
