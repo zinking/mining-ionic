@@ -54,6 +54,11 @@ angular.module('mining', [
                 controller: 'LoginCtrl',
                 templateUrl: "js/account/templates/LoginView.html"
             })
+            .state('logout', {
+                url: "/logout",
+                controller: 'LogoutCtrl',
+                templateUrl: "js/account/templates/LogoutView.html"
+            })
             .state('register', {
                 url: "/register",
                 controller: 'RegisterCtrl',

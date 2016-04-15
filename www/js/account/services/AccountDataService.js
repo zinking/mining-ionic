@@ -14,6 +14,9 @@ angular.module('mining.account')
                     return null;
                 }
             },
+            wipeUserData : function() {
+                window.localStorage['userData'] = null;
+            },
             login : function ( email, pass ) {
                 var deferred = $q.defer();
                 var promise = deferred.promise;
