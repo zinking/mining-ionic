@@ -1,0 +1,64 @@
+<ion-view view-title="Add Feed">
+    <ion-header-bar class="bar-calm">
+        <h1 class="title">Manage Feeds</h1>
+    </ion-header-bar>
+
+    <div class="bar bar-header item-input-inset">
+        <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
+        <label class="item-input-wrapper">
+            <i class="icon ion-ios-search placeholder-icon"></i>
+            <!--<input type="text" placeholder="Add Feed" ng-model="viewModel.feedUrl" ng-enter="previewFeedSource($event)">-->
+            <input ion-autocomplete type="text"
+                   readonly="readonly"
+                   class="ion-autocomplete"
+                   autocomplete="off"
+                   items-method="getAddSuggestion(query)"
+                   items-method-value-key="items"
+                   ng-model="viewModel.feedUrl"
+                   max-selected-items="1" />
+        </label>
+        <button class="button button-clear" ng-click="previewFeedSource($event)" >
+            Preview
+        </button>
+    </div>
+
+    <ion-content class="has-header gem-ion-content" ng-show="viewModel.hasFeedStory">
+
+        <ion-list>
+        <div class="list card" ng-repeat="story in viewModel.feedStories">
+            <div class="item item-avatar">
+                <h2>{{story.Title}}</h2>
+                <p>{{story.Author}}</p>
+                <p>{{story.Updated}}</p>
+            </div>
+        </div>
+        </ion-list>
+
+    </ion-content>
+
+    <!-- align to the bottom of the page -->
+    <div ng-show="viewModel.hasFeedStory" class="fixed-outside"
+         style="position: absolute; bottom: 0px; width: 100%; background-color: white; padding:1em">
+        <div class="row" style="text-align: center; padding:0 1em;">
+            <div class="col">
+                <button class="button icon-left ion-home button-positive"
+                        ng-click="goHome()">Back</button>
+            </div>
+            <div class="col">
+                <label class="item item-input item-select">
+                    <div class="input-label">
+                        Under Folder:
+                    </div>
+
+                    <input id="folderPicker" ng-model="viewModel.underFolder" value=""/>
+
+                </label>
+            </div>
+            <div class="col">
+                <button class="button icon-left ion-star button-positive"
+                        ng-click="addFeedSource()">Add</button>
+
+            </div>
+        </div>
+    </div>
+</ion-view>

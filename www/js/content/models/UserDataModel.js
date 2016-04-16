@@ -252,6 +252,19 @@ angular.module('mining.content')
             }
         };
 
+        UserDataModel.prototype.getAllFolderOpmls = function() {
+            var me = this;
+            var folderOpmls = [];
+            for(i=0, len=me.Opml.length; i<len; i++) {
+                var opmlOutline = me.Opml[i];
+                if (opmlOutline.hasOutline) {
+                    folderOpmls.push(opmlOutline)
+                }
+            }
+            return folderOpmls;
+
+        };
+
         UserDataModel.prototype.markStoryRead = function(story) {
             me = this;
             story.isRead = true;

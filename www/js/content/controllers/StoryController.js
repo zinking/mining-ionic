@@ -75,6 +75,10 @@ angular.module('mining.content')
                     if (data.error!=null){
                         console.info("mark story read failed ", feedId, storyId, data.error)
                     } else {
+                        //TODO: issue: unread counter not decreased in all scenarios
+                        //for some feed, the counter can be decreased and propogated to corresponding views
+                        //but egg. bohaishibei, this is not the case.
+                        //in `gud` the opml counter is decreased, but going back to feed page, the counter is resumed
                         globalUserData.markStoryRead($scope.viewModel.story);
                     }
                 },

@@ -95,7 +95,7 @@ angular.module('mining.content')
             opmlFeed : {},
             isBusy : false,
             //filterHasRead: false,
-            source : '',
+            source : '', //indicating coming from which page
             hasMoreStories : true
         };
 
@@ -125,7 +125,6 @@ angular.module('mining.content')
             return;
         }
 
-        var opmlFeed =
         $scope.viewModel.opmlFeed = $stateParams.opmlFeed;
         $scope.viewModel.source = $stateParams.source;
 
@@ -192,8 +191,7 @@ angular.module('mining.content')
             var feedUrls = $scope.viewModel.opmlFeed.getFeedsUrls();
             var feedIds = _.map(feedUrls, function(feedUrl,i){
                 var feed = globalUserData.FeedsMap[feedUrl];
-                var feedId = feed.Id;
-                return feedId;
+                return feed.Id;
             });
             $scope.viewModel.isBusy = true;
 
@@ -332,7 +330,6 @@ angular.module('mining.content')
                 setTimeout(function() { //has no clue why this is needed
                     $ionicScrollDelegate.scrollTo(lastPos.left, lastPos.top);
                 },10);
-                return
             }
         };
 

@@ -19,5 +19,9 @@
     "www/lib",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+    "ion-autocomplete": "~0.3.2",
+    "angular-ui-select2": "~0.0.5"
+  }
 }

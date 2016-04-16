@@ -5,11 +5,10 @@ angular.module('mining.content')
                                          SessionService) {
         $scope.viewModel = {
             feedUrl: "",
-            hasFeedStory : false,
+            hasFeedStory : true,
             isBusy: false,
             feedStories : []
         };
-
 
         $scope.goHome = function(){
             $state.go('tab.contents')
@@ -20,9 +19,43 @@ angular.module('mining.content')
             return;
         }
 
+        $scope.getFolderOptions = function() {
+            var folderOpmls = globalUserData.getAllFolderOpmls();
+            function opmlToOption(opml) {
+                return {id: opml.Title, text: opml.Title};
+            }
+            var options = _.map(folderOpmls, opmlToOption);
+            return options;
+        };
+
+        $('#folderPicker').select2({
+            data: $scope.getFolderOptions(),
+            width: 'resolve',
+            createSearchChoice: function(term, data) {
+                var filteredOptions = _.filter(data,function(option){
+                    return option.text.indexOf(term) > -1;
+                });
+                if (filteredOptions.length==0) {
+                    return { id:term, text:term };
+                } else {
+                    return filteredOptions;
+                }
+            }
+        });
+
+
+        $scope.getAddSuggestion =function (query, isInitializing) {
+            if(isInitializing || query.length < 5) {
+                return { items: [] }
+            } else {
+                return ContentDataService.getAddSuggestion(query)
+            }
+        };
+
         $scope.addFeedSource = function(){
             $scope.viewModel.isBusy = true;
-            ContentDataService.addFeedSource($scope.viewModel.feedUrl).then(
+            var selectedFolder = $('#folderPicker').val();
+            ContentDataService.addFeedSource($scope.viewModel.feedUrl,selectedFolder).then(
                 function(data){
                     $scope.viewModel.isBusy = false;
                     if (data.error!=null){
@@ -33,12 +66,9 @@ angular.module('mining.content')
                     }
                     else{
                         $ionicPopup.alert({
-                            title: data.data
+                            title: 'Subscribe Feed Success',
+                            subtitle: data.data
                         });
-
-                        //load latest content
-                        ContentDataService.listFeed();
-                        $state.go('tab.contents')
                     }
                 },
                 function(){
@@ -64,6 +94,7 @@ angular.module('mining.content')
                     $scope.viewModel.feedUrl = feedUrl;
                 }
                 $scope.viewModel.isBusy = true;
+
                 ContentDataService.previewFeedSource(feedUrl).then(
                     function(data){
                         $scope.viewModel.isBusy = false;

@@ -7,6 +7,7 @@ angular.module('mining.content')
         var GET_MORE_STARFEEDS_PATH     = BASE_SERVER_URL + '/user/get-starstories';
         var LOAD_STORY_CONTENT_PATH     = BASE_SERVER_URL + '/user/get-contents';
         var ADD_FEED_SOURCE_PATH        = BASE_SERVER_URL + '/user/add-subscription';
+        var GET_ADD_SUGGEST_PATH        = BASE_SERVER_URL + '/user/get-addsuggestion';
         var REMOVE_FEED_SOURCE_PATH     = BASE_SERVER_URL + '/user/remove-subscription';
         var PREVIEW_FEED_SOURCE_PATH    = BASE_SERVER_URL + '/user/preview-subscription';
         var MARK_STORY_READ_PATH        = BASE_SERVER_URL + '/user/mark-read';
@@ -32,6 +33,18 @@ angular.module('mining.content')
             }
 
         }, 1000*60*1);
+
+        function makeHttpRequest(request) {
+            var deferred = $q.defer();
+            $http(request).
+                success(function (d) {
+                    deferred.resolve(d);
+                }).
+                error(function () {
+                    deferred.reject();
+                });
+            return deferred.promise;
+        }
 
 
         return {
@@ -96,129 +109,54 @@ angular.module('mining.content')
             previewFeedSource: function(feedUrl) {
                 var requestData = {'url':feedUrl};
                 var req = SessionService.getUserPostRequest(PREVIEW_FEED_SOURCE_PATH,requestData);
-                var deferred = $q.defer();
-
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             },
-            addFeedSource: function(feedUrl) {
-                var requestData = {'url':feedUrl};
+            getAddSuggestion: function(query) {
+                var requestData = {'query':query};
+                var req = SessionService.getUserPostRequest(GET_ADD_SUGGEST_PATH,requestData);
+                return makeHttpRequest(req);
+            },
+            addFeedSource: function(feedUrl,folder) {
+                var requestData = {'url':feedUrl,'folder':folder};
                 var req = SessionService.getUserPostRequest(ADD_FEED_SOURCE_PATH,requestData);
-                var deferred = $q.defer();
-
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             },
             loadMoreStories: function(feedUrls, pageNo) {
                 var requestData = {'FS':feedUrls, 'C':pageNo};
                 var req = SessionService.getUserPostRequest(GET_MORE_FEEDS_PATH,requestData);
-                var deferred = $q.defer();
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             },
 
             loadMoreStarStories: function(feedUrls, pageNo) {
                 var requestData = {'FS':feedUrls, 'C':pageNo};
                 var req = SessionService.getUserPostRequest(GET_MORE_STARFEEDS_PATH,requestData);
-                var deferred = $q.defer();
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             },
             markStoryRead: function(feedId, storyId) {
                 if (storyId<0) storyId = -storyId; //I know this is the virtual stories
                 var requestData = [{'FeedId':feedId, 'StoryId':storyId, 'Read':1}];
                 var req = SessionService.getUserPostRequest(MARK_STORY_READ_PATH,requestData);
-                var deferred = $q.defer();
-
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             },
             markStoryStar: function(feedId, storyId) {
                 if (storyId<0) storyId = -storyId; //I know this is the virtual stories
                 var requestData = {'FeedId':feedId, 'StoryId':storyId, 'Star':1};
                 var req = SessionService.getUserPostRequest(MARK_STORY_STAR_PATH,requestData);
-                var deferred = $q.defer();
-
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             },
             markFeedRead: function(feedId) {
                 var requestData = {'FeedId':feedId};
                 var req = SessionService.getUserPostRequest(MARK_FEED_READ_PATH,requestData);
-                var deferred = $q.defer();
-
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             },
             markFeedsRead: function(feedIds) {
-                var requestData = feedIds;
-                var req = SessionService.getUserPostRequest(MARK_FEEDS_READ_PATH,requestData);
-                var deferred = $q.defer();
-
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                var req = SessionService.getUserPostRequest(MARK_FEEDS_READ_PATH,feedIds);
+                return makeHttpRequest(req);
             },
             removeFeedSource: function(feedUrl) {
                 var requestData = {'url':feedUrl};
                 var req = SessionService.getUserPostRequest(REMOVE_FEED_SOURCE_PATH,requestData);
-                var deferred = $q.defer();
-
-                $http(req).
-                    success(function (d) {
-                        deferred.resolve(d);
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             }
 
         };

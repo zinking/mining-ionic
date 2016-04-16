@@ -1,5 +1,7 @@
 angular.module('mining', [
     'angularMoment',
+    'ion-autocomplete',
+    'ui.select2',
     'mining.session',
     'mining.content',
     'mining.account'
@@ -27,6 +29,9 @@ angular.module('mining', [
             })
             .state('tab.contents', {
                 url: '/contents',
+                // this page should be cached, as it is the heaviest
+                // TODO: the side effect of this is, the counters are not up-to-date
+                // I'm keeping this issue at the moment
                 views: {
                     'tab-contents': {
                         templateUrl: 'js/content/templates/OpmlNestedListView.html',
@@ -74,7 +79,7 @@ angular.module('mining', [
             .state('addfeed', {
                 url: '/addfeed',
                 cache: false,
-                templateUrl: 'js/content/templates/AddNestedListView.html',
+                templateUrl: 'js/content/templates/AddFeedView.html',
                 controller: 'AddFeedCtrl'
             })
             .state('bulkfeed', {

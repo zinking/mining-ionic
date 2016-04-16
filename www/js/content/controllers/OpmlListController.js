@@ -38,6 +38,7 @@ angular.module('mining.content')
         }
 
         $scope.viewModel.isBusy = true;
+        $scope.viewModel.totalUnReadCount = globalUserData.totalUnReadCount;
 
         ContentDataService.listFeed().then(
             function(){
