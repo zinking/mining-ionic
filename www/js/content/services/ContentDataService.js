@@ -16,6 +16,8 @@ angular.module('mining.content')
         var MARK_FEED_READ_PATH         = BASE_SERVER_URL + '/user/mark-feedread';
         var MARK_FEEDS_READ_PATH        = BASE_SERVER_URL + '/user/mark-feedsread';
         var APPEND_STORY_STATS_PATH     = BASE_SERVER_URL + '/user/append-stats';
+        var LOAD_LM_READ_STATS_PATH     = BASE_SERVER_URL + '/user/load-lastmonth-readstats';
+        var LOAD_LM_FEED_STATS_PATH     = BASE_SERVER_URL + '/user/load-lastmonth-feedstats';
 
 
         //push the stats collected to server every 1 minute
@@ -123,7 +125,8 @@ angular.module('mining.content')
                 return makeHttpRequest(req);
             },
             arrangeFeedSource: function(changes) {
-                var req = SessionService.getUserPostRequest(ADD_FEED_SOURCE_PATH,changes);
+                var requestData = {"changes":changes};
+                var req = SessionService.getUserPostRequest(ARRANGE_FEED_SOURCE_PATH,requestData);
                 return makeHttpRequest(req);
             },
             loadMoreStories: function(feedUrls, pageNo) {
@@ -161,6 +164,14 @@ angular.module('mining.content')
             removeFeedSource: function(feedUrl) {
                 var requestData = {'url':feedUrl};
                 var req = SessionService.getUserPostRequest(REMOVE_FEED_SOURCE_PATH,requestData);
+                return makeHttpRequest(req);
+            },
+            loadLastMonthFeedStats: function() {
+                var req = SessionService.getUserPostRequest(LOAD_LM_FEED_STATS_PATH,{});
+                return makeHttpRequest(req);
+            },
+            loadLastMonthReadStats: function() {
+                var req = SessionService.getUserPostRequest(LOAD_LM_READ_STATS_PATH,{});
                 return makeHttpRequest(req);
             }
 

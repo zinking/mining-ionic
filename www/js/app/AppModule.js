@@ -2,6 +2,7 @@ angular.module('mining', [
     'angularMoment',
     'ion-autocomplete',
     'ui.select2',
+    'nvd3',
     'mining.session',
     'mining.content',
     'mining.account'
