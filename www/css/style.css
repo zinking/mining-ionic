@@ -73,3 +73,19 @@ div.story .spinner svg {
     border-bottom:#ddd solid;
 }
 
+.unsubsribe-inactive {
+    color:silver;
+    font-size:1.5em;
+    margin-right:1em;
+}
+
+.unsubsribe-active {
+    color:red;
+    font-size:1.5em;
+    margin-right:1em;
+}
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+    display: none !important;
+}
+

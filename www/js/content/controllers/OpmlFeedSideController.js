@@ -9,7 +9,8 @@ angular.module('mining.content')
         };
 
         $scope.goHome = function(){
-            $state.go('tab.contents')
+            $state.go('tab.contents');
+            return;
         };
 
         if (typeof globalUserData === "undefined") {
@@ -37,8 +38,6 @@ angular.module('mining.content')
                 $scope.viewModel.opmlsList = globalUserData.Opml;
             }
         );
-
-
 
         function stripSummary(html)
         {

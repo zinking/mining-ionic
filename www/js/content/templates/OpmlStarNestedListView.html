@@ -1,4 +1,4 @@
-<ion-view view-title="">
+<ion-view view-title="Follow Star Feeds">
 
     <ion-header-bar class="bar-calm">
         <button class="button button-icon icon ion-navicon" ></button>
@@ -11,13 +11,13 @@
         <ion-list>
             <ion-item ng-repeat="opml in viewModel.opmlsList"  >
                 <i class="icon ion-folder" ng-if="opml.hasOutline" ng-click="openFolder(opml)"></i>
-                <i class="icon ion-document" ng-if="!opml.hasOutline"></i>
+                <i class="icon ion-person" ng-if="!opml.hasOutline"></i>
                 <b ng-click="openOpmlFeed( opml )">{{opml.Title}}</b>
                 <!--<span class="badge badge-assertive" ng-show="opml.unReadCount!=0">{{opml.unReadCount}}</span>-->
                 <ion-list ng-show="opml.isOpen">
                     <ion-item class="item-accordion" ng-repeat="feed in opml.Outline"
                             style="border:none">
-                        <i class="icon ion-document"></i>
+                        <i class="icon ion-person"></i>
                         <b ng-click="openOpmlFeed( feed )" style="width:90%">{{feed.Title}}</b>
                         <!--<span class="badge badge-assertive" ng-show="feed.unReadCount!=0">{{feed.unReadCount}}</span>-->
                     </ion-item>

@@ -10,6 +10,8 @@ angular.module('mining.content')
             this.cleanFeedStructure();
         };
 
+
+
         UserDataModel.prototype.clearStats = function() {
             this.UserActStats = [];
         };

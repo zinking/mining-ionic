@@ -41,10 +41,21 @@ angular.module('mining', [
             })
             .state('tab.stars', {
                 url: '/stars',
+                //cache: false,
                 views: {
                     'tab-stars': {
                         templateUrl: 'js/content/templates/OpmlStarNestedListView.html',
                         controller: 'OpmlStarListCtrl'
+                    }
+                }
+            })
+            .state('tab.manage', {
+                url: '/manage',
+                cache:false,
+                views: {
+                    'tab-manage': {
+                        templateUrl: 'js/content/templates/ManageView.html',
+                        controller: 'ManageCtrl'
                     }
                 }
             })
@@ -95,6 +106,25 @@ angular.module('mining', [
                 params: { story: null,opmlFeed: null },
                 controller: 'StoryCtrl'
             })
+
+            .state('arrangefeed', {
+                url: '/arrangefeed',
+                cache: false,
+                templateUrl: 'js/content/templates/ManageArrangeFeedView.html',
+                controller: 'ArrangeFeedCtrl'
+            })
+            .state('readingtrends', {
+                url: '/readingtrends',
+                cache: false,
+                templateUrl: 'js/content/templates/ManageReadingTrendsView.html',
+                controller: 'ReadingTrendsCtrl'
+            })
+            .state('feedtrends', {
+                url: '/feedtrends',
+                cache: false,
+                templateUrl: 'js/content/templates/ManageFeedTrendsView.html',
+                controller: 'FeedTrendsCtrl'
+            })
             ;
         $urlRouterProvider.otherwise('/tab/contents');
     })
@@ -102,3 +132,12 @@ angular.module('mining', [
     .controller('TabCtrl', function ($scope) {
 
     });
+
+function clone(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}

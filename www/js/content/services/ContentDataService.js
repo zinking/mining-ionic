@@ -7,6 +7,7 @@ angular.module('mining.content')
         var GET_MORE_STARFEEDS_PATH     = BASE_SERVER_URL + '/user/get-starstories';
         var LOAD_STORY_CONTENT_PATH     = BASE_SERVER_URL + '/user/get-contents';
         var ADD_FEED_SOURCE_PATH        = BASE_SERVER_URL + '/user/add-subscription';
+        var ARRANGE_FEED_SOURCE_PATH    = BASE_SERVER_URL + '/user/arrange-feedsource';
         var GET_ADD_SUGGEST_PATH        = BASE_SERVER_URL + '/user/get-addsuggestion';
         var REMOVE_FEED_SOURCE_PATH     = BASE_SERVER_URL + '/user/remove-subscription';
         var PREVIEW_FEED_SOURCE_PATH    = BASE_SERVER_URL + '/user/preview-subscription';
@@ -119,6 +120,10 @@ angular.module('mining.content')
             addFeedSource: function(feedUrl,folder) {
                 var requestData = {'url':feedUrl,'folder':folder};
                 var req = SessionService.getUserPostRequest(ADD_FEED_SOURCE_PATH,requestData);
+                return makeHttpRequest(req);
+            },
+            arrangeFeedSource: function(changes) {
+                var req = SessionService.getUserPostRequest(ADD_FEED_SOURCE_PATH,changes);
                 return makeHttpRequest(req);
             },
             loadMoreStories: function(feedUrls, pageNo) {

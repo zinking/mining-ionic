@@ -1,4 +1,4 @@
-<ion-view view-title="">
+<ion-view view-title="All Feeds">
 
     <script id="home-menu-popover.html" type="text/ng-template">
         <ion-popover-view>
@@ -36,13 +36,13 @@
         <ion-list>
             <ion-item ng-repeat="opml in viewModel.opmlsList"  class="folder-item">
                 <i class="icon ion-folder folder-item-icon" ng-if="opml.hasOutline" ng-click="openFolder(opml)"></i>
-                <i class="icon ion-document folder-item-icon" ng-if="!opml.hasOutline"></i>
+                <i class="icon ion-social-rss folder-item-icon" ng-if="!opml.hasOutline"></i>
                 <b ng-click="openOpmlFeed( opml )" style="padding-right:50%">{{opml.Title}}</b>
                 <span class="badge badge-assertive badge-unread" style="top:7px"
                       ng-show="opml.unReadCount!=0">{{opml.unReadCount}}</span>
                 <ion-list ng-show="opml.isOpen">
                     <ion-item class="item-accordion outline-item" ng-repeat="feed in opml.Outline" >
-                        <i class="icon ion-document"></i>
+                        <i class="icon ion-social-rss"></i>
                         <b ng-click="openOpmlFeed( feed )" style="padding-right:50%">{{feed.Title}}</b>
                         <span class="badge badge-assertive" style="top:7px"
                               ng-show="feed.unReadCount!=0">{{feed.unReadCount}}</span>
