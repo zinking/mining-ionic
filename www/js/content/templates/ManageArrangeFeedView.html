@@ -1,13 +1,13 @@
-<ion-view view-title="Manage your account">
+<ion-view view-title="Manage Account Setting">
     <ion-header-bar class="bar-calm">
         <button class='button icon ion-arrow-left-a' ng-click='goHome()'></button>
         <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
-        <h1 class="title">Arrange your feeds</h1>
+        <h1 class="title">Arrange feeds</h1>
         <button class="button icon ion-thumbsup" ng-click="applyAllChanges()">Apply</button>
     </ion-header-bar>
 
     <ion-content class="has-header gem-ion-content">
-        <div class="list">
+        <div id="manage" class="list">
 
             <div class="card" ng-repeat="opml in viewModel.currentOpmlFeeds " ng-cloak>
                 <div class="item item-divider" ng-if="opml.hasOutline">
@@ -22,16 +22,16 @@
 
                     <label class="item item-input" ng-click="markFeedDelete(opml)">
                         <i class="icon ion-android-delete unsubsribe-inactive" ></i>
-                        <h2>{{opml.XmlUrl}} @ {{opml.OFolder}}</h2>
+                        <h2 class="oneline" >{{opml.XmlUrl}}</h2>
                     </label>
 
                     <label class="item item-input">
-                        <span class="input-label">Change Title</span>
+                        <span class="input-label">Title</span>
                         <input type="text" placeholder="Feed Title" ng-model="opml.Title"/>
                     </label>
 
                     <label class="item item-input">
-                        <span class="input-label">Change Folder</span>
+                        <span class="input-label">Folder</span>
                         <select ui-select2="pickOption" ng-model="opml.Folder" data-placeholder="Pick a folder">
                             <!--<option value="opml.OFolder">{{opml.OFolder}}</option>-->
                             <option ng-repeat="folderOption in viewModel.folderOptions"
@@ -52,16 +52,16 @@
                     <!--TODO: possibly highlight the unbsubscribe after click-->
                     <label class="item item-input" ng-click="markFeedDelete(feed)">
                         <a><i class="icon ion-android-delete unsubsribe-inactive" ></i></a>
-                        <h2>{{feed.XmlUrl}} @ {{feed.OFolder}}</h2>
+                        <h2 class="oneline" >{{feed.XmlUrl}}</h2>
                     </label>
 
                     <label class="item item-input">
-                        <span class="input-label">Change Title</span>
+                        <span class="input-label">Title</span>
                         <input type="text" placeholder="Feed Title" ng-model="feed.Title"/>
                     </label>
 
                     <label class="item item-input">
-                        <span class="input-label">Change Folder</span>
+                        <span class="input-label">Folder</span>
                         <select ui-select2="pickOption" ng-model="feed.Folder" data-placeholder="Pick a folder">
                             <!--<option value="feed.OFolder">{{feed.OFolder}}</option>-->
                             <option ng-repeat="folderOption in viewModel.folderOptions"

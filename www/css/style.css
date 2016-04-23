@@ -76,13 +76,15 @@ div.story .spinner svg {
 .unsubsribe-inactive {
     color:silver;
     font-size:1.5em;
-    margin-right:1em;
+    margin-left:0.5em;
+    margin-right:0.5em;
 }
 
 .unsubsribe-active {
     color:red;
     font-size:1.5em;
-    margin-right:1em;
+    margin-left:0.5em;
+    margin-right:0.5em;
 }
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -100,3 +102,21 @@ svg {
     display: block;
 }
 
+.item .badge {
+    right: 5px;
+    top: 7px;
+}
+
+h2.oneline,div.oneline {
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#manage.list .item{
+    padding: 8px;
+}
+
+#manage.list .input-label{
+    width: 50px;
+}

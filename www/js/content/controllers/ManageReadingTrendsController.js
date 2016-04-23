@@ -91,7 +91,7 @@ angular.module('mining.content')
                         .color(d3.scale.category10().range())
                         .duration(300)
                         .rotateLabels(45)      //Angle to rotate x-axis labels.
-                        .showControls(true)   //Allow user to switch between 'Grouped' and 'Stacked' mode.
+                        .showControls(false)   //Allow user to switch between 'Grouped' and 'Stacked' mode.
                         .groupSpacing(0.24)    //Distance between each group of bars.
                     ;
                 chart.reduceXTicks(false).staggerLabels(true);
