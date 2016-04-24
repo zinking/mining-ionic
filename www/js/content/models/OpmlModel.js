@@ -24,6 +24,23 @@ angular.module('mining.content')
                     model.hasOutline = true;
                 }
             }
+            model.filterHasRead = false;
+            return model;
+        };
+
+        OpmlModel.prototype.createAllFeedsOpml = function() {
+            var model = new OpmlModel();
+            model.XmlUrl        = "http://readmine.co/feeds?all=true";
+            model.Title         = "All Feeds";
+            model.HtmlUrl       = "http://readmine.co/feeds?all=true";
+            model.Type          = "RSS/ALL";
+            model.Image         = "N/A";
+            model.Text          = "All Feeds";
+            model.hasOutline    = true;
+            model.unReadCount   = 0;
+            model.currentPage   =  0;
+            model.filterHasRead = false;
+
             return model;
         };
 

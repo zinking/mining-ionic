@@ -81,7 +81,6 @@ angular.module('mining.content')
             this.StoryContents.push(sc);
             var story = this.AddedStories[sc.storyId];
             if (sc.content === "" ) {
-                //TODO: probably remove the concept of story content
                 this.storyId2ContentMap[sc.storyId]=sc.summary;
             } else {
                 this.storyId2ContentMap[sc.storyId]=sc.content;
@@ -169,11 +168,18 @@ angular.module('mining.content')
             var d = feedStructure;
             var i=0, len=0;
             //this.Opml = d.Opml;
+
+            //Add the all feeds opml
+            var allFeedsOpml = OpmlModel.prototype.createAllFeedsOpml();
+            me.Opml.push(allFeedsOpml);
+
             for(i=0, len=d.Opml.length; i < len; i++){
                 var opmlJson = d.Opml[i];
                 var opml = new OpmlModel().fromJSONObject(opmlJson);
                 me.Opml.push(opml);
             }
+
+
 
             for(i=0, len=d.FeedIds.length; i < len; i++){
                 var idItem = d.FeedIds[i];
@@ -433,6 +439,14 @@ angular.module('mining.content')
             return allFeedsStories;
         };
 
+        UserDataModel.prototype.getAllFeedXmlUrls = function() {
+            var urls = [];
+            for (var url in this.FeedUrl2Id) {
+                urls.push(url);
+            }
+            return urls;
+        };
+
         /**
          * return all the stories that are available locally
          * @param opmlFeed
@@ -442,17 +456,23 @@ angular.module('mining.content')
             var me = this;
             if (opmlFeed.hasOutline) {
                 var outlineStories = [];
-                _.each(opmlFeed.Outline,function(subOpmlFeed,i){
-                    //every element of outline should be opmlFeed
-                    var feedStories = me.StoriesMap[subOpmlFeed.XmlUrl];
-                    if (feedStories instanceof Array) {
-                        outlineStories = outlineStories.concat(feedStories);
-                    }
+                if (opmlFeed.Type=="RSS/ALL") {//it is the all feeds
+                    outlineStories = me.Stories;
+                } else {
+                    _.each(opmlFeed.Outline,function(subOpmlFeed,i){
+                        //every element of outline should be opmlFeed
+                        var feedStories = me.StoriesMap[subOpmlFeed.XmlUrl];
+                        if (feedStories instanceof Array) {
+                            outlineStories = outlineStories.concat(feedStories);
+                        }
+                    });
+                }
+
+
+                var sortedOutlineStories = _.sortBy( outlineStories, function(s){
+                    return -s.Published
                 });
-                _.sortBy( outlineStories, function(s){
-                    return s.Published
-                });
-                return outlineStories;
+                return sortedOutlineStories;
             } else{
                 if (opmlFeed.XmlUrl in this.StoriesMap) {
                     return this.StoriesMap[opmlFeed.XmlUrl];

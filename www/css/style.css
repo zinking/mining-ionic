@@ -120,3 +120,7 @@ h2.oneline,div.oneline {
 #manage.list .input-label{
     width: 50px;
 }
+
+b.feedTitle {
+    padding-right:50%;
+}

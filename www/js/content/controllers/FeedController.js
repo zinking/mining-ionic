@@ -88,25 +88,24 @@ angular.module('mining.content')
             return filtered;
         };
     })
-    .controller('FeedCtrl', function($scope, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
+    .controller('FeedCtrl', function($scope, $filter, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
                                      $ionicScrollDelegate, $q, ContentDataService, AccountDataService, SessionService) {
         $scope.viewModel = {
             stories : [],
             opmlFeed : {},
             isBusy : false,
-            //filterHasRead: false,
             source : '', //indicating coming from which page
             hasMoreStories : true
         };
 
         function isUrlStartWithMine(xmlUrl) {
-            var mineUrl = "http://readmine.co";
+            var mineUrl = "http://readmine.co/users";
             var xmlUrlPre = xmlUrl.substring(0, mineUrl.length);
             return (xmlUrlPre === mineUrl)
         }
 
         $scope.toggleReadFilter = function() {
-            $scope.viewModel.opmlFeed.fiterHasRead = !$scope.viewModel.opmlFeed.filterHasRead;
+            $scope.viewModel.opmlFeed.filterHasRead = !$scope.viewModel.opmlFeed.filterHasRead;
         };
 
         $scope.goHome = function(){
@@ -258,7 +257,12 @@ angular.module('mining.content')
         }
 
         $scope.loadRequestedStories = function(opmlFeed, pageToLoad){
-            var feedUrls = opmlFeed.getFeedsUrls();
+            var feedUrls = [];
+            if (opmlFeed.Type == "RSS/ALL") {
+                feedUrls = globalUserData.getAllFeedXmlUrls();
+            } else {
+                feedUrls = opmlFeed.getFeedsUrls();
+            }
             $scope.viewModel.isBusy = true;
             var deferred = $q.defer();
             generalLoadRequestedStories(feedUrls, pageToLoad).then(
@@ -373,7 +377,11 @@ angular.module('mining.content')
 
 
         $scope.openStory = function (index){
-            var s = $scope.viewModel.stories[index];
+            var currentStories = $filter('filterRead')(
+                $scope.viewModel.stories,
+                $scope.viewModel.opmlFeed.filterHasRead
+            );
+            var s = currentStories[index];
             $scope.rememberScrollPos();
             $state.go('story',{story:s,opmlFeed: $scope.viewModel.opmlFeed})
         };

@@ -28,6 +28,7 @@ angular.module('mining.content')
             model.fTitle        = this.fitFeedTitle(model.Title,30);
             model.startFrom     = 0;
             model.unReadCount   = 0;
+            model.filterHasRead = false;
             return model;
         };
 

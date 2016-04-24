@@ -60,6 +60,7 @@ angular.module('mining.content')
 
         function loadOpmlFeedContent(opmlFeed){
             if( "Outline" in opmlFeed ){
+                var allStories = [];
                 _.each(opmlFeed.Outline,function(feed,i){
                     //every element of outline should be opmlFeed
                     var feedStories = globalUserData.StoriesMap[feed.XmlUrl];
@@ -69,12 +70,16 @@ angular.module('mining.content')
                         s.Summary = stripSummary(s.Summary)
 
                     });
-                    $scope.viewModel.stories = $scope.viewModel.stories.concat(feedStories)
+                    allStories = allStories.concat(feedStories)
                 });
 
-                _.sortBy( $scope.viewModel.stories, function(s){
+                //TODO: it's more complicated than this
+                //as the stories are loaded in by page
+                var sortedStories = _.sortBy( allStories, function(s){
                     return s.Date
-                })
+                });
+
+                $scope.viewModel.stories = sortedStories;
             }
             else{
                 var feedXmlUrl = opmlFeed.XmlUrl;
