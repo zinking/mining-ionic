@@ -33,11 +33,5 @@ angular.module('mining.content')
             }
         );
 
-        $scope.openFolder = function (opml) {
-            opml.isOpen = !opml.isOpen;
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-            $scope.$broadcast('scroll.resize');
-        };
-
 
     });

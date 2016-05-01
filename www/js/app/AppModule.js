@@ -77,12 +77,12 @@ angular.module('mining', [
                     }
                 }
             })
-            //.state('side', {
-            //    url: '/side',
-            //    cache: false,
-            //    templateUrl: 'js/content/templates/OpmlFeedSideView.html',
-            //    controller: 'OpmlFeedSideCtrl'
-            //})
+            .state('full', {
+                url: '/full',
+                cache: false,
+                templateUrl: 'js/content/templates/FullReadView.html',
+                controller: 'FullReadCtrl'
+            })
 
             .state('readFeed', {
                 url: '/feed/read',

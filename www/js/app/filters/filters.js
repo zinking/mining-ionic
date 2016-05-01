@@ -1,5 +1,4 @@
 angular.module('mining.filters', [])
-
     .filter('partition', function ($cacheFactory) {
         var arrayCache = $cacheFactory('partition');
         var filter = function (arr, size) {
@@ -25,4 +24,5 @@ angular.module('mining.filters', [])
         return function(htmlCode){
             return $sce.trustAsHtml(htmlCode);
         }
-    }]);
+    }])
+;

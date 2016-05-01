@@ -1,0 +1,10 @@
+<div  class="item folder-item">
+    <i class="icon ion-folder folder-item-icon" ng-if="opml.hasOutline" ng-click="openFolder(opml)"></i>
+    <i class="icon ion-social-rss folder-item-icon" ng-if="!opml.hasOutline"></i>
+    <b class="feedtitle" ng-click="onOpmlClicked(opml)">{{opml.Title}}</b>
+    <span class="badge badge-assertive badge-unread" ng-show="opml.unReadCount!=0">{{opml.unReadCount}}</span>
+    <ion-list ng-show="opml.isOpen">
+        <feed   feed="feed" ng-repeat="feed in opml.Outline"
+                on-feed-clicked="onOpmlFeedClicked({opmlFeed:feed})" ></feed>
+    </ion-list>
+</div>

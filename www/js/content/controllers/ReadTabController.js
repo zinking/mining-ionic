@@ -17,22 +17,9 @@ angular.module('mining.content')
             omplsList : []
         };
 
-        $ionicPopover.fromTemplateUrl('js/content/directives/templates/ReadTabPopMenu.html', {
-            scope: $scope
-        }).then(function(popover) {
-            $scope.popover = popover;
-        });
+        var READ_TAB_POPUP_TEMPLATE = 'js/content/directives/templates/ReadTabPopMenu.html';
+        SessionService.injectPopUpDiaglog(READ_TAB_POPUP_TEMPLATE, $scope);
 
-
-        $scope.openPopover = function($event) {
-            $scope.popover.show($event);
-        };
-        $scope.closePopover = function() {
-            $scope.popover.hide();
-        };
-        $scope.$on('$destroy', function() {
-            $scope.popover.remove();
-        });
 
         //verify user credential exists
         var userAuthData = AccountDataService.getUserData();
@@ -49,32 +36,18 @@ angular.module('mining.content')
         $scope.viewModel.isBusy = true;
         $scope.viewModel.totalUnReadCount = globalUserData.totalUnReadCount;
 
-        ContentDataService.listFeed().then(
+        SessionService.apiCall(
+            'Load Feeds',
+            ContentDataService.listFeed(),
             function(){
                 $scope.viewModel.isBusy = false;
-                var opmlList = globalUserData.Opml;
-                _.each(opmlList, function(opml){
-                    opml.isFolder = 'Outline' in opml;
-                    opml.isOpen = false;
-                });
-                $scope.viewModel.opmlsList = opmlList;
+                $scope.viewModel.opmlsList = globalUserData.Opml;
                 $scope.viewModel.totalUnReadCount = globalUserData.totalUnReadCount;
             },
             function(){
                 $scope.viewModel.isBusy = false;
-                $ionicPopup.alert({
-                    title: 'Loading Failed,fallback on cache'
-                });
                 ContentDataService.loadLocalUserData();
                 $scope.viewModel.opmlsList = globalUserData.Opml;
             }
         );
-
-        $scope.openFolder = function (opml) {
-            opml.isOpen = !opml.isOpen;
-            $scope.$broadcast('scroll.infiniteScrollComplete');
-            $scope.$broadcast('scroll.resize');
-        };
-
-
     });

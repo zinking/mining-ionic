@@ -58,7 +58,7 @@ angular.module('mining.content')
                     success(function (d) {
                         globalUserData.cleanFeedStructure();
                         globalUserData.setFeedStructure(d);
-                        deferred.resolve();
+                        deferred.resolve({});
                     }).
                     error(function () {
                         deferred.reject();
@@ -72,7 +72,7 @@ angular.module('mining.content')
                     success(function (d) {
                         //globalUserData.cleanFeedStructure();
                         globalUserData.setStarFeedStructure(d);
-                        deferred.resolve();
+                        deferred.resolve({});
                     }).
                     error(function () {
                         deferred.reject();
@@ -102,7 +102,7 @@ angular.module('mining.content')
                             var sc = { 'storyId':storyId, 'content':d[i].Content, 'summary':d[i].Summary };
                             globalUserData.addStoryContent(sc);
                         });
-                        deferred.resolve();
+                        deferred.resolve({});
                     }).
                     error(function () {
                         deferred.reject();

@@ -1,23 +1,4 @@
 angular.module('mining.content')
-.directive('ngcDone', function ($timeout) {
-    return function (scope, element, attrs) {
-        scope.$watch(attrs.ngcDone, function (callback) {
-            //console.log("hello there");
-            if (scope.$last === undefined) {
-                scope.$watch('htmlElement', function () {
-                    if (scope.htmlElement !== undefined) {
-                        $timeout(eval(callback), 1);
-                    }
-                });
-            }
-
-            if (scope.$last) {
-                eval(callback)();
-            }
-        });
-    }
-})
-.filter('unsafe', function($sce) { return $sce.trustAsHtml; })
 .controller('ReadStoryCtrl', function($scope, $sce, $ionicLoading, $state,$stateParams,$ionicPopup,
                                       ContentDataService, SessionService) {
 
@@ -47,7 +28,6 @@ angular.module('mining.content')
         $scope.viewModel.startTimeStamp = new Date().getTime();
 
         $scope.goToFeed = function(){
-
             var endTimeStamp = new Date().getTime();
             var duration = endTimeStamp - $scope.viewModel.startTimeStamp;
 
@@ -58,7 +38,6 @@ angular.module('mining.content')
                 $scope.viewModel.story.Id,
                 'Duration:'+duration
             );
-
             $scope.router.goReadFeed($scope.viewModel.opmlFeed);
         };
 
@@ -68,22 +47,20 @@ angular.module('mining.content')
             }
             var storyId = $scope.viewModel.story.Id;
             var feedId = $scope.viewModel.story.FeedId;
-            ContentDataService.markStoryRead(feedId,storyId).then(
-                function(data){
-                    if (data.error!=null){
-                        console.info("mark story read failed ", feedId, storyId, data.error)
-                    } else {
-                        //TODO: issue: unread counter not decreased in all scenarios
-                        //for some feed, the counter can be decreased and propogated to corresponding views
-                        //but egg. bohaishibei, this is not the case.
-                        //in `gud` the opml counter is decreased, but going back to feed page, the counter is resumed
-                        globalUserData.markStoryRead($scope.viewModel.story);
-                    }
+            SessionService.apiCall(
+                'Mark Story Read',
+                ContentDataService.markStoryRead(feedId,storyId),
+                function() {
+                    //TODO: issue: unread counter not decreased in all scenarios
+                    //for some feed, the counter can be decreased and propogated to corresponding views
+                    //but egg. bohaishibei, this is not the case.
+                    //in `gud` the opml counter is decreased, but going back to feed page, the counter is resumed
+                    globalUserData.markStoryRead($scope.viewModel.story);
                 },
                 function(){
-                    console.info("mark story read failed with exception ")
+
                 }
-            )
+            );
         };
 
         $scope.markStoryStar = function() {
@@ -92,27 +69,24 @@ angular.module('mining.content')
             }
             var storyId = $scope.viewModel.story.Id;
             var feedId = $scope.viewModel.story.FeedId;
-            ContentDataService.markStoryStar(feedId,storyId).then(
-                function(data){
-                    if (data.error!=null){
-                        console.info("mark story Star failed ", feedId, storyId, data.error)
-                    } else {
-                        globalUserData.markStoryStar($scope.viewModel.story);
-                    }
+            SessionService.apiCall(
+                'Star Story',
+                ContentDataService.markStoryStar(feedId,storyId),
+                function() {
+                    globalUserData.markStoryStar($scope.viewModel.story);
                 },
-                function(){
-                    console.info("mark story Star failed with exception ")
+                function() {
+
                 }
-            )
+            );
         };
 
         $scope.onContentLoaded = function() {
-            //console.log("yeah content loaded");
-
-            $('#storyContainer img').addClass('fitContent');
-            $('#storyContainer embed').addClass('fitContent');
-            $('#storyContainer video').addClass('fitContent');
-            $('#storyContainer iframe').addClass('fitContent');
+            $('#storyContainer').find('img').addClass('fitContent');
+            $('#storyContainer').find('img').removeAttr('style');
+            $('#storyContainer').find('embed').addClass('fitContent');
+            $('#storyContainer').find('video').addClass('fitContent');
+            $('#storyContainer').find('iframe').addClass('fitContent');
         };
 
         $scope.loadStoryContent = function(story){
@@ -126,20 +100,19 @@ angular.module('mining.content')
             }
             else{
                 $scope.viewModel.isBusy = true;
-                ContentDataService.loadStoryContentFromServer([storyId]).then(
-                    function(){
+                SessionService.apiCall(
+                    'Load More Story',
+                    ContentDataService.loadStoryContentFromServer([storyId]),
+                    function() {
                         $scope.viewModel.isBusy = false;
                         $scope.viewModel.story.Content = globalUserData.getStoryContentById(storyId);
                         //TODO: oh really, loaded means read ?
                         $scope.markStoryRead();
                     },
-                    function(){
+                    function() {
                         $scope.viewModel.isBusy = false;
-                        $ionicPopup.alert({
-                            title: 'Loading Story Failed.'
-                        });
                     }
-                )
+                );
             }
         };
 

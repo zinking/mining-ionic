@@ -6,7 +6,8 @@
     <h1 class="title">{{viewModel.story.Title}}</h1>
     <div class="buttons">
         <button class="button icon ion-heart" ng-show="!viewModel.story.isStar" ng-click="markStoryStar()"></button>
-        <button class="button icon ion-heart" style="color:red"
+        <!--tried to move style to css doesn't work, moving back temp-->
+        <button class="button icon ion-heart starred" style="color:red"
                 ng-show="viewModel.story.isStar" ng-click="markStoryStar()"></button>
     </div>
 </ion-footer-bar>
@@ -15,12 +16,12 @@
     <div class="bar bar-header">
         <h2 class="title">
             <b>{{viewModel.story.Author}}</b>
-            <b am-time-ago="viewModel.story.Date" am-preprocess="unix" ></b>
+            <!--<span am-time-ago="viewModel.story.PublishedTime"></span>-->
+            <a class='button icon ion-link button-right' ng-href="{{viewModel.story.Link}}" target="_blank"></a>
         </h2>
     </div>
 
     <div>
-        <p id="storyContainer" ng-bind-html="viewModel.story.Content | sanitize "
-             ngc-done="onContentLoaded()"  style="padding:3em;max-width:100%"></p>
+        <p id="storyContainer" ng-bind-html="viewModel.story.Content | sanitize " ngc-done="onContentLoaded()"></p>
     </div>
 </ion-content>

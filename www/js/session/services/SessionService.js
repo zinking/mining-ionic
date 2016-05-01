@@ -2,7 +2,7 @@ angular.module('mining.session')
     .constant('BASE_SERVER_URL', 'http://0.0.0.0:9000')
     //.constant('BASE_SERVER_URL', 'http://120.24.209.215:9000')
     //.constant('BASE_SERVER_URL', 'http://readmine.co:9000')
-    .factory('SessionService', function(SessionsStorage, $state) {
+    .factory('SessionService', function(SessionsStorage, $state, $ionicPopover) {
         return {
         	getAll : function () {
         		var defaultToken = null;
@@ -11,6 +11,51 @@ angular.module('mining.session')
                     defaultToken = angular.fromJson(cookieStr);
                 }
                 return defaultToken;
+            },
+            apiCall: function(actionName, promise, cbOk, cbError){
+                promise.then(
+                    function(data){
+                        if (data==1) {
+                            cbOk(data);
+                        }
+                        else if ('error' in data && data.error!=null){
+                            $ionicPopup.alert({
+                                title: actionName + ' issue',
+                                subtitle:data.error
+                            });
+                            console.log(actionName, 'error', data.error);
+                            cbError();
+                        }
+                        else{
+                            cbOk(data);
+                        }
+                    },
+                    function(){
+                        $ionicPopup.alert({
+                            title: actionName + 'failed, retry later'
+                        });
+                        console.log(actionName, 'error')
+                    }
+                )
+
+            },
+
+            injectPopUpDiaglog: function(templateUrl, theScope) {
+                $ionicPopover.fromTemplateUrl(templateUrl, {
+                    scope: theScope
+                }).then(function(popover) {
+                    theScope.popover = popover;
+                });
+
+                theScope.openPopover = function($event) {
+                    theScope.popover.show($event);
+                };
+                theScope.closePopover = function() {
+                    theScope.popover.hide();
+                };
+                theScope.$on('$destroy', function() {
+                    theScope.popover.remove();
+                });
             },
 
             routeUtil : {
@@ -37,7 +82,7 @@ angular.module('mining.session')
                 },
                 goReadImportFeed: function(){
                     $state.go('importFeed');
-                    $scope.closePopover();
+                    //$scope.closePopover();
                 },
                 goManageTab: function() {
                     $state.go('tab.manage');
@@ -78,6 +123,8 @@ angular.module('mining.session')
             put : function (cname, cvalue) {
         	    document.cookie += cname + "=" + cvalue + "; ";
             },
+
+
             getUserPostRequest : function(path,data) {
                 return {
                     method: 'POST',

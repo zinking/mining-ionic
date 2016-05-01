@@ -1,0 +1,25 @@
+<ion-view title="Full">
+    <ion-side-menus enable-menu-with-back-views="true">
+        <ion-side-menu side="left" >
+            <div class="bar bar-header bar-dark">
+                <h1 class="title">zinking3@gmail.com</h1>
+            </div>
+            <content has-header="true">
+                <ion-list>
+                    <opml opml="opml" on-opml-clicked="router.goReadFeed(opml)"
+                          on-opml-feed-clicked="router.goReadFeed(opmlFeed)"
+                          ng-repeat="opml in viewModel.opmlsList"></opml>
+                </ion-list>
+            </content>
+        </ion-side-menu>
+        <pane side-menu-content>
+            <nav-bar animation="nav-title-slide-ios7"
+                     type="bar-positive"
+                     back-button-type="button-icon"
+                     back-button-icon="ion-arrow-left-c"></nav-bar>
+
+            <nav-view animation="slide-left-right"></nav-view>
+        </pane>
+    </ion-side-menus>
+</ion-view>
+

@@ -9,19 +9,11 @@
 
     <ion-content class="has-header gem-ion-content">
         <ion-list>
-            <ion-item ng-repeat="opml in viewModel.opmlsList"  >
-                <i class="icon ion-folder" ng-if="opml.hasOutline" ng-click="openFolder(opml)"></i>
-                <i class="icon ion-person" ng-if="!opml.hasOutline"></i>
-                <b ng-click="openOpmlFeed( opml )">{{opml.Title}}</b>
-                <ion-list ng-show="opml.isOpen">
-                    <ion-item class="item-accordion" ng-repeat="feed in opml.Outline"
-                            style="border:none">
-                        <i class="icon ion-person"></i>
-                        <b ng-click="openOpmlFeed( feed )" style="width:90%">{{feed.Title}}</b>
-                    </ion-item>
-                </ion-list>
-
-            </ion-item>
+            <ion-list>
+                <opml opml="opml" on-opml-clicked="router.goReadFeed(opml)"
+                      on-opml-feed-clicked="router.goReadFeed(opmlFeed)"
+                      ng-repeat="opml in viewModel.opmlsList"></opml>
+            </ion-list>
         </ion-list>
     </ion-content>
 </ion-view>

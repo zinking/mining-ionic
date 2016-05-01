@@ -24,7 +24,11 @@ angular.module('mining.content')
                     model.hasOutline = true;
                 }
             }
+
+            //psudo element, interact with user
             model.filterHasRead = false;
+            model.isFolder = model.hasOutline;
+            model.isOpen = false;
             return model;
         };
 

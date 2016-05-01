@@ -13,7 +13,6 @@ angular.module('mining.content',['ionic'])
         };
 
         $scope.openFileDialog=function() {
-
             ionic.trigger('click', { target: document.getElementById('fileToUpload') });
             console.log('fire! $scope.openFileDialog()');
         };

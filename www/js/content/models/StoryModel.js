@@ -66,5 +66,9 @@ angular.module('mining.content')
             };
         };
 
+        StoryModel.prototype.hasContent = function() {
+            return typeof Content === "undefined" && Content != null && Content !== "";
+        };
+
         return StoryModel;
     });

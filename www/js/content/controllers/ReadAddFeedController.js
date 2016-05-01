@@ -3,7 +3,12 @@ angular.module('mining.content')
     function($scope, $ionicLoading,$state,$ionicPopup,$ionicPopover,
              AccountDataService, ContentDataService, SessionService) {
 
-        SessionService.refreshIfExpired();
+        //SessionService.refreshIfExpired();
+        if (typeof globalUserData === "undefined" ) {
+            $state.go('tab.read');
+            return;
+        }
+
         $scope.router = SessionService.routeUtil;
 
         $scope.viewModel = {
@@ -49,29 +54,20 @@ angular.module('mining.content')
         $scope.addFeedSource = function(){
             $scope.viewModel.isBusy = true;
             var selectedFolder = $('#folderPicker').val();
-            ContentDataService.addFeedSource($scope.viewModel.feedUrl,selectedFolder).then(
-                function(data){
-                    $scope.viewModel.isBusy = false;
-                    if (data.error!=null){
-                        $ionicPopup.alert({
-                            title: 'Subscribe Feed issue',
-                            subtitle:data.error
-                        });
-                    }
-                    else{
-                        $ionicPopup.alert({
-                            title: 'Subscribe Feed Success',
-                            subtitle: data.data
-                        });
-                    }
-                },
-                function(){
+            SessionService.apiCall(
+                'Subscribe Feed',
+                ContentDataService.addFeedSource($scope.viewModel.feedUrl,selectedFolder),
+                function(data) {
                     $scope.viewModel.isBusy = false;
                     $ionicPopup.alert({
-                        title: 'Subscribe Faild, retry later'
+                        title: 'Subscribe Feed Success',
+                        subtitle: data.data
                     });
+                },
+                function() {
+                    $scope.viewModel.isBusy = false;
                 }
-            )
+            );
         };
 
         function isValidUrl(s) {
@@ -89,34 +85,23 @@ angular.module('mining.content')
                 }
                 $scope.viewModel.isBusy = true;
 
-                ContentDataService.previewFeedSource(feedUrl).then(
-                    function(data){
+                SessionService.apiCall(
+                    'Preview Feed',
+                    ContentDataService.previewFeedSource(feedUrl),
+                    function(data) {
                         $scope.viewModel.isBusy = false;
-                        if (data.error!=null){
-                            $ionicPopup.alert({
-                                title: 'Preview Feed issue',
-                                subtitle:data.error
-                            });
+                        if (data.Stories.length==0){
+                            $ionicPopup.alert({title: 'No stories for this feed'});
                         }
                         else{
-                            if (data.Stories.length==0){
-                                $ionicPopup.alert({
-                                    title: 'No stories for this feed'
-                                });
-                            }
-                            else{
-                                $scope.viewModel.feedStories = data.Stories;
-                                $scope.viewModel.hasFeedStory = true;
-                            }
+                            $scope.viewModel.feedStories = data.Stories;
+                            $scope.viewModel.hasFeedStory = true;
                         }
                     },
-                    function(){
+                    function() {
                         $scope.viewModel.isBusy = false;
-                        $ionicPopup.alert({
-                            title: 'Loading Prview Faild, retry later'
-                        });
                     }
-                )
+                );
             }
             else{
                 $ionicPopup.alert({
