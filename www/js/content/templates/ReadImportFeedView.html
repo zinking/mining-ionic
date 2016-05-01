@@ -1,0 +1,35 @@
+<ion-view view-title="Bulk Import Feed">
+    <ion-header-bar class="bar-calm">
+        <button class='button icon ion-arrow-left-a' ng-click='router.goHome()'></button>
+        <h1 class="title">Bulk Import Feeds</h1>
+    </ion-header-bar>
+
+    <ion-content class="has-header gem-ion-content">
+        <ion-list>
+            <div class="item item-divider">Import Opml - File Upload </div>
+            <div class="item">
+                <!--<button class="button button-positive pull-right" ng-click="openFileDialog()">Import Opml</button>-->
+                <input type="file" id="fileToUpload" ng-model-instant  style="display:block"
+                       multiple onchange="angular.element(this).scope().setFiles(this)" />
+            </div>
+            <div class="item item-divider">Import Opml - Drag&Drop </div>
+            <div class="item">
+                <div id="dropbox" class="dropbox" ng-class="dropClass"><span>{{dropText}}</span></div>
+                <div ng-show="files.length">
+                    <div ng-repeat="file in files.slice(0)" style="margin:10px;">
+                        <span>{{file.webkitRelativePath || file.name}}</span>
+                        (<span ng-switch="file.size > 1024*1024">
+                            <span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+                            <span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+                        </span>)
+                    </div>
+                    <input type="button" class="button button-positive pull-right" ng-click="uploadFile()" value="Upload" />
+                    <div ng-show="progressVisible">
+                        <div class="percent">{{progress}}%</div>
+                        <div class="progress-bar"><div class="uploaded" ng-style="{'width': progress+'%'}"></div></div>
+                    </div>
+                </div>
+            </div>
+        </ion-list>
+    </ion-content>
+</ion-view>

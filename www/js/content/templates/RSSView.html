@@ -1,0 +1,18 @@
+<ion-view view-title="">
+    <ion-header-bar class="bar-calm">
+        <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
+        <h1 class="title">All Feeds (1000+)</h1>
+    </ion-header-bar>
+
+    <ion-content class="has-header gem-ion-content">
+        <div class="list">
+            <div class="item item-icon-left" ng-repeat="opml in viewModel.opmlsList"  ng-click="openOpml( $index )">
+
+                <i class="icon ion-folder" ng-if="opml.isFolder"></i>
+                <i class="icon ion-document" ng-if="!opml.isFolder"></i>
+                <b>{{opml.Title}}</b>
+                <span class="badge badge-assertive">0</span>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

@@ -1,0 +1,26 @@
+<ion-footer-bar align-title="left" class="bar-calm">
+    <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
+    <div class="buttons">
+        <button class='button icon ion-arrow-left-a' ng-click='router.goReadFeed(viewModel.opmlFeed)'></button>
+    </div>
+    <h1 class="title">{{viewModel.story.Title}}</h1>
+    <div class="buttons">
+        <button class="button icon ion-heart" ng-show="!viewModel.story.isStar" ng-click="markStoryStar()"></button>
+        <button class="button icon ion-heart" style="color:red"
+                ng-show="viewModel.story.isStar" ng-click="markStoryStar()"></button>
+    </div>
+</ion-footer-bar>
+
+<ion-content class="gem-ion-content">
+    <div class="bar bar-header">
+        <h2 class="title">
+            <b>{{viewModel.story.Author}}</b>
+            <b am-time-ago="viewModel.story.Date" am-preprocess="unix" ></b>
+        </h2>
+    </div>
+
+    <div>
+        <p id="storyContainer" ng-bind-html="viewModel.story.Content | sanitize "
+             ngc-done="onContentLoaded()"  style="padding:3em;max-width:100%"></p>
+    </div>
+</ion-content>
