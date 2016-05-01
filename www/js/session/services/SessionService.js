@@ -2,7 +2,7 @@ angular.module('mining.session')
     .constant('BASE_SERVER_URL', 'http://0.0.0.0:9000')
     //.constant('BASE_SERVER_URL', 'http://120.24.209.215:9000')
     //.constant('BASE_SERVER_URL', 'http://readmine.co:9000')
-    .factory('SessionService', function(SessionsStorage) {
+    .factory('SessionService', function(SessionsStorage, $state) {
         return {
         	getAll : function () {
         		var defaultToken = null;
@@ -11,6 +11,57 @@ angular.module('mining.session')
                     defaultToken = angular.fromJson(cookieStr);
                 }
                 return defaultToken;
+            },
+
+            routeUtil : {
+                goHome : function(){
+                    $state.go('tab.read');
+                },
+                goReadTab : function(){
+                    $state.go('tab.read');
+                },
+                goReadFeed : function ( fo ){
+                    $state.go('readFeed',{
+                        opmlFeed:fo,
+                        source:''
+                    });
+                },
+                goReadStory : function ( fo,s ){
+                    $state.go('readStory',{
+                        opmlFeed:fo,
+                        story:s
+                    });
+                },
+                goReadAddFeed: function(){
+                    $state.go('addFeed');
+                },
+                goReadImportFeed: function(){
+                    $state.go('importFeed');
+                    $scope.closePopover();
+                },
+                goManageTab: function() {
+                    $state.go('tab.manage');
+                },
+                goManageAdjust: function() {
+                    $state.go('manageAdjust');
+                },
+                goManageReadTrend: function() {
+                    $state.go('manageReadTrend');
+                },
+                goManageFeedTrend: function() {
+                    $state.go('manageFeedTrend');
+                },
+                goFollowTab: function() {
+                    $state.go('tab.follow');
+                }
+
+            },
+
+            refreshIfExpired: function() {
+                if (typeof globalUserData === "undefined" ) {
+                    $state.go('tab.read');
+                    return;
+                }
             },
 
             get : function (cname) {
@@ -27,19 +78,6 @@ angular.module('mining.session')
             put : function (cname, cvalue) {
         	    document.cookie += cname + "=" + cvalue + "; ";
             },
-            saveAddress : function(addresses) {
-            	SessionsStorage.saveAddress(addresses);
-            },
-            getAddresses : function() {
-            	return SessionsStorage.getAddresses();
-            },
-            saveProfile : function(profile) {
-                SessionsStorage.saveProfile(profile);
-            },
-            getProfile : function() {
-                SessionsStorage.getProfile();
-            },
-
             getUserPostRequest : function(path,data) {
                 return {
                     method: 'POST',

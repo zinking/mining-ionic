@@ -124,3 +124,10 @@ h2.oneline,div.oneline {
 b.feedTitle {
     padding-right:50%;
 }
+
+.fitContent {
+    max-width:100%;
+    max-height:100%;
+    width:100%;
+    height:100%;
+}

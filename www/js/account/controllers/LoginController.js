@@ -1,7 +1,7 @@
 angular.module('mining.account')
-    .controller('LoginCtrl', function(
-        $scope, $ionicLoading,$state,$ionicPopup,
-        AccountDataService, SessionService) {
+    .controller('LoginCtrl', function($scope, $ionicLoading,$state,$ionicPopup, AccountDataService, SessionService) {
+        $scope.router = SessionService.routeUtil;
+
         $scope.viewModel = {
             email : '',
             pass  : ''
@@ -10,7 +10,7 @@ angular.module('mining.account')
         $scope.login = function(){
             AccountDataService.login($scope.viewModel.email,$scope.viewModel.pass).then(
                 function(){
-                    $state.go('tab.contents');
+                    $scope.router.goHome();
                     return
                 },
                 function(){

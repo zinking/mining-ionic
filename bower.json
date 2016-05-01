@@ -23,6 +23,7 @@
   "dependencies": {
     "ion-autocomplete": "~0.3.2",
     "angular-ui-select2": "~0.0.5",
-    "d3": "~3.5.16"
+    "d3": "~3.5.16",
+    "ng-device-detector": "~3.0.1"
   }
 }

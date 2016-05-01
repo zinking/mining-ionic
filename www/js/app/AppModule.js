@@ -3,6 +3,7 @@ angular.module('mining', [
     'ion-autocomplete',
     'ui.select2',
     'nvd3',
+    "ng.deviceDetector",
     'mining.session',
     'mining.content',
     'mining.account'
@@ -22,50 +23,6 @@ angular.module('mining', [
     })
     .config(function ($stateProvider, $urlRouterProvider) {
         $stateProvider
-            .state('tab', {
-                url: "/tab",
-                abstract: true,
-                controller: 'TabCtrl',
-                templateUrl: "js/app/directives/templates/TabView.html"
-            })
-            .state('tab.contents', {
-                url: '/contents',
-                // this page should be cached, as it is the heaviest
-                // TODO: the side effect of this is, the counters are not up-to-date
-                // I'm keeping this issue at the moment
-                views: {
-                    'tab-contents': {
-                        templateUrl: 'js/content/templates/OpmlNestedListView.html',
-                        controller: 'OpmlListCtrl'
-                    }
-                }
-            })
-            .state('tab.stars', {
-                url: '/stars',
-                //cache: false,
-                views: {
-                    'tab-stars': {
-                        templateUrl: 'js/content/templates/OpmlStarNestedListView.html',
-                        controller: 'OpmlStarListCtrl'
-                    }
-                }
-            })
-            .state('tab.manage', {
-                url: '/manage',
-                cache:false,
-                views: {
-                    'tab-manage': {
-                        templateUrl: 'js/content/templates/ManageView.html',
-                        controller: 'ManageCtrl'
-                    }
-                }
-            })
-            .state('side', {
-                url: '/side',
-                cache: false,
-                templateUrl: 'js/content/templates/OpmlFeedSideView.html',
-                controller: 'OpmlFeedSideCtrl'
-            })
             .state('login', {
                 url: "/login",
                 controller: 'LoginCtrl',
@@ -81,53 +38,99 @@ angular.module('mining', [
                 controller: 'RegisterCtrl',
                 templateUrl: "js/account/templates/RegisterView.html"
             })
-            .state('feed', {
-                url: '/feed',
+
+            .state('tab', {
+                url: "/tab",
+                abstract: true,
+                controller: 'TabCtrl',
+                templateUrl: "js/app/directives/templates/TabView.html"
+            })
+            .state('tab.read', {
+                url: '/read',
+                // this page should be cached, as it is the heaviest
+                // TODO: the side effect of this is, the counters are not up-to-date
+                // I'm keeping this issue at the moment
+                views: {
+                    'tab-read': {
+                        templateUrl: 'js/content/templates/ReadTabView.html',
+                        controller: 'ReadTabCtrl'
+                    }
+                }
+            })
+            .state('tab.follow', {
+                url: '/follow',
+                //cache: false,
+                views: {
+                    'tab-follow': {
+                        templateUrl: 'js/content/templates/FollowTabView.html',
+                        controller: 'FollowTabCtrl'
+                    }
+                }
+            })
+            .state('tab.manage', {
+                url: '/manage',
+                cache:false,
+                views: {
+                    'tab-manage': {
+                        templateUrl: 'js/content/templates/ManageTabView.html',
+                        controller: 'ManageTabCtrl'
+                    }
+                }
+            })
+            //.state('side', {
+            //    url: '/side',
+            //    cache: false,
+            //    templateUrl: 'js/content/templates/OpmlFeedSideView.html',
+            //    controller: 'OpmlFeedSideCtrl'
+            //})
+
+            .state('readFeed', {
+                url: '/feed/read',
                 cache: false,
-                templateUrl: 'js/content/templates/FeedView.html',
+                templateUrl: 'js/content/templates/ReadFeedView.html',
                 params: { opmlFeed:null, source:null },
-                controller: 'FeedCtrl'
+                controller: 'ReadFeedCtrl'
             })
-            .state('addfeed', {
-                url: '/addfeed',
+            .state('addFeed', {
+                url: '/feed/add',
                 cache: false,
-                templateUrl: 'js/content/templates/AddFeedView.html',
-                controller: 'AddFeedCtrl'
+                templateUrl: 'js/content/templates/ReadAddFeedView.html',
+                controller: 'ReadAddFeedCtrl'
             })
-            .state('bulkfeed', {
-                url: '/bulkfeed',
+            .state('importFeed', {
+                url: '/feed/import',
                 cache: false,
-                templateUrl: 'js/content/templates/BulkFeedView.html',
-                controller: 'BulkFeedCtrl'
+                templateUrl: 'js/content/templates/ReadImportFeedView.html',
+                controller: 'ReadImportFeedCtrl'
             })
-            .state('story', {
-                url: '/story',
+            .state('readStory', {
+                url: '/feed/story',
                 cache: false,
-                templateUrl: 'js/content/templates/StoryView.html',
+                templateUrl: 'js/content/templates/ReadStoryView.html',
                 params: { story: null,opmlFeed: null },
-                controller: 'StoryCtrl'
+                controller: 'ReadStoryCtrl'
             })
 
-            .state('arrangefeed', {
-                url: '/arrangefeed',
+            .state('manageAdjust', {
+                url: '/manage/adjust',
                 cache: false,
-                templateUrl: 'js/content/templates/ManageArrangeFeedView.html',
-                controller: 'ArrangeFeedCtrl'
+                templateUrl: 'js/content/templates/ManageFeedAdjustView.html',
+                controller: 'ManageFeedAdjustCtrl'
             })
-            .state('readingtrends', {
-                url: '/readingtrends',
+            .state('manageReadTrend', {
+                url: '/manage/trend/read',
                 cache: false,
-                templateUrl: 'js/content/templates/ManageReadingTrendsView.html',
-                controller: 'ReadingTrendsCtrl'
+                templateUrl: 'js/content/templates/ManageReadTrendView.html',
+                controller: 'ManageReadTrendCtrl'
             })
-            .state('feedtrends', {
-                url: '/feedtrends',
+            .state('manageFeedTrend', {
+                url: '/manage/trend/feed',
                 cache: false,
-                templateUrl: 'js/content/templates/ManageFeedTrendsView.html',
-                controller: 'FeedTrendsCtrl'
+                templateUrl: 'js/content/templates/ManageFeedTrendView.html',
+                controller: 'ManageFeedTrendCtrl'
             })
             ;
-        $urlRouterProvider.otherwise('/tab/contents');
+        $urlRouterProvider.otherwise('/tab/read');
     })
 
     .controller('TabCtrl', function ($scope) {
