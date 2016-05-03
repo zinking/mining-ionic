@@ -73,6 +73,15 @@ angular.module('mining.content')
         };
 
         UserDataModel.prototype.setFeedStructure = function(feedStructure) {
+            this.addFeedStructureToOpml(feedStructure, this.Opml)
+        };
+
+        UserDataModel.prototype.setStarFeedStructure = function(feedStructure) {
+            this.addFeedStructureToOpml(feedStructure, this.StarOpml)
+            this.StarOpml.shift();
+        };
+
+        UserDataModel.prototype.addFeedStructureToOpml = function(feedStructure, container) {
             var me = this;
             var d = feedStructure;
 
@@ -81,7 +90,7 @@ angular.module('mining.content')
 
             //Add the all feeds opml
             var allFeedsOpml = OpmlModel.prototype.createAllFeedsOpml();
-            me.Opml.push(allFeedsOpml);
+            container.push(allFeedsOpml);
             XmlUrl2OpmlMap[allFeedsOpml.XmlUrl] = allFeedsOpml;
 
 
@@ -98,7 +107,7 @@ angular.module('mining.content')
                     }
 
                 });
-                me.Opml.push(opml);
+                container.push(opml);
             }
 
 

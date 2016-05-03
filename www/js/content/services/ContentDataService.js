@@ -19,6 +19,7 @@ angular.module('mining.content')
         var LOAD_LM_FEED_STATS_PATH     = BASE_SERVER_URL + '/user/load-lastmonth-feedstats';
 
 
+        //TODO: when first subscribe, mark the readpoint current, not the most ancient
         //push the stats collected to server every 1 minute
         $interval(function(){
             if (globalUserData.UserActionStats.length > 0) {
@@ -70,9 +71,7 @@ angular.module('mining.content')
                 var deferred = $q.defer();
                 $http(req).
                     success(function (d) {
-                        //globalUserData.cleanFeedStructure();
-                        //globalUserData.setStarFeedStructure(d);
-                        globalUserData.setFeedStructure(d);
+                        globalUserData.setStarFeedStructure(d);
                         deferred.resolve({});
                     }).
                     error(function () {

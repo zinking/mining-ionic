@@ -1,12 +1,13 @@
 angular.module('mining.content')
     .controller('FollowTabCtrl', function($scope, $ionicLoading, $state, $ionicPopup, $ionicPopover,
                                              AccountDataService, ContentDataService, SessionService) {
-        SessionService.refreshIfExpired();
+        if (typeof globalUserData === "undefined" ) {
+            $state.go('tab.read');
+        }
         $scope.router = SessionService.routeUtil;
 
         $scope.viewModel = {
             isBusy:false,
-            //totalUnReadCount: 0,
             opmlList : []
         };
 
@@ -15,13 +16,7 @@ angular.module('mining.content')
         ContentDataService.listStarFeed().then(
             function(){
                 $scope.viewModel.isBusy = false;
-                var opmlList = globalUserData.StarOpml;
-                _.each(opmlList, function(opml){
-                    opml.isFolder = 'Outline' in opml;
-                    opml.isOpen = false;
-                });
-                $scope.viewModel.opmlsList = opmlList;
-                //$scope.viewModel.totalUnReadCount = globalUserData.totalUnReadCount;
+                $scope.viewModel.opmlsList = globalUserData.StarOpml;
             },
             function(){
                 $scope.viewModel.isBusy = false;
@@ -32,6 +27,5 @@ angular.module('mining.content')
                 $scope.viewModel.opmlsList = globalUserData.Opml;
             }
         );
-
 
     });

@@ -1,6 +1,6 @@
 <div  class="item folder-item">
-    <i class="icon ion-folder folder-item-icon" ng-if="opml.hasOutline" ng-click="openFolder(opml)"></i>
-    <i class="icon ion-social-rss folder-item-icon" ng-if="!opml.hasOutline"></i>
+    <i class="icon ion-folder folder-item-icon" ng-if="opml.isFolder()" ng-click="openFolder(opml)"></i>
+    <i class="icon ion-social-rss folder-item-icon" ng-if="!opml.isFolder()"></i>
     <b class="feedtitle" ng-click="onOpmlClicked(opml)">{{opml.Title}}</b>
     <span class="badge badge-assertive badge-unread" ng-show="opml.unReadCount!=0">{{opml.unReadCount}}</span>
     <ion-list ng-show="opml.isOpen">

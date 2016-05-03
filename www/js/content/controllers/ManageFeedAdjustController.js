@@ -29,7 +29,7 @@ angular.module('mining.content')
 
         //setup the data structure for arrange
         _.forEach($scope.viewModel.opmlFeeds, function(opml){
-            if (opml.hasOutline) {
+            if (opml.isFolder()) {
                 _.forEach(opml.Outline, function(feed){
                     feed.OTitle = feed.Title;
                     feed.OFolder = opml.Title;
@@ -103,7 +103,7 @@ angular.module('mining.content')
             $scope.viewModel.changes = [];
             var changedFeeds = [];
             _.forEach(allOpmls, function(opml){
-                if (opml.hasOutline) {
+                if (opml.isFolder()) {
                     _.forEach(opml.Outline, function(feed){
                         if ($scope.isOpmlModified(feed)) {
                             var change = {

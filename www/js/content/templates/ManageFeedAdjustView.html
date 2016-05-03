@@ -10,12 +10,12 @@
         <div id="manage" class="list">
 
             <div class="card" ng-repeat="opml in viewModel.currentOpmlFeeds " ng-cloak>
-                <div class="item item-divider" ng-if="opml.hasOutline">
+                <div class="item item-divider" ng-if="opml.isFolder()">
                     {{opml.Title}}
                 </div>
 
                 <!-- if the folder is indeed a feed-->
-                <div class="item item-text-wrap" ng-if="!opml.hasOutline && !opml.Deleted">
+                <div class="item item-text-wrap" ng-if="!opml.isFolder() && !opml.Deleted">
                     <i class="icon ion-checkmark-circled" ng-if="isOpmlModified(opml)" style="color:green">
                         Changed
                     </i>

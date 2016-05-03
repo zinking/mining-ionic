@@ -14,10 +14,10 @@ angular.module('mining.content')
             model.Text          = data.Text;
 
             // psudo element
-            model.hasOutline    = false;
             model.unReadCount   = 0;
             model.currentPage   = 0;
             model.parentOpml    = null;
+            model.Outline       = [];
 
             // Structure section
             model.feed = null;
@@ -27,15 +27,11 @@ angular.module('mining.content')
                     childOpml.parentOpml = model;
                     return childOpml;
                 });
-                if (model.Outline.length>0) {
-                    model.hasOutline = true;
-                }
             } else {
                 me.parentOpml = me;
             }
 
             model.filterHasRead = false;
-            model.isFolder = model.hasOutline;
             model.isOpen = false;
             return model;
         };
@@ -49,19 +45,22 @@ angular.module('mining.content')
             model.Image         = "N/A";
             model.Text          = "All Feeds";
 
-            model.hasOutline    = true;
             model.unReadCount   = 0;
             model.currentPage   =  0;
             model.filterHasRead = false;
             model.feed          = new FeedModel();
             model.parentOpml    = model;
+            model.Outline       = [];
 
             return model;
+        };
+        OpmlModel.prototype.isFolder = function() {
+            return this.Outline.length > 0;
         };
 
         OpmlModel.prototype.readOneStory = function() {
             this.unReadCount -= 1;
-            if (!this.isFolder) { //if the opml is not folder prop upwards
+            if (!this.isFolder()) { //if the opml is not folder prop upwards
                 if (this.parentOpml != null) {
                     this.parentOpml.readOneStory();
                 }
@@ -69,7 +68,7 @@ angular.module('mining.content')
         };
 
         OpmlModel.prototype.markRead = function() {
-            if (this.isFolder) {
+            if (this.isFolder()) {
                 _.each(this.Outline, function(child){
                     child.markRead();
                 })
@@ -79,7 +78,7 @@ angular.module('mining.content')
         };
 
         OpmlModel.prototype.getStories = function() {
-            if (this.isFolder) {
+            if (this.isFolder()) {
                 var stories = [];
                 _.each(this.Outline, function(child){
                     stories = stories.concat(child.feed.getStories());
@@ -94,7 +93,7 @@ angular.module('mining.content')
 
 
         OpmlModel.prototype.refreshUnreadCount = function() {
-            if (this.isFolder) {
+            if (this.isFolder()) {
                 var me = this;
                 this.unReadCount = _.sum(
                     _.map(me.Outline, function (child) {
@@ -109,7 +108,7 @@ angular.module('mining.content')
 
         OpmlModel.prototype.getFeedsUrls = function() {
             var me = this;
-            if (me.hasOutline) {
+            if (me.isFolder()) {
                 return _.map(me.Outline, function(opmlOutline){
                     return opmlOutline.XmlUrl;
                 });
@@ -119,7 +118,7 @@ angular.module('mining.content')
         };
 
         OpmlModel.prototype.getOutlines = function() {
-            if (this.hasOutline) {
+            if (this.isFolder()) {
                 return this.Outline;
             } else {
                 return [this];
@@ -148,7 +147,7 @@ angular.module('mining.content')
                 Image       : this.Image,
                 Text        : this.Text
             };
-            if (this.hasOutline){
+            if (this.isFolder()){
                 obj.Outline = _.map(this.Outline, function(child){
                     return child.toJSONObject();
                 });
