@@ -1,13 +1,13 @@
 angular.module('mining.content')
     .controller('FollowTabCtrl', function($scope, $ionicLoading, $state, $ionicPopup, $ionicPopover,
-                                             AccountDataService, ContentDataService, SessionService, UserDataModel) {
+                                             AccountDataService, ContentDataService, SessionService) {
         SessionService.refreshIfExpired();
         $scope.router = SessionService.routeUtil;
 
         $scope.viewModel = {
             isBusy:false,
             //totalUnReadCount: 0,
-            omplsList : []
+            opmlList : []
         };
 
         $scope.viewModel.isBusy = true;

@@ -1,5 +1,5 @@
 angular.module('mining.content')
-    .factory('StoryModel', function(BASE_SERVER_URL) {
+    .factory('StoryModel', function () {
         var StoryModel = function () {
 
         };
@@ -8,24 +8,34 @@ angular.module('mining.content')
             var model = new StoryModel();
             model.Id        = data.Id;
             model.FeedId    = data.FeedId;
-            model.FeedTitle = "";
             model.Title     = data.Title;
             model.Link      = data.Link;
             model.Updated   = data.Updated;
             model.Published = data.Published;
             model.Author    = data.Author;
             model.Summary   = data.Summary;
+            model.Content   = null;
+            model.PublishedTime = new Date(model.Published);
+
+            // -psudo element section --
             model.isRead    = false;
             model.isStar    = false;
-
-            model.PublishedTime = new Date(model.Published);
+            model.feed      = null;
 
             return model;
         };
 
-        StoryModel.prototype.setContent = function( contentData ) {
-            this.Content = contentData;
+        StoryModel.prototype.markRead = function() {
+            this.isRead = true;
+            this.feed.readOneStory();
         };
+
+        StoryModel.prototype.markStar = function() {
+            this.isStar = true;
+            //TODO: add the story to the star opml
+        };
+
+
 
         StoryModel.prototype.fromJSONObject = function(data) {
             var me = this;
@@ -42,8 +52,8 @@ angular.module('mining.content')
         };
 
         StoryModel.prototype.setSummary = function (summary) {
-            this.Summary   = this.stripSummary(summary);
-            this.Content   = this.Summary;
+            //this.Summary   = this.stripSummary(summary);
+            this.Summary   = summary;
         };
 
         StoryModel.prototype.stripSummary = function (html)
@@ -51,6 +61,14 @@ angular.module('mining.content')
             var tmp = document.createElement("DIV");
             tmp.innerHTML = html;
             return tmp.textContent || tmp.innerText || "";
+        };
+
+        StoryModel.prototype.setContent = function( contentData ) {
+            if (contentData !== null && contentData !== "") {
+                this.Content = contentData;
+            } else {
+                this.Content = this.Summary;
+            }
         };
 
         StoryModel.prototype.toJSONObject = function() {
@@ -67,7 +85,7 @@ angular.module('mining.content')
         };
 
         StoryModel.prototype.hasContent = function() {
-            return typeof Content === "undefined" && Content != null && Content !== "";
+            return  this.Content != null && this.Content !== "";
         };
 
         return StoryModel;

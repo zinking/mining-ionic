@@ -2,16 +2,15 @@ angular.module('mining.session')
     .constant('BASE_SERVER_URL', 'http://0.0.0.0:9000')
     //.constant('BASE_SERVER_URL', 'http://120.24.209.215:9000')
     //.constant('BASE_SERVER_URL', 'http://readmine.co:9000')
-    .factory('SessionService', function(SessionsStorage, $state, $ionicPopover) {
+    .factory('SessionService', function(SessionsStorage, $state, $ionicPopover, $ionicPopup) {
         return {
-        	getAll : function () {
-        		var defaultToken = null;
-                var cookieStr = decodeURI(this.get('user_data'));
-                if (cookieStr) {
-                    defaultToken = angular.fromJson(cookieStr);
-                }
-                return defaultToken;
+            isUrlStartWithMine : function (xmlUrl) {
+                var mineUrl = "http://readmine.co/users";
+                var xmlUrlPre = xmlUrl.substring(0, mineUrl.length);
+                return (xmlUrlPre === mineUrl)
             },
+
+
             apiCall: function(actionName, promise, cbOk, cbError){
                 promise.then(
                     function(data){
@@ -66,15 +65,61 @@ angular.module('mining.session')
                     $state.go('tab.read');
                 },
                 goReadFeed : function ( fo ){
-                    $state.go('readFeed',{
-                        opmlFeed:fo,
-                        source:''
+                    $state.go('readFeed',{opml:fo});
+                },
+                goReadStory : function ( s ){
+                    $state.go('readStory',{story:s});
+                },
+                goReadAddFeed: function(){
+                    $state.go('addFeed');
+                },
+                goReadImportFeed: function(){
+                    $state.go('importFeed');
+                    //$scope.closePopover();
+                },
+                goManageTab: function() {
+                    $state.go('tab.manage');
+                },
+                goManageAdjust: function() {
+                    $state.go('manageAdjust');
+                },
+                goManageReadTrend: function() {
+                    $state.go('manageReadTrend');
+                },
+                goManageFeedTrend: function() {
+                    $state.go('manageFeedTrend');
+                },
+                goFollowTab: function() {
+                    $state.go('tab.follow');
+                }
+            },
+
+            routeFullUtil : {
+                goHome : function(){
+                    $state.go('tab.read');
+                },
+                goReadTab : function(){
+                    $state.go('tab.read');
+                },
+                goReadFeed : function ( fo ){
+                    $state.go('full.readFeed',{
+                        opml:fo,
+                    },
+                    {
+                        reload: true,
+                        inherit: false,
+                        notify: true
                     });
                 },
                 goReadStory : function ( fo,s ){
-                    $state.go('readStory',{
-                        opmlFeed:fo,
+                    $state.go('readStory',
+                    {
                         story:s
+                    },
+                    {
+                        reload: true,
+                        inherit: false,
+                        notify: true
                     });
                 },
                 goReadAddFeed: function(){
@@ -99,13 +144,15 @@ angular.module('mining.session')
                 goFollowTab: function() {
                     $state.go('tab.follow');
                 }
+            },
 
+            initialized: function() {
+                return typeof globalUserData !== "undefined";
             },
 
             refreshIfExpired: function() {
                 if (typeof globalUserData === "undefined" ) {
                     $state.go('tab.read');
-                    return;
                 }
             },
 

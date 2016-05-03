@@ -31,7 +31,7 @@ angular.module('mining.account')
 
                 $http(req).
                     success(function (d) {
-                        userData ={
+                        var userData ={
                             'email':email,
                             'apiKey': d.apiKey
                         };

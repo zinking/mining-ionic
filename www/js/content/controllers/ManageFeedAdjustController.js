@@ -18,17 +18,13 @@ angular.module('mining.content')
 
         $scope.isOpmlModified = function(opmlFeed) {
 
-            if (opmlFeed.Title != opmlFeed.OTitle ||
-                opmlFeed.Folder != opmlFeed.OFolder ||
-                opmlFeed.Delete ) {
-                return true;
-            } else {
-                return false;
-            }
+            return !!(opml.Title != opml.OTitle ||
+            opml.Folder != opml.OFolder ||
+            opml.Delete);
         };
 
         $scope.markFeedDelete = function(opmlFeed) {
-            opmlFeed.Delete = !opmlFeed.Delete;
+            opml.Delete = !opml.Delete;
         };
 
         //setup the data structure for arrange
@@ -73,12 +69,11 @@ angular.module('mining.content')
 
 
         $scope.getFolderOptions = function() {
-            var folderOpmls = globalUserData.getAllFolderOpmls();
+            var folderOpmls = globalUserData.getFolderOpmls();
             function opmlToOption(opml) {
                 return {id: opml.Title, text: opml.Title};
             }
-            var options = _.map(folderOpmls, opmlToOption);
-            return options;
+            return _.map(folderOpmls, opmlToOption);
         };
 
         $scope.viewModel.folderOptions = $scope.getFolderOptions();
@@ -156,9 +151,9 @@ angular.module('mining.content')
 
                         //reset the changes
                         _.forEach($scope.viewModel.changes, function(opmlFeed){
-                            opmlFeed.OTitle = opmlFeed.Title;
-                            opmlFeed.OFolder = opmlFeed.Folder;
-                            opmlFeed.Deleted = true;
+                            opml.OTitle = opml.Title;
+                            opml.OFolder = opml.Folder;
+                            opml.Deleted = true;
 
                         });
                         $scope.viewModel.changes = [];
@@ -167,7 +162,7 @@ angular.module('mining.content')
                 function(){
                     $scope.viewModel.isBusy = false;
                     $ionicPopup.alert({
-                        title: 'Arrange Feed Faild, retry later'
+                        title: 'Arrange Feed Failed, retry later'
                     });
                 }
             )

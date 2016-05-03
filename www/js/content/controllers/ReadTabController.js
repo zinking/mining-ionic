@@ -5,7 +5,7 @@ angular.module('mining.content')
     ) {
         //USE different view for PC
         //if (!deviceDetector.isMobile()){
-        //    //$state.go('pchome');
+        //    //$state.go('pcHome');
         //    return;
         //}
 
@@ -14,7 +14,7 @@ angular.module('mining.content')
         $scope.viewModel = {
             isBusy:false,
             totalUnReadCount: 0,
-            omplsList : []
+            opmlList : []
         };
 
         var READ_TAB_POPUP_TEMPLATE = 'js/content/directives/templates/ReadTabPopMenu.html';
@@ -28,8 +28,8 @@ angular.module('mining.content')
             return;
         }
         else{
-            //create a global userdata structure
-            globalUserData = new UserDataModel();
+            //create a global user data structure
+            window.globalUserData = new UserDataModel();
             globalUserData.setUserAuth(userAuthData);
         }
 

@@ -1,25 +1,29 @@
-<ion-view title="Full">
-    <ion-side-menus enable-menu-with-back-views="true">
-        <ion-side-menu side="left" >
-            <div class="bar bar-header bar-dark">
-                <h1 class="title">zinking3@gmail.com</h1>
+<ion-view title="Full" >
+    <ion-side-menus enable-menu-with-back-views="true" >
+        <ion-side-menu-content>
+            <ion-nav-bar class="bar-positive nav-title-slide-ios7">
+                <ion-nav-back-button class="button-clear">
+                    <i class="icon ion-ios7-arrow-back"></i>
+                </ion-nav-back-button>
+            </ion-nav-bar>
+            <ion-nav-view name="full" animation="slide-left-right"></ion-nav-view>
+        </ion-side-menu-content>
+
+        <ion-side-menu side="left" width="350" class="side-menu">
+            <div class="bar bar-header bar-positive">
+                <h1 class="title">{{viewModel.user.email}}</h1>
             </div>
-            <content has-header="true">
-                <ion-list>
-                    <opml opml="opml" on-opml-clicked="router.goReadFeed(opml)"
+            <ion-content has-header="true">
+                <ion-list >
+                    <ion-item style="height:40px">Start</ion-item>
+                    <opml opml="opml"
+                          on-opml-clicked="router.goReadFeed(opml)"
                           on-opml-feed-clicked="router.goReadFeed(opmlFeed)"
                           ng-repeat="opml in viewModel.opmlsList"></opml>
                 </ion-list>
-            </content>
+            </ion-content>
         </ion-side-menu>
-        <pane side-menu-content>
-            <nav-bar animation="nav-title-slide-ios7"
-                     type="bar-positive"
-                     back-button-type="button-icon"
-                     back-button-icon="ion-arrow-left-c"></nav-bar>
 
-            <nav-view animation="slide-left-right"></nav-view>
-        </pane>
     </ion-side-menus>
 </ion-view>
 

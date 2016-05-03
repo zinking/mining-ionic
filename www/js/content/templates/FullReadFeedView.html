@@ -1,17 +1,18 @@
 <ion-view view-title="{{viewModel.opml.Title}}" hide-nav-bar="true">
     <ion-footer-bar class="bar-calm">
-        <button class='button icon ion-arrow-left-a' ng-click='goBackToTab()'></button>
+        <!--<button class='button icon ion-arrow-left-a' ng-click='goBackToTab()'></button>-->
         <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
         <h1 class="title">({{viewModel.opml.unReadCount}})</h1>
         <button ng-if="viewModel.opml.filterHasRead" class="button icon ion-ios-book"
                 ng-click="toggleReadFilter()" style="color:silver"></button>
         <button ng-if="!viewModel.opml.filterHasRead" class="button icon ion-ios-book" ng-click="toggleReadFilter()"></button>
-        <button class="button icon ion-navicon" ng-click="openPopover($event)"></button>
+        <!--<button class="button icon ion-navicon" ng-click="openPopover($event)"></button>-->
     </ion-footer-bar>
 
     <ion-content class="gem-ion-content" >
-        <storylist opml="viewModel.opml" is-busy="viewModel.isBusy"
+        <storylist opml="viewModel.opmlFeed" is-busy="viewModel.isBusy"
                 on-feed-story-clicked="openStory(story)">
         </storylist>
+
     </ion-content>
 </ion-view>

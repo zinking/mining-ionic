@@ -11,7 +11,6 @@ angular.module('mining.account')
             AccountDataService.login($scope.viewModel.email,$scope.viewModel.pass).then(
                 function(){
                     $scope.router.goHome();
-                    return
                 },
                 function(){
                     $ionicPopup.alert({

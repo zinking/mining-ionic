@@ -16,56 +16,109 @@ angular.module('mining.content')
             });
         }
     })
-    .directive('story', ['$compile', 'ContentDataService', function($compile, ContentDataService) {
+    .directive('story', ['$compile','$state', 'ContentDataService','SessionService',
+        function($compile, $state, ContentDataService, SessionService) {
         return {
             restrict: 'E',
-            templateUrl: 'js/content/directives/templates/Story.html',
+            templateUrl: function() {
+                var mode = 'item';
+                var device = 'mobile';
+                if ('mode' in $state.params) {
+                    mode = $state.params.mode;
+                }
+                if ('device' in $state.params) {
+                    device = $state.params.device;
+                }
+                var templateBase = 'js/content/directives/templates/';
+                var templateName = 'Story'+ mode.capitalizeFirstLetter() + device.capitalizeFirstLetter();
+                return templateBase + templateName + ".html";
+            },
             replace: true,
             transclude: true,
             scope: {
-                story: '=story',
-                open: '&'
+                story: '=',
+                open: '&',
+                isBusy: '='
+
             },
-            controller: function($scope, $element) {
+            controller: function($scope) {
                 $scope.viewModel = {
-                    isBusy : false,
+                    expanded: false,
                     level : 0,
                     content0 : "",
                     content1 : "",
                     content2 : ""
                 };
-                $scope.loadStoryContent = function(story, callback){
-                    //first try local cache
+
+                $scope.onContentLoaded = function() {
+                    var storyContainer = $('#storyContainer');
+                    storyContainer.find('img').addClass('fitContent');
+                    storyContainer.find('img').removeAttr('style');
+                    storyContainer.find('img').removeAttr('height');
+                    storyContainer.find('embed').addClass('fitContent');
+                    storyContainer.find('video').addClass('fitContent');
+                    storyContainer.find('iframe').addClass('fitContent');
+                };
+
+                $scope.markStoryRead = function() {
+                    if ($scope.story.isRead==true) {
+                        return;
+                    }
                     var storyId = $scope.story.Id;
-                    var storyLink = $scope.story.Link;
-                    var localContent = globalUserData.getStoryContentById(storyId);
-                    if( localContent !== null ){
-                        $scope.story.Content = localContent;
+                    var feedId = $scope.story.FeedId;
+                    SessionService.apiCall(
+                        'Mark Story Read',
+                        ContentDataService.markStoryRead(feedId,storyId),
+                        function() {
+                            //TODO: issue: unread counter not decreased in all scenarios
+                            //for some feed, the counter can be decreased and propogated to corresponding views
+                            //but egg. bohaishibei, this is not the case.
+                            //in `gud` the opml counter is decreased, but going back to feed page, the counter is resumed
+                            $scope.story.markRead();
+                            globalUserData.totalUnReadCount -= 1;
+                        },
+                        function(){
+
+                        }
+                    );
+                };
+
+                $scope.loadStoryContent = function(){
+                    //first try local cache
+                    if($scope.story.hasContent()){
+                        $scope.markStoryRead();
                     }
                     else{
-                        $scope.viewModel.isBusy = true;
-                        ContentDataService.loadStoryContentFromServer([storyId]).then(
-                            function(){
-                                $scope.viewModel.isBusy = false;
-                                $scope.story.Content = globalUserData.getStoryContentById(storyId);
-                                if (!$scope.story.hasContent()){
-                                    $scope.story.Content=$scope.story.Summary
-                                }
+                        $scope.isBusy = true;
+                        var storyId = $scope.story.Id;
+                        SessionService.apiCall(
+                            'Load More Story',
+                            ContentDataService.loadStoryContentFromServer([storyId]),
+                            function(d) {
+                                $scope.isBusy = false;
 
-                                callback();
+                                $scope.story.setSummary(d[0].Summary);
+                                $scope.story.setContent(d[0].Content);
+                                $scope.markStoryRead();
                             },
-                            function(){
-                                $scope.viewModel.isBusy = false;
-                                $ionicPopup.alert({
-                                    title: 'Loading Story Failed.'
-                                });
+                            function() {
+                                $scope.isBusy = false;
                             }
-                        )
+                        );
                     }
                 };
 
+                if (globalUserData && $state.params.mode === 'full') {
+                    $scope.loadStoryContent( $scope.story )
+                }
 
 
+                $scope.expandStory = function(){
+                    $scope.loadStoryContent($scope.story);
+                    $scope.expanded = true;
+                };
+
+                //TODO: the attempt to incrementally preview story is not successful
                 $scope.expand = function(){
                     if (!$scope.story.hasContent()) {
                         $scope.loadStoryContent($scope.story, function(){

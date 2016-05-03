@@ -19,7 +19,7 @@ function BaseRestfulService(endPoint, TOKEN, $q, $http) {
         },
         timeout: 60000
     };
-};
+}
 
 BaseRestfulService.prototype.POST = function(data, success, error, retryable) {
     this.requestSettings.method = 'POST';
@@ -57,8 +57,8 @@ BaseRestfulService.prototype._process = function(success, error) {
             me.used = true;
             me._deferred.resolve(data);
         }).
-        error(function(rowData){
-            data = error.call(me, rawData);
+        error(function(rawData){
+            var data = error.call(me, rawData);
             me.used = true;
             me._deferred.reject(data);
         });

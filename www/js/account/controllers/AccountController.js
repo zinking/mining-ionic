@@ -1,5 +1,5 @@
 angular.module('mining.account')
-    .controller('AccountCtrl', function($scope, $ionicLoading, AccountDataService, SessionService) {
+    .controller('AccountCtrl', function($scope, $ionicLoading) {
         $scope.settings = {};
 
         $scope.viewModel = {

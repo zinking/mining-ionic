@@ -4,20 +4,15 @@ angular.module('mining.content')
             //strucutres to be persisted
             this.email = "";
             this.apiKey = "";
-
-            this.UserActStats = [];
-
+            this.UserActionStats = [];
             this.cleanFeedStructure();
         };
 
-
-
         UserDataModel.prototype.clearStats = function() {
-            this.UserActStats = [];
+            this.UserActionStats = [];
         };
 
         UserDataModel.prototype.appendUserStats = function(timestamp, action, feedId, storyId, content) {
-            //new Date().getTime();
             var userStat = {
                 'TimeStamp':timestamp,
                 'Action':action,
@@ -26,7 +21,7 @@ angular.module('mining.content')
                 'Content':content
             };
 
-            this.UserActStats.push(userStat);
+            this.UserActionStats.push(userStat);
         };
 
         UserDataModel.prototype.cleanFeedStructure = function() {
@@ -36,34 +31,28 @@ angular.module('mining.content')
             this.Stories = [];
             this.Feeds = [];
             this.FeedIds = [];
-            this.StoryContents = [];
-            //structurs to be used efficiently
-            this.StoriesMap = {};  //feed xml url to stories list
-            this.FeedsMap = {};    //feed xml url to feed conent
+            this.FeedsMap = {};
             this.AddedStories = {};
             this.FeedId2Url = {};
             this.FeedUrl2Id = {};
-            this.Feed2OpmlMap = {};
-            this.storyId2ContentMap = {};
         };
 
         UserDataModel.prototype.populate = function(data) {
             var model = new UserDataModel();
             model.setFeedStructure(data);
             model.setUserAuth(data);
-            model.setFeedContent(data);
             return model;
         };
 
         UserDataModel.prototype.toJSONObject = function() {
             return {
-                "Opml" : _.map(this.Opml, function(Opml,i,l){
+                "Opml" : _.map(this.Opml, function(Opml){
                     return Opml.toJSONObject();
                 }),
-                'Storis': _.map(this.Stories, function(Story,i,l){
+                'Storis': _.map(this.Stories, function(Story){
                     return Story.toJSONObject();
                 }),
-                "Feeds" : _.map(this.Feeds, function(Feed,i,l){
+                "Feeds" : _.map(this.Feeds, function(Feed){
                     return Feed.toJSONObject();
                 }),
                 "FeedIds"   : this.FeedIds,
@@ -77,108 +66,40 @@ angular.module('mining.content')
             return this.populate(data);
         };
 
-        UserDataModel.prototype.addStoryContent = function(sc) { //story content
-            this.StoryContents.push(sc);
-            var story = this.AddedStories[sc.storyId];
-            if (sc.content === "" ) {
-                this.storyId2ContentMap[sc.storyId]=sc.summary;
-            } else {
-                this.storyId2ContentMap[sc.storyId]=sc.content;
-            }
-            story.setSummary(sc.Summary);
-        };
-
         //recover the user data structure from persisted json format
         UserDataModel.prototype.setUserAuth = function(userAuth) {
             this.email = userAuth.email;
             this.apiKey = userAuth.apiKey;
         };
 
-        UserDataModel.prototype.setFeedContent = function(feedContent) {
-            var me = this;
-            if ('StoryContents' in feedContent) {
-                _.each(feedContent.StoryContents, function(storycontent,i,l){
-                    me.addStoryContent(storycontent);
-                });
-            }
-        };
-
-        UserDataModel.prototype.setStarFeedStructure = function(feedStructure) {
-            var me = this;
-            var d = feedStructure;
-            var i=0, len=0;
-            //this.Opml = d.Opml;
-            for(i=0, len=d.StarOpml.length; i < len; i++){
-                var opmlJson = d.StarOpml[i];
-                var opml = new OpmlModel().fromJSONObject(opmlJson);
-                me.StarOpml.push(opml);
-            }
-
-            for(i=0, len=d.FeedIds.length; i < len; i++){
-                var idItem = d.FeedIds[i];
-                //build the feedId to XmlUrl map
-                me.FeedId2Url[idItem.Id] = idItem.XmlUrl;
-                me.FeedUrl2Id[idItem.XmlUrl] = idItem.Id;
-                me.FeedIds.push(idItem);
-            }
-
-            for(i=0, len=d.Feeds.length; i < len; i++){ //TODO: this feeds object is actually opmloutline, so it doesn't have Id
-                var feedData = d.Feeds[i];
-                feedData['Id'] = me.FeedUrl2Id[feedData.XmlUrl];
-                var feed = new FeedModel().fromJSONObject(feedData);
-                me.FeedsMap[feed.XmlUrl] = feed;
-                me.Feeds.push(feed);
-            }
-
-            if ('Stories' in d) {
-                for (i = 0, len = d.Stories.length; i < len; i++) {
-                    //build the XmlUrl2Stories map
-                    var storyData = d.Stories[i];
-                    me.populateStoryData(storyData);
-                }
-            }
-
-            //deal with user feed read stat
-            /*me.totalUnReadCount = 0;
-            for(i=0, len=d.UserReadFeedStats.length; i < len; i++) {
-                var userReadFeedStat = d.UserReadFeedStats[i];
-                var feedId = userReadFeedStat.FeedId;
-                var feedUrl = me.FeedId2Url[feedId];
-                var feed = me.FeedsMap[feedUrl];
-                feed.unReadCount = userReadFeedStat.UnreadCount;
-                feed.startFrom = userReadFeedStat.StartFrom;
-                me.totalUnReadCount += feed.unReadCount;
-                me.updateStoryReadStatusUseStartFromTime(feedUrl,feed.startFrom);
-            }*/
-            me.createFeed2OpmlMap();
-            me.updateOpmlUnReadCount();
-
-            //deal with read stories
-            if ('UserReadStoryIds' in d) {
-                for (i = 0, len = d.UserReadStoryIds.length; i < len; i++) {
-                    var storyId = d.UserReadStoryIds[i];
-                    var story = me.AddedStories[storyId];
-                    story.isRead = true;
-                }
-            }
-        };
-
         UserDataModel.prototype.setFeedStructure = function(feedStructure) {
             var me = this;
             var d = feedStructure;
-            var i=0, len=0;
-            //this.Opml = d.Opml;
+
+            //this will be a one to many map as allow user to scatter feed around in opml structure
+            var XmlUrl2OpmlMap = {};
 
             //Add the all feeds opml
             var allFeedsOpml = OpmlModel.prototype.createAllFeedsOpml();
             me.Opml.push(allFeedsOpml);
+            XmlUrl2OpmlMap[allFeedsOpml.XmlUrl] = allFeedsOpml;
 
+
+            var i, len;
+            //Initialize opml data from ajax result
             for(i=0, len=d.Opml.length; i < len; i++){
                 var opmlJson = d.Opml[i];
                 var opml = new OpmlModel().fromJSONObject(opmlJson);
+                _.each(opml.getOutlines(), function(child){
+                    if (!(child.XmlUrl in XmlUrl2OpmlMap)) {
+                        XmlUrl2OpmlMap[child.XmlUrl] = [child];
+                    } else {
+                        XmlUrl2OpmlMap[child.XmlUrl].push(child);
+                    }
+
+                });
                 me.Opml.push(opml);
             }
-
 
 
             for(i=0, len=d.FeedIds.length; i < len; i++){
@@ -189,14 +110,27 @@ angular.module('mining.content')
                 me.FeedIds.push(idItem);
             }
 
-            for(i=0, len=d.Feeds.length; i < len; i++){ //TODO: this feeds object is actually opmloutline, so it doesn't have Id
+            for(i=0, len=d.Feeds.length; i < len; i++){
+                //this `Feeds` object is actually opml outline, so it doesn't have Id
+                //SO ID have to be mapped
                 var feedData = d.Feeds[i];
-                feedData['Id'] = me.FeedUrl2Id[feedData.XmlUrl];
-                var feed = new FeedModel().fromJSONObject(feedData);
-                me.FeedsMap[feed.XmlUrl] = feed;
-                me.Feeds.push(feed);
+                var theFeedUrl = feedData.XmlUrl;
+                feedData['Id'] = me.FeedUrl2Id[theFeedUrl];
+                var theFeed = new FeedModel().fromJSONObject(feedData);
+                if (theFeedUrl in XmlUrl2OpmlMap) {
+                    _.each(XmlUrl2OpmlMap[theFeedUrl], function(theOpml){
+                        theFeed.opml = theOpml;
+                        theOpml.feed = theFeed;
+                    });
+
+                    XmlUrl2OpmlMap[theFeedUrl].feed = theFeed;
+                } else {
+                    console.log("!!!some feed couldn't be associated", theFeed)
+                }
+
+                me.FeedsMap[theFeed.XmlUrl] = theFeed;
+                me.Feeds.push(theFeed);
             }
-            me.createFeed2OpmlMap();
 
             if ('Stories' in d) {
                 for(i=0, len=d.Stories.length; i < len; i++){
@@ -206,13 +140,12 @@ angular.module('mining.content')
                 }
             }
 
-
-
             if ('UserReadStoryIds' in d) {
                 //deal with read stories
                 for(i=0, len=d.UserReadStoryIds.length; i < len; i++) {
                     var storyId = d.UserReadStoryIds[i];
                     var story = me.AddedStories[storyId];
+                    // Note: here doesn't need to do the counter , as is already done at server side
                     story.isRead = true;
                 }
             }
@@ -229,257 +162,97 @@ angular.module('mining.content')
                         feed.unReadCount = userReadFeedStat.UnreadCount;
                         feed.startFrom = userReadFeedStat.StartFrom;
                         me.totalUnReadCount += feed.unReadCount;
-                        //because story data is nolonger populated from start
-                        //me.updateStoryReadStatusUseStartFromTime(feedUrl,feed.startFrom);
                     }
                 }
                 me.updateOpmlUnReadCount();
             }
-        };
 
-        //UserDataModel.prototype.updateStoryReadStatusUseStartFromTime = function( feedUrl, startFrom){
-        //    var stories = this.StoriesMap[feedUrl];
-        //    _.each(stories, function(story,i){
-        //        if (story.Published<startFrom) { //if the story is published before user's focus, mark it read
-        //            story.isRead = true;
-        //        }
-        //    });
-        //};
-
-        UserDataModel.prototype.createFeed2OpmlMap = function() {
-            var me = this;
-            for(i=0, len=me.Opml.length; i<len; i++) {
-                var opmlOutline = me.Opml[i];
-                var opmlUnreadCount = 0;
-                var outlines = opmlOutline.getOutlines();
-                _.each(outlines, function(outline,i){
-                    var feedUrl = outline.XmlUrl;
-                    var feed = me.FeedsMap[feedUrl];
-                    me.Feed2OpmlMap[feedUrl] = opmlOutline;
-                });
-            }
-        };
-
-        UserDataModel.prototype.getAllFolderOpmls = function() {
-            var me = this;
-            var folderOpmls = [];
-            for(i=0, len=me.Opml.length; i<len; i++) {
-                var opmlOutline = me.Opml[i];
-                if (opmlOutline.hasOutline) {
-                    folderOpmls.push(opmlOutline)
+            //override the special `all feed` behavior
+            allFeedsOpml.getFeedsUrls = function() {
+                var urls = [];
+                for (var theUrl in me.FeedUrl2Id) {
+                    if (me.FeedUrl2Id.hasOwnProperty(theUrl)) {
+                        urls.push(theUrl);
+                    }
                 }
-            }
-            return folderOpmls;
+                return urls;
+            };
 
+            allFeedsOpml.getStories = function() {
+                var stories = [];
+                for (var storyId in me.AddedStories) {
+                    if (me.AddedStories.hasOwnProperty(storyId)){
+                        var theStory = me.AddedStories[storyId];
+                        stories.push(theStory);
+                    }
+                }
+                return _.sortBy(stories, function (s) {
+                    return -s.Published
+                });
+            };
+
+            allFeedsOpml.unReadCount = me.totalUnReadCount;
         };
 
-        UserDataModel.prototype.markStoryRead = function(story) {
-            me = this;
-            story.isRead = true;
-            var feedId = story.FeedId;
-            var feedUrl = me.FeedId2Url[feedId];
-            var feed = me.FeedsMap[feedUrl];
-            var opml = me.Feed2OpmlMap[feedUrl];
-            feed.unReadCount -= 1;
-            opml.unReadCount -= 1;
-            me.totalUnReadCount -=1;
-        };
-
-        UserDataModel.prototype.markStoryStar = function(story) {
-            me = this;
-            story.isStar = true;
+        UserDataModel.prototype.getFolderOpmls = function() {
+            return _.filter(this.opml,function(o){ return o.hasOutline});
         };
 
         UserDataModel.prototype.updateOpmlUnReadCount = function() {
             var me = this;
-            for(i=0, len=me.Opml.length; i<len; i++) {
-                var opmlOutline = me.Opml[i];
-                var opmlUnreadCount = 0;
-                var outlines = opmlOutline.getOutlines();
-                _.each(outlines, function(outline,i){
-                    var feedUrl = outline.XmlUrl;
-                    var feed = me.FeedsMap[feedUrl];
-                    outline.unReadCount = feed.unReadCount;
-                    opmlUnreadCount += feed.unReadCount;
-                });
-                opmlOutline.unReadCount = opmlUnreadCount;
-            }
+            _.each(me.Opml, function(opmlOutline){
+                opmlOutline.refreshUnreadCount();
+            });
         };
 
         UserDataModel.prototype.populateStoryData = function(storyData) {
-            var me = this;
             var story = new StoryModel().fromJSONObject(storyData);
             var feedId = story.FeedId;
-            var feedUrl = me.FeedId2Url[feedId];
-            var feed = me.FeedsMap[feedUrl];
-            story.FeedTitle = feed.Title;
+            var feedUrl = this.FeedId2Url[feedId];
+            var theFeed = this.FeedsMap[feedUrl];
 
-            if (!(feedUrl in me.StoriesMap)){
-                this.StoriesMap[feedUrl] = [];
-            }
-
-            // if the story is already added then do nothing
-            if (me.AddedStories[story.Id]!=null) {
+            if (this.AddedStories[story.Id]!=null) {
                 return null;
             } else {
                 //else add it to the collection and feed
-                if (story.Published<feed.startFrom) {
+                if (story.Published<theFeed.startFrom) {
                     story.isRead = true;
                 }
-                me.Stories.push(story);
-                me.AddedStories[story.Id] = story;
-                me.StoriesMap[feedUrl].push(story);
+                this.Stories.push(story);
+                this.AddedStories[story.Id] = story;
+                theFeed.addStory(story);
             }
 
             return story;
         };
 
-        UserDataModel.prototype.getStoryContentById = function(storyId) {
-            if (storyId in this.storyId2ContentMap) {
-                return this.storyId2ContentMap[storyId];
-            }
-            return null;
-        };
-
-        UserDataModel.prototype.getStoryById = function(storyId) {
-            if (storyId in this.AddedStories) {
-                return this.AddedStories[storyId];
-            }
-            return null;
-        };
-
-
         UserDataModel.prototype.addStories = function(storiesData,UserReadStoryIds,UserStarStoryIds) {
             var me = this;
             var newAddedStories = [];
-            _.each(storiesData, function(newStoryData,i){
+            _.each(storiesData, function(newStoryData){
                 var addedStory = me.populateStoryData(newStoryData);
                 if (addedStory!=null) {
                     newAddedStories.push(addedStory);
                 }
             });
-            _.sortBy(newAddedStories, function(story){
-                return story.Published
-            });
+
+            var theStoryId = 0,
+                i, len,
+                theStory = null;
 
             for(i=0, len=UserReadStoryIds.length; i < len; i++) {
-                var storyId = UserReadStoryIds[i];
-                var story = me.AddedStories[storyId];
-                story.isRead = true;
+                theStoryId = UserReadStoryIds[i];
+                theStory = me.AddedStories[theStoryId];
+                theStory.isRead = true;
             }
 
             for(i=0, len=UserStarStoryIds.length; i < len; i++) {
-                var storyId = UserStarStoryIds[i];
-                var story = me.AddedStories[storyId];
-                story.isStar = true;
+                theStoryId = UserStarStoryIds[i];
+                theStory = me.AddedStories[theStoryId];
+                theStory.isStar = true;
             }
 
             return newAddedStories;
-        };
-
-        //mark stories in the specified feed as read
-        UserDataModel.prototype.markFeedStoriesRead = function(xmlUrl) {
-            //var feed = this.FeedsMap[xmlUrl];
-            // probably update the feed stats as well??
-            var stories = this.StoriesMap[xmlUrl];
-            _.each(stories, function(story,i){
-                story.isRead = true;
-            })
-        };
-        UserDataModel.prototype.markFeedsStoriesRead = function(xmlUrls) {
-            var me = this;
-            _.forEach(xmlUrls,function(xmlUrl,i){
-                me.markFeedStoriesRead(xmlUrl);
-            });
-        };
-
-        //get local cached story for the specified feed
-        UserDataModel.prototype.getLocalStoriesPerFeed = function(xmlUrl, pageNo) {
-            var me = this;
-            //let's use the current page size say 10
-            var feedStories = me.StoriesMap[xmlUrl];
-            if (feedStories instanceof Array) {
-                var pageNo = pageNo || 0,
-                    per_page = 10,
-                    offset = pageNo * per_page,
-                    stories = _.rest(feedStories, offset).slice(0, per_page);
-                if (stories.length < per_page) {
-                    return [];
-                } else {
-                    return stories;
-                }
-            }
-
-            return [];
-        };
-
-
-        /**
-         * get Feed Stories of specified page,
-         * get local cached stories for the specified feeds *feeds*
-         * if one of the feed cache returned empty, then the whole call return empty
-         * @param xmlUrls
-         * @param pageNo
-         * @returns {Array}
-         */
-        UserDataModel.prototype.getLocalFeedStoriesOfPage = function(xmlUrls, pageNo) {
-            var me = this;
-            var allFeedsStories = [];
-            _.each(xmlUrls, function(xmlUrl,i){
-                var feedStories = me.getLocalStoriesPerFeed(xmlUrl, pageNo);
-                if (feedStories.length == 0) {
-                    return [];
-                } else {
-                    allFeedsStories = allFeedsStories.concat(feedStories);
-                }
-            });
-            _.sortBy( allFeedsStories, function(s){
-                return s.Published
-            });
-            return allFeedsStories;
-        };
-
-        UserDataModel.prototype.getAllFeedXmlUrls = function() {
-            var urls = [];
-            for (var url in this.FeedUrl2Id) {
-                urls.push(url);
-            }
-            return urls;
-        };
-
-        /**
-         * return all the stories that are available locally
-         * @param opmlFeed
-         * @returns {*}
-         */
-        UserDataModel.prototype.getStoriesByOpml = function(opmlFeed) {
-            var me = this;
-            if (opmlFeed.hasOutline) {
-                var outlineStories = [];
-                if (opmlFeed.Type=="RSS/ALL") {//it is the all feeds
-                    outlineStories = me.Stories;
-                } else {
-                    _.each(opmlFeed.Outline,function(subOpmlFeed,i){
-                        //every element of outline should be opmlFeed
-                        var feedStories = me.StoriesMap[subOpmlFeed.XmlUrl];
-                        if (feedStories instanceof Array) {
-                            outlineStories = outlineStories.concat(feedStories);
-                        }
-                    });
-                }
-
-
-                var sortedOutlineStories = _.sortBy( outlineStories, function(s){
-                    return -s.Published
-                });
-                return sortedOutlineStories;
-            } else{
-                if (opmlFeed.XmlUrl in this.StoriesMap) {
-                    return this.StoriesMap[opmlFeed.XmlUrl];
-                } else {
-                    return [];
-                }
-            }
         };
 
         return UserDataModel;

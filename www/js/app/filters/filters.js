@@ -1,7 +1,7 @@
 angular.module('mining.filters', [])
     .filter('partition', function ($cacheFactory) {
         var arrayCache = $cacheFactory('partition');
-        var filter = function (arr, size) {
+        return function (arr, size) {
             if (!arr) {
                 return;
             }
@@ -18,7 +18,6 @@ angular.module('mining.filters', [])
             arrayCache.put(arrString + size, newArr);
             return newArr;
         };
-        return filter;
     })
     .filter("sanitize", ['$sce', function($sce) {
         return function(htmlCode){

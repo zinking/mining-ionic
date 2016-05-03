@@ -1,7 +1,5 @@
 angular.module('mining.account')
-    .controller('LogoutCtrl', function(
-        $scope, $ionicLoading,$state,$ionicPopup,
-        AccountDataService, SessionService) {
+    .controller('LogoutCtrl', function( $scope, $state, AccountDataService) {
 
         $scope.msg = "logging out";
         AccountDataService.wipeUserData();
@@ -9,8 +7,5 @@ angular.module('mining.account')
 
         $scope.goToLogin = function(){
             $state.go('login');
-            return
         }
-
-
     });

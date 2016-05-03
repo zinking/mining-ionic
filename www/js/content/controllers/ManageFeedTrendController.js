@@ -37,7 +37,7 @@ angular.module('mining.content')
                 function(){
                     $scope.viewModel.isBusy = false;
                     $ionicPopup.alert({
-                        title: 'Load last month stats Faild, retry later'
+                        title: 'Load last month stats Failed, retry later'
                     });
                 }
             )
@@ -61,7 +61,7 @@ angular.module('mining.content')
                     }
                 },
                 function(){
-                    console.log("unsubscribe failed")
+                    console.log("unSubscribe failed")
                 }
             );
 

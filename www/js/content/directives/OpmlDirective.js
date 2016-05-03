@@ -1,5 +1,5 @@
 angular.module('mining.content')
-    .directive('opml', ['$compile', function($compile) {
+    .directive('opml', ['$compile', function() {
         return {
             restrict: 'E',
             templateUrl: 'js/content/directives/templates/Opml.html',
@@ -10,7 +10,7 @@ angular.module('mining.content')
                 onOpmlClicked: '&',
                 onOpmlFeedClicked: '&'
             },
-            controller: function($scope, $element) {
+            controller: function($scope) {
                 $scope.viewModel = {
                     isBusy : false
                 };

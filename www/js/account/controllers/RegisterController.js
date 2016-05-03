@@ -1,7 +1,5 @@
 angular.module('mining.account')
-    .controller('RegisterCtrl', function(
-        $scope, $ionicLoading,$state,$ionicPopup,
-        AccountDataService, SessionService) {
+    .controller('RegisterCtrl', function( $scope, $ionicLoading,$state,$ionicPopup, AccountDataService) {
         $scope.viewModel = {
             email  : '',
             pass1  : '',

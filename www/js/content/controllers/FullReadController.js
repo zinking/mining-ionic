@@ -1,20 +1,22 @@
 angular.module('mining.content')
+    .controller('NavController', function($scope, $ionicSideMenuDelegate) {
+        $scope.toggleLeft = function() {
+            $ionicSideMenuDelegate.toggleLeft();
+        };
+    })
     .controller('FullReadCtrl', function(
-        $scope, $ionicLoading, $state, $ionicPopup, $ionicPopover,deviceDetector, AccountDataService,
+        $scope, $ionicLoading, $state, $ionicPopup, $ionicPopover,$ionicSideMenuDelegate, $timeout, AccountDataService,
         ContentDataService, SessionService, UserDataModel
     ) {
 
-        $scope.router = SessionService.routeUtil;
+        $scope.router = SessionService.routeFullUtil;
+
 
         $scope.viewModel = {
             isBusy:false,
             totalUnReadCount: 0,
-            omplsList : []
+            opmlList : []
         };
-
-        //var READ_TAB_POPUP_TEMPLATE = 'js/content/directives/templates/ReadTabPopMenu.html';
-        //SessionService.injectPopUpDiaglog(READ_TAB_POPUP_TEMPLATE, $scope);
-
 
         //verify user credential exists
         var userAuthData = AccountDataService.getUserData();
@@ -23,10 +25,12 @@ angular.module('mining.content')
             return;
         }
         else{
-            //create a global userdata structure
-            globalUserData = new UserDataModel();
+            //create a global user data structure
+            window.globalUserData = new UserDataModel();
             globalUserData.setUserAuth(userAuthData);
         }
+
+        $scope.viewModel.user = userAuthData;
 
         $scope.viewModel.isBusy = true;
         $scope.viewModel.totalUnReadCount = globalUserData.totalUnReadCount;
@@ -38,6 +42,8 @@ angular.module('mining.content')
                 $scope.viewModel.isBusy = false;
                 $scope.viewModel.opmlsList = globalUserData.Opml;
                 $scope.viewModel.totalUnReadCount = globalUserData.totalUnReadCount;
+
+                $ionicSideMenuDelegate.toggleLeft();
             },
             function(){
                 $scope.viewModel.isBusy = false;

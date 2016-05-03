@@ -19,12 +19,11 @@ angular.module('mining.content')
         };
 
         $scope.getFolderOptions = function() {
-            var folderOpmls = globalUserData.getAllFolderOpmls();
+            var folderOpmls = globalUserData.getFolderOpmls();
             function opmlToOption(opml) {
                 return {id: opml.Title, text: opml.Title};
             }
-            var options = _.map(folderOpmls, opmlToOption);
-            return options;
+            return _.map(folderOpmls, opmlToOption);
         };
 
         $('#folderPicker').select2({
@@ -71,12 +70,14 @@ angular.module('mining.content')
         };
 
         function isValidUrl(s) {
-            var regexp1 = /^HTTP|HTTP|http(s)?:\/\/(www\.)?[A-Za-z0-9]+([\-\.]{1}[A-Za-z0-9]+)*\.[A-Za-z]{2,40}(:[0-9]{1,40})?(\/.*)?$/;
-            var regexp2 = /^(www\.)?[A-Za-z0-9]+([\-\.]{1}[A-Za-z0-9]+)*\.[A-Za-z]{2,40}(:[0-9]{1,40})?(\/.*)?$/;
+            //var regexp1 = /^HTTP|HTTP|http(s)?:\/\/(www\.)?[A-Za-z0-9]+([\-\.]{1}[A-Za-z0-9]+)*\.[A-Za-z]{2,40}(:[0-9]{1,40})?(\/.*)?$/;
+            var regexp1 = /^HTTP|HTTP|http(s)?:\/\/(www\.)?[A-Za-z0-9]+([\-\.][A-Za-z0-9]+)*\.[A-Za-z]{2,40}(:[0-9]{1,40})?(\/.*)?$/;
+            //var regexp2 = /^(www\.)?[A-Za-z0-9]+([\-\.]{1}[A-Za-z0-9]+)*\.[A-Za-z]{2,0}(:[0-9]{1,40})?(\/.*)?$/;
+            var regexp2 = /^(www\.)?[A-Za-z0-9]+([\-\.][A-Za-z0-9]+)*\.[A-Za-z]{2,40}(:[0-9]{1,40})?(\/.*)?$/;
             return regexp1.test(s) || regexp2.test(s);
         }
 
-        $scope.previewFeedSource = function ($event){
+        $scope.previewFeedSource = function (){
             var feedUrl = $scope.viewModel.feedUrl;
             if (isValidUrl(feedUrl)){
                 if (feedUrl.substr(0,4)!='http'){

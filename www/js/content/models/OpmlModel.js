@@ -1,5 +1,5 @@
 angular.module('mining.content')
-    .factory('OpmlModel', function(BASE_SERVER_URL) {
+    .factory('OpmlModel', function (FeedModel) {
         var OpmlModel = function () {
 
         };
@@ -12,20 +12,28 @@ angular.module('mining.content')
             model.Type          = data.Type;
             model.Image         = data.Image;
             model.Text          = data.Text;
+
+            // psudo element
             model.hasOutline    = false;
             model.unReadCount   = 0;
-            model.currentPage   =  0;
-            if ('Outline' in data){
+            model.currentPage   = 0;
+            model.parentOpml    = null;
 
-                model.Outline   = _.map(data.Outline, function(omplData,i){
-                    return OpmlModel.prototype.fromJSONObject(omplData);
+            // Structure section
+            model.feed = null;
+            if ('Outline' in data){
+                model.Outline   = _.map(data.Outline, function(omplData){
+                    var childOpml = OpmlModel.prototype.fromJSONObject(omplData);
+                    childOpml.parentOpml = model;
+                    return childOpml;
                 });
                 if (model.Outline.length>0) {
                     model.hasOutline = true;
                 }
+            } else {
+                me.parentOpml = me;
             }
 
-            //psudo element, interact with user
             model.filterHasRead = false;
             model.isFolder = model.hasOutline;
             model.isOpen = false;
@@ -40,18 +48,69 @@ angular.module('mining.content')
             model.Type          = "RSS/ALL";
             model.Image         = "N/A";
             model.Text          = "All Feeds";
+
             model.hasOutline    = true;
             model.unReadCount   = 0;
             model.currentPage   =  0;
             model.filterHasRead = false;
+            model.feed          = new FeedModel();
+            model.parentOpml    = model;
 
             return model;
+        };
+
+        OpmlModel.prototype.readOneStory = function() {
+            this.unReadCount -= 1;
+            if (!this.isFolder) { //if the opml is not folder prop upwards
+                if (this.parentOpml != null) {
+                    this.parentOpml.readOneStory();
+                }
+            }
+        };
+
+        OpmlModel.prototype.markRead = function() {
+            if (this.isFolder) {
+                _.each(this.Outline, function(child){
+                    child.markRead();
+                })
+            } else {
+                this.feed.markRead();
+            }
+        };
+
+        OpmlModel.prototype.getStories = function() {
+            if (this.isFolder) {
+                var stories = [];
+                _.each(this.Outline, function(child){
+                    stories = stories.concat(child.feed.getStories());
+                });
+                return _.sortBy(stories, function (s) {
+                    return -s.Published
+                });
+            } else {
+                return this.feed.getStories();
+            }
+        };
+
+
+        OpmlModel.prototype.refreshUnreadCount = function() {
+            if (this.isFolder) {
+                var me = this;
+                this.unReadCount = _.sum(
+                    _.map(me.Outline, function (child) {
+                        child.refreshUnreadCount();
+                        return child.unReadCount;
+                    })
+                );
+            } else {
+                this.unReadCount = this.feed.unReadCount;
+            }
         };
 
         OpmlModel.prototype.getFeedsUrls = function() {
             var me = this;
             if (me.hasOutline) {
-                return _.map(me.Outline, function(opmlOutline,i){
+                return _.map(me.Outline, function(opmlOutline){
                     return opmlOutline.XmlUrl;
                 });
             } else {
@@ -60,13 +119,10 @@ angular.module('mining.content')
         };
 
         OpmlModel.prototype.getOutlines = function() {
-            var me = this;
-            if (me.hasOutline) {
-                return _.map(me.Outline, function(suboutline,i){
-                    return suboutline;
-                });
+            if (this.hasOutline) {
+                return this.Outline;
             } else {
-                return [me];
+                return [this];
             }
         };
 
@@ -93,8 +149,8 @@ angular.module('mining.content')
                 Text        : this.Text
             };
             if (this.hasOutline){
-                obj.Outline = _.map(this.Outline, function(ompl,i){
-                    return opml.toJSONObject();
+                obj.Outline = _.map(this.Outline, function(child){
+                    return child.toJSONObject();
                 });
             } else {
                 return obj;

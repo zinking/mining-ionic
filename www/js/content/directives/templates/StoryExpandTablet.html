@@ -1,0 +1,13 @@
+<div class="item">
+    <div class="bar bar-header">
+        <h2 class="title">
+            <b>{{story.Author}}</b>
+            <!--<span am-time-ago="viewModel.story.PublishedTime"></span>-->
+            <a class='button icon ion-link button-right' ng-href="{{story.Link}}" target="_blank"></a>
+        </h2>
+    </div>
+
+    <div ng-if="viewModel.expanded">
+        <p id="storyContainer" ng-bind-html="story.Content | sanitize " ngc-done="onContentLoaded()"></p>
+    </div>
+</div>

@@ -1,10 +1,10 @@
 angular.module('mining.content')
-    .factory('ContentDataService', function($http, $q, $interval, SessionService, BASE_SERVER_URL, UserDataModel) {
+    .factory('ContentDataService', function($http, $q, $interval, SessionService, BASE_SERVER_URL) {
 
         var LIST_FEEDS_PATH             = BASE_SERVER_URL + '/user/list-feeds';
         var LIST_STAR_FEEDS_PATH        = BASE_SERVER_URL + '/user/list-starfeeds';
         var GET_MORE_FEEDS_PATH         = BASE_SERVER_URL + '/user/get-feedsstories';
-        var GET_MORE_STARFEEDS_PATH     = BASE_SERVER_URL + '/user/get-starstories';
+        var GET_MORE_STAR_FEEDS_PATH    = BASE_SERVER_URL + '/user/get-starstories';
         var LOAD_STORY_CONTENT_PATH     = BASE_SERVER_URL + '/user/get-contents';
         var ADD_FEED_SOURCE_PATH        = BASE_SERVER_URL + '/user/add-subscription';
         var ARRANGE_FEED_SOURCE_PATH    = BASE_SERVER_URL + '/user/arrange-feedsource';
@@ -13,7 +13,6 @@ angular.module('mining.content')
         var PREVIEW_FEED_SOURCE_PATH    = BASE_SERVER_URL + '/user/preview-subscription';
         var MARK_STORY_READ_PATH        = BASE_SERVER_URL + '/user/mark-read';
         var MARK_STORY_STAR_PATH        = BASE_SERVER_URL + '/user/mark-star';
-        var MARK_FEED_READ_PATH         = BASE_SERVER_URL + '/user/mark-feedread';
         var MARK_FEEDS_READ_PATH        = BASE_SERVER_URL + '/user/mark-feedsread';
         var APPEND_STORY_STATS_PATH     = BASE_SERVER_URL + '/user/append-stats';
         var LOAD_LM_READ_STATS_PATH     = BASE_SERVER_URL + '/user/load-lastmonth-readstats';
@@ -21,21 +20,22 @@ angular.module('mining.content')
 
 
         //push the stats collected to server every 1 minute
-        var statsPusher = $interval(function(){
-            if (globalUserData.UserActStats.length > 0) {
-                var data = globalUserData.UserActStats;
+        $interval(function(){
+            if (globalUserData.UserActionStats.length > 0) {
+                var data = globalUserData.UserActionStats;
                 var req = SessionService.getUserPostRequest(APPEND_STORY_STATS_PATH, data);
                 $http(req).
                     success(function (d) {
-                        //maybe check the return val is 1
-                        globalUserData.clearStats();
+                        if (d == 1 ){
+                            globalUserData.clearStats();
+                        }
                     }).
                     error(function () {
                         console.log("error sending stats to server")
                     });
             }
 
-        }, 1000*60*1);
+        }, 1000*60);
 
         function makeHttpRequest(request) {
             var deferred = $q.defer();
@@ -71,7 +71,8 @@ angular.module('mining.content')
                 $http(req).
                     success(function (d) {
                         //globalUserData.cleanFeedStructure();
-                        globalUserData.setStarFeedStructure(d);
+                        //globalUserData.setStarFeedStructure(d);
+                        globalUserData.setFeedStructure(d);
                         deferred.resolve({});
                     }).
                     error(function () {
@@ -79,35 +80,14 @@ angular.module('mining.content')
                     });
                 return deferred.promise;
             },
-            saveLocalUserData: function(){
-                var gUserData = globalUserData.toJSONObject();
-                window.localStorage['userData.global'] = JSON.stringify(gUserData);
-            },
-            loadLocalUserData: function () {
-                var globalData = window.localStorage['userData.global'];
-                var gUserData = JSON.parse(globalData);
-                globalUserData = UserDataModel.fromJSONObject(gUserData);
-            },
+
             loadStoryContentFromServer: function(storyIds) {
                 var requestData = _.map(storyIds, function(sl){
                     if (sl<0) sl = -sl; //I know this is the virtual stories
                     return {'StoryId':sl}
                 });
                 var req = SessionService.getUserPostRequest(LOAD_STORY_CONTENT_PATH,requestData);
-                var deferred = $q.defer();
-
-                $http(req).
-                    success(function (d) {
-                        _.each(storyIds, function (storyId, i) {
-                            var sc = { 'storyId':storyId, 'content':d[i].Content, 'summary':d[i].Summary };
-                            globalUserData.addStoryContent(sc);
-                        });
-                        deferred.resolve({});
-                    }).
-                    error(function () {
-                        deferred.reject();
-                    });
-                return deferred.promise;
+                return makeHttpRequest(req);
             },
             previewFeedSource: function(feedUrl) {
                 var requestData = {'url':feedUrl};
@@ -137,7 +117,7 @@ angular.module('mining.content')
 
             loadMoreStarStories: function(feedUrls, pageNo) {
                 var requestData = {'FS':feedUrls, 'C':pageNo};
-                var req = SessionService.getUserPostRequest(GET_MORE_STARFEEDS_PATH,requestData);
+                var req = SessionService.getUserPostRequest(GET_MORE_STAR_FEEDS_PATH,requestData);
                 return makeHttpRequest(req);
             },
             markStoryRead: function(feedId, storyId) {
@@ -150,11 +130,6 @@ angular.module('mining.content')
                 if (storyId<0) storyId = -storyId; //I know this is the virtual stories
                 var requestData = {'FeedId':feedId, 'StoryId':storyId, 'Star':1};
                 var req = SessionService.getUserPostRequest(MARK_STORY_STAR_PATH,requestData);
-                return makeHttpRequest(req);
-            },
-            markFeedRead: function(feedId) {
-                var requestData = {'FeedId':feedId};
-                var req = SessionService.getUserPostRequest(MARK_FEED_READ_PATH,requestData);
                 return makeHttpRequest(req);
             },
             markFeedsRead: function(feedIds) {

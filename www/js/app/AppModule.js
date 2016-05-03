@@ -12,9 +12,9 @@ angular.module('mining', [
             if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
                 cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
             }
-            if (window.StatusBar) {
-                StatusBar.styleLightContent();
-            }
+            //if (window.StatusBar) {
+            //    StatusBar.styleLightContent();
+            //}
         });
     })
     .config(function ($ionicConfigProvider) {
@@ -79,16 +79,26 @@ angular.module('mining', [
             })
             .state('full', {
                 url: '/full',
-                cache: false,
                 templateUrl: 'js/content/templates/FullReadView.html',
+                params: { opml:null, mode:'expand', device:'Tablet' },
                 controller: 'FullReadCtrl'
+            })
+            .state('full.readFeed', {
+                cache:false,
+                views: {
+                    'full': {
+                        templateUrl: 'js/content/templates/FullReadFeedView.html',
+                        params: { opml:null, mode:'expand', device:'Tablet' },
+                        controller: 'ReadFeedCtrl'
+                    }
+                }
             })
 
             .state('readFeed', {
                 url: '/feed/read',
                 cache: false,
                 templateUrl: 'js/content/templates/ReadFeedView.html',
-                params: { opmlFeed:null, source:null },
+                params: { opml:null, mode:'item', device:'mobile' },
                 controller: 'ReadFeedCtrl'
             })
             .state('addFeed', {
@@ -107,7 +117,7 @@ angular.module('mining', [
                 url: '/feed/story',
                 cache: false,
                 templateUrl: 'js/content/templates/ReadStoryView.html',
-                params: { story: null,opmlFeed: null },
+                params: { story: null, mode:'full', device:'mobile' },
                 controller: 'ReadStoryCtrl'
             })
 
@@ -145,6 +155,16 @@ function clone(obj) {
     }
     return copy;
 }
+
+String.prototype.capitalizeFirstLetter = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+_.sum = function(arr){
+    return _.reduce(arr, function(m, n){ return m + n; }, 0);
+};
+
+
 
 moment.locale('en', {
     relativeTime : {

@@ -1,5 +1,5 @@
 angular.module('mining.content')
-    .directive('feed', ['$compile', function($compile) {
+    .directive('feed', ['$compile', function() {
         return {
             restrict: 'E',
             templateUrl: 'js/content/directives/templates/Feed.html',

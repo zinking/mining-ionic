@@ -1,0 +1,20 @@
+<div>
+
+    <div class="bar bar-header">
+        <h2 class="title">
+            <b>{{viewModel.opml.Title}}</b>
+            <a class='button icon ion-link button-right' ng-href="{{viewModel.opml.HtmlUrl}}" target="_blank"></a>
+        </h2>
+    </div>
+
+    <ion-list >
+        <story story="story" open="onStoryItemClicked($index)"
+               collection-repeat="story in viewModel.stories | filterRead:viewModel.opmlFeed.filterHasRead">
+        </story>
+    </ion-list>
+    <div class="item" ng-show="!viewModel.hasMoreStories">End Of Feed</div>
+    <ion-infinite-scroll ng-if="viewModel.hasMoreStories"
+                         on-infinite="loadMoreStories()" immediate-check="false" distance="1%">
+    </ion-infinite-scroll>
+    
+</div>

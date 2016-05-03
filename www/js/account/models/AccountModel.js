@@ -15,7 +15,7 @@ angular.module('mining.account')
         };
         
         AccountModel.prototype.getAvatarUrl = function() {
-        	return BASE_SERVER_URL + avatarurl;
+        	return BASE_SERVER_URL + this.avatarurl;
         };
 
         AccountModel.prototype.populate = function(data) {

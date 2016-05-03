@@ -13,11 +13,28 @@ angular.module('mining.storage', [])
             },
             clear: function () {
                 window.localStorage.removeItem('locations');
+            },
+            saveLocalUserData: function(){
+                var gUserData = window.globalUserData.toJSONObject();
+                window.localStorage['userData.global'] = JSON.stringify(gUserData);
+            },
+            loadLocalUserData: function () {
+                var globalData = window.localStorage['userData.global'];
+                var gUserData = JSON.parse(globalData);
+                window.globalUserData = UserDataModel.fromJSONObject(gUserData);
             }
         }
     })
     .factory('SessionsStorage', function () {
         return {
+            getAll : function () {
+                var defaultToken = null;
+                var cookieStr = decodeURI(this.get('user_data'));
+                if (cookieStr) {
+                    defaultToken = angular.fromJson(cookieStr);
+                }
+                return defaultToken;
+            },
             all: function () {
                 var sessions = window.localStorage['sessions'];
                 if (sessions) {

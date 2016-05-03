@@ -107,7 +107,7 @@ svg {
     top: 7px;
 }
 
-h2.oneline,div.oneline {
+h2.one-line,div.one-line {
     text-overflow:ellipsis;
     white-space: nowrap;
     overflow: hidden;
@@ -128,8 +128,7 @@ b.feedTitle {
 .fitContent {
     max-width:100%;
     max-height:100%;
-    width:100%;
-    height:100%;
+
 }
 
 #storyContainer {

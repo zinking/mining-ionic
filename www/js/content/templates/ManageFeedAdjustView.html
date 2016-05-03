@@ -22,7 +22,7 @@
 
                     <label class="item item-input" ng-click="markFeedDelete(opml)">
                         <i class="icon ion-android-delete unsubsribe-inactive" ></i>
-                        <h2 class="oneline" >{{opml.XmlUrl}}</h2>
+                        <span class="oneline" >{{opml.XmlUrl}}</span>
                     </label>
 
                     <label class="item item-input">
@@ -49,10 +49,10 @@
                     </i>
 
 
-                    <!--TODO: possibly highlight the unbsubscribe after click-->
+                    <!--TODO: possibly highlight the unsubscribe after click-->
                     <label class="item item-input" ng-click="markFeedDelete(feed)">
                         <a><i class="icon ion-android-delete unsubsribe-inactive" ></i></a>
-                        <h2 class="oneline" >{{feed.XmlUrl}}</h2>
+                        <span class="one-line">{{feed.XmlUrl}}</span>
                     </label>
 
                     <label class="item item-input">

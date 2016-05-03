@@ -36,7 +36,7 @@ angular.module('mining.content',['ionic'])
         dropbox.addEventListener("dragover", function(evt) {
             evt.stopPropagation();
             evt.preventDefault();
-            var clazz = 'not-available';
+            //var clazz = 'not-available';
             var ok = evt.dataTransfer && evt.dataTransfer.types && evt.dataTransfer.types.indexOf('Files') >= 0;
             $scope.$apply(function(){
                 $scope.dropText = ok ? 'Drop files here...' : 'Only files are allowed!';
@@ -64,7 +64,7 @@ angular.module('mining.content',['ionic'])
         //============== DRAG & DROP =============
 
         $scope.setFiles = function(element) {
-            $scope.$apply(function(scope) {
+            $scope.$apply(function() {
                 console.log('files:', element.files);
                 // Turn the FileList object into an Array
                 $scope.files = [];
@@ -78,7 +78,9 @@ angular.module('mining.content',['ionic'])
         $scope.uploadFile = function() {
             var fd = new FormData();
             for (var i in $scope.files) {
-                fd.append("file", $scope.files[i]);
+                if ($scope.files.hasOwnProperty(i)){
+                    fd.append("file", $scope.files[i]);
+                }
             }
             var xhr = new XMLHttpRequest();
             xhr.upload.addEventListener("progress", uploadProgress, false);
@@ -113,7 +115,7 @@ angular.module('mining.content',['ionic'])
 
         function uploadFailed(evt) {
             $ionicPopup.alert({
-                title: 'Import OPML Error'
+                title: 'Import OPML Error'+evt
             });
         }
 
@@ -123,7 +125,7 @@ angular.module('mining.content',['ionic'])
             });
             //alert("The upload has been canceled by the user or the browser dropped the connection.")
             $ionicPopup.alert({
-                title: 'Import OPML Canceld or connection dropped'
+                title: 'Import OPML Canceled or connection dropped' + evt
             });
         }
 
