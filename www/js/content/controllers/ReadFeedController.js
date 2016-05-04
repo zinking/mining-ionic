@@ -1,6 +1,5 @@
 angular.module('mining.content')
-    .controller('ReadFeedCtrl', function($scope, $filter, $ionicLoading,$state,$stateParams,$ionicPopover,$ionicPopup,
-                                     $ionicScrollDelegate, $q, ContentDataService, AccountDataService, SessionService) {
+    .controller('ReadFeedCtrl', function($scope, $filter,$state,$stateParams,$ionicPopup, $q, ContentDataService, SessionService) {
         SessionService.refreshIfExpired();
         $scope.router = SessionService.routeUtil;
 
@@ -34,6 +33,7 @@ angular.module('mining.content')
 
         $scope.viewModel.opml = $stateParams.opml;
         $scope.viewModel.source = $stateParams.source;
+        $scope.viewModel.mode = $stateParams.mode;
 
 
         var READ_FEED_POPUP_TEMPLATE = 'js/content/directives/templates/ReadFeedPopMenu.html';
@@ -92,9 +92,18 @@ angular.module('mining.content')
         };
 
 
-        $scope.openStory = function (story) {
-            $scope.router.goReadStory(story);
+        $scope.openStory = function (story,opml) {
+            if ($state.params.mode=="expand") {
+
+            } else if($state.params.mode=="item") {
+                $scope.router.goReadStory(story,opml);
+            }
         };
 
+        $scope.closeExpandStory = function() {
+            if ($state.params.mode=="expand") {
+                $scope.viewModel.opml.closeExpandStory();
+            }
+        }
 
     });

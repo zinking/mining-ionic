@@ -43,21 +43,27 @@ angular.module('mining.content')
             },
             controller: function($scope) {
                 $scope.viewModel = {
-                    expanded: false,
                     level : 0,
                     content0 : "",
                     content1 : "",
                     content2 : ""
                 };
 
+                $scope.story.expand = false;
+
                 $scope.onContentLoaded = function() {
-                    var storyContainer = $('#storyContainer');
-                    storyContainer.find('img').addClass('fitContent');
-                    storyContainer.find('img').removeAttr('style');
-                    storyContainer.find('img').removeAttr('height');
-                    storyContainer.find('embed').addClass('fitContent');
-                    storyContainer.find('video').addClass('fitContent');
-                    storyContainer.find('iframe').addClass('fitContent');
+                    //var storyContainer = $('#story-container');
+                    //storyContainer.find('img').addClass('fitContent');
+                    //storyContainer.find('img').removeAttr('style');
+                    //storyContainer.find('img').removeAttr('height');
+                    //storyContainer.find('embed').addClass('fitContent');
+                    //storyContainer.find('video').addClass('fitContent');
+                    //storyContainer.find('iframe').addClass('fitContent');
+                    $('#story-container img').addClass('fitContent').removeAttr('style').removeAttr('height');
+                    $('#story-container embed').addClass('fitContent');
+                    $('#story-container video').addClass('fitContent');
+                    $('#story-container iframe').addClass('fitContent');
+
                 };
 
                 $scope.markStoryRead = function() {
@@ -83,7 +89,7 @@ angular.module('mining.content')
                     );
                 };
 
-                $scope.loadStoryContent = function(){
+                $scope.loadStoryContent = function(onSuccessCallBack){
                     //first try local cache
                     if($scope.story.hasContent()){
                         $scope.markStoryRead();
@@ -100,6 +106,9 @@ angular.module('mining.content')
                                 $scope.story.setSummary(d[0].Summary);
                                 $scope.story.setContent(d[0].Content);
                                 $scope.markStoryRead();
+                                if (onSuccessCallBack) {
+                                    onSuccessCallBack();
+                                }
                             },
                             function() {
                                 $scope.isBusy = false;
@@ -109,13 +118,21 @@ angular.module('mining.content')
                 };
 
                 if (globalUserData && $state.params.mode === 'full') {
-                    $scope.loadStoryContent( $scope.story )
+                    $scope.loadStoryContent(  )
                 }
 
 
                 $scope.expandStory = function(){
-                    $scope.loadStoryContent($scope.story);
-                    $scope.expanded = true;
+                    if ($state.params.mode=="expand") { //only works in expand mode
+                        $scope.open(); //calling callback handler
+                        $scope.story.expand = true;
+                        $scope.loadStoryContent(function () {
+
+                            $scope.$broadcast('scroll.infiniteScrollComplete');
+                            $scope.$broadcast('scroll.resize');
+                        });
+                    }
+
                 };
 
                 //TODO: the attempt to incrementally preview story is not successful

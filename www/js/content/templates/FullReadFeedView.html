@@ -1,6 +1,6 @@
 <ion-view view-title="{{viewModel.opml.Title}}" hide-nav-bar="true">
     <ion-footer-bar class="bar-calm">
-        <!--<button class='button icon ion-arrow-left-a' ng-click='goBackToTab()'></button>-->
+        <button class='button icon ion-close-circled' ng-click='closeExpandStory()' ng-show="viewModel.mode=='expand'"></button>
         <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
         <h1 class="title">({{viewModel.opml.unReadCount}})</h1>
         <button ng-if="viewModel.opml.filterHasRead" class="button icon ion-ios-book"
@@ -10,9 +10,9 @@
     </ion-footer-bar>
 
     <ion-content class="gem-ion-content" >
-        <storylist opml="viewModel.opmlFeed" is-busy="viewModel.isBusy"
+        <storyalist opml="viewModel.opml" is-busy="viewModel.isBusy"
                 on-feed-story-clicked="openStory(story)">
-        </storylist>
+        </storyalist>
 
     </ion-content>
 </ion-view>

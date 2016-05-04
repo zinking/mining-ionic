@@ -21,7 +21,7 @@ angular.module('mining.storage', [])
             loadLocalUserData: function () {
                 var globalData = window.localStorage['userData.global'];
                 var gUserData = JSON.parse(globalData);
-                window.globalUserData = UserDataModel.fromJSONObject(gUserData);
+                //window.globalUserData = UserDataModel.fromJSONObject(gUserData);
             }
         }
     })

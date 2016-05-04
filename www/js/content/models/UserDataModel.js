@@ -1,7 +1,7 @@
 angular.module('mining.content')
     .factory('UserDataModel', function(BASE_SERVER_URL, FeedModel, StoryModel, OpmlModel) {
         var UserDataModel = function () {
-            //strucutres to be persisted
+            //structures to be persisted
             this.email = "";
             this.apiKey = "";
             this.UserActionStats = [];
@@ -25,7 +25,6 @@ angular.module('mining.content')
         };
 
         UserDataModel.prototype.cleanFeedStructure = function() {
-            //strucutres to be persisted
             this.Opml = [];
             this.StarOpml = [];
             this.Stories = [];
@@ -49,7 +48,7 @@ angular.module('mining.content')
                 "Opml" : _.map(this.Opml, function(Opml){
                     return Opml.toJSONObject();
                 }),
-                'Storis': _.map(this.Stories, function(Story){
+                'Stories': _.map(this.Stories, function(Story){
                     return Story.toJSONObject();
                 }),
                 "Feeds" : _.map(this.Feeds, function(Feed){
@@ -73,11 +72,11 @@ angular.module('mining.content')
         };
 
         UserDataModel.prototype.setFeedStructure = function(feedStructure) {
-            this.addFeedStructureToOpml(feedStructure, this.Opml)
+            this.addFeedStructureToOpml(feedStructure, this.Opml);
         };
 
         UserDataModel.prototype.setStarFeedStructure = function(feedStructure) {
-            this.addFeedStructureToOpml(feedStructure, this.StarOpml)
+            this.addFeedStructureToOpml(feedStructure, this.StarOpml);
             this.StarOpml.shift();
         };
 
@@ -204,7 +203,7 @@ angular.module('mining.content')
         };
 
         UserDataModel.prototype.getFolderOpmls = function() {
-            return _.filter(this.opml,function(o){ return o.hasOutline});
+            return _.filter(this.opml,function(o){ return o.isFolder()});
         };
 
         UserDataModel.prototype.updateOpmlUnReadCount = function() {

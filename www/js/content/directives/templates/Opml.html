@@ -4,7 +4,7 @@
     <b class="feedtitle" ng-click="onOpmlClicked(opml)">{{opml.Title}}</b>
     <span class="badge badge-assertive badge-unread" ng-show="opml.unReadCount!=0">{{opml.unReadCount}}</span>
     <ion-list ng-show="opml.isOpen">
-        <feed   feed="feed" ng-repeat="feed in opml.Outline"
-                on-feed-clicked="onOpmlFeedClicked({opmlFeed:feed.opml})" ></feed>
+        <feed feed="feed" ng-repeat="feed in opml.Outline"
+              on-feed-clicked="onOpmlFeedClicked({opmlFeed:feed.opml})" ></feed>
     </ion-list>
 </div>

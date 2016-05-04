@@ -44,14 +44,16 @@ angular.module('mining.content')
                 $scope.viewModel.totalUnReadCount = globalUserData.totalUnReadCount;
 
                 $ionicSideMenuDelegate.toggleLeft();
+                $scope.router.goReadFeed($scope.viewModel.opmlsList[1]);
             },
             function(){
                 $scope.viewModel.isBusy = false;
                 ContentDataService.loadLocalUserData();
                 $scope.viewModel.opmlsList = globalUserData.Opml;
+
+
             }
         );
-
 
 
     });

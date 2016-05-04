@@ -1,13 +1,25 @@
 <div class="item">
-    <div class="bar bar-header">
-        <h2 class="title">
-            <b>{{story.Author}}</b>
-            <!--<span am-time-ago="viewModel.story.PublishedTime"></span>-->
-            <a class='button icon ion-link button-right' ng-href="{{story.Link}}" target="_blank"></a>
-        </h2>
+    <div class="bar bar-header wide" ng-show="!story.expand">
+        <div class="row" ng-click="expandStory()">
+            <div class="col col-20 item">
+                <b>{{story.feed.Title}}</b>
+            </div>
+            <div class="col col-75 item">
+                <b ng-if="!story.isRead">{{story.Title}}</b>
+                <b ng-if="story.isRead">{{story.Title}}</b>
+                <span>
+                    {{story.SSummary}}
+                </span>
+            </div>
+            <div class="col item">
+                <span am-time-ago="story.PublishedTime"></span>
+            </div>
+        </div>
     </div>
 
-    <div ng-if="viewModel.expanded">
-        <p id="storyContainer" ng-bind-html="story.Content | sanitize " ngc-done="onContentLoaded()"></p>
+    <div class="item-accordion " ng-show="story.expand">
+        <h2 style="padding:1em 3em; font-size:1.2em">{{story.Title}}</h2>
+        <h2 style="padding:0em 3em;"><span am-time-ago="story.PublishedTime"></span> {{story.feed.Title}}</h2>
+        <p id="story-container" ng-bind-html="story.Content | sanitize " ngc-done="onContentLoaded()"></p>
     </div>
 </div>

@@ -117,7 +117,7 @@ angular.module('mining', [
                 url: '/feed/story',
                 cache: false,
                 templateUrl: 'js/content/templates/ReadStoryView.html',
-                params: { story: null, mode:'full', device:'mobile' },
+                params: { story: null, opml: null, mode:'full', device:'mobile' },
                 controller: 'ReadStoryCtrl'
             })
 

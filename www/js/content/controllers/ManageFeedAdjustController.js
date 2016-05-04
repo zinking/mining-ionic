@@ -16,14 +16,13 @@ angular.module('mining.content')
         //clone the structure
         $scope.viewModel.opmlFeeds = JSON.parse(JSON.stringify(globalUserData.Opml));
 
-        $scope.isOpmlModified = function(opmlFeed) {
-
+        $scope.isOpmlModified = function(opml) {
             return !!(opml.Title != opml.OTitle ||
             opml.Folder != opml.OFolder ||
             opml.Delete);
         };
 
-        $scope.markFeedDelete = function(opmlFeed) {
+        $scope.markFeedDelete = function(opml) {
             opml.Delete = !opml.Delete;
         };
 
@@ -150,7 +149,7 @@ angular.module('mining.content')
                         });
 
                         //reset the changes
-                        _.forEach($scope.viewModel.changes, function(opmlFeed){
+                        _.forEach($scope.viewModel.changes, function(opml){
                             opml.OTitle = opml.Title;
                             opml.OFolder = opml.Folder;
                             opml.Deleted = true;

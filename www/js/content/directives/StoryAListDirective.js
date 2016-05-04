@@ -1,5 +1,5 @@
 angular.module('mining.content')
-    .directive('storylist', ['$state', '$q', '$filter', '$ionicScrollDelegate', 'ContentDataService', 'SessionService',
+    .directive('storyalist', ['$state', '$q', '$filter', '$ionicScrollDelegate', 'ContentDataService', 'SessionService',
         function($state, $q, $filter,  $ionicScrollDelegate, ContentDataService, SessionService) {
         return {
             restrict: 'E',
@@ -12,11 +12,13 @@ angular.module('mining.content')
                 onFeedStoryClicked: '&'
             },
             controller: function($scope) {
+                //The story accordion list to be distinct from the original directive
                 //TODO: I feel this page requires refactoring
                 $scope.viewModel = {
                     stories : [],
                     opml : {},
-                    hasMoreStories : true
+                    hasMoreStories : true,
+                    currentStory : null
                 };
 
                 $scope.viewModel.opml = $scope.opml;
@@ -28,8 +30,18 @@ angular.module('mining.content')
                     );
                     var s = currentStories[index];
 
-                    $scope.rememberScrollPos();
-                    $scope.onFeedStoryClicked({story:s,opml:$scope.opml});
+                    $scope.rememberScrollPos(index);
+                    $scope.onFeedStoryClicked({story:s});
+
+                    $scope.opml.closeExpandStory();
+                    $scope.viewModel.currentStory = s;
+                };
+
+                $scope.opml.closeExpandStory = function() {
+                    if ($scope.viewModel.currentStory != null) {
+                        $scope.viewModel.currentStory.expand = false;
+                        $scope.scrollToLastRemembered();
+                    }
                 };
 
                 //SECTION STORY LOADING
@@ -87,7 +99,7 @@ angular.module('mining.content')
                                 opml.currentPage+=1;
                             }
                             $scope.viewModel.stories = opml.getStories();
-                            $scope.viewModel.currentStory =  $scope.viewModel.stories[0];
+                            //$scope.viewModel.currentStory =  $scope.viewModel.stories[0];
                             $scope.$broadcast('scroll.infiniteScrollComplete');
                             $scope.$broadcast('scroll.resize');
                         },
@@ -97,15 +109,6 @@ angular.module('mining.content')
                     )
                 };
 
-                $scope.scrollToLastRemembered = function() {
-                    if (typeof $scope.viewModel.opml.lastPos !== "undefined") {
-                        var lastPos = $scope.viewModel.opml.lastPos;
-                        setTimeout(function() { //has no clue why this is needed
-                            $ionicScrollDelegate.scrollTo(lastPos.left, lastPos.top);
-                        },10);
-                    }
-                };
-
                 $scope.displayCurrentStories = function() {
                     $scope.viewModel.pageLoaded = true;
                     var opml = $scope.viewModel.opml;
@@ -113,13 +116,13 @@ angular.module('mining.content')
                     var cachedStories = opml.getStories();
                     if (cachedStories.length>0) {
                         $scope.viewModel.stories = cachedStories;
-                        $scope.scrollToLastRemembered();
+                        //$scope.scrollToLastRemembered();
                     } else {
                         //if requested current page is not downloaded yet
                         $scope.loadRequestedStories(opml,pageToLoad).then(
                             function(){
                                 $scope.viewModel.stories = opml.getStories();
-                                $scope.scrollToLastRemembered();
+                                //$scope.scrollToLastRemembered();
                             },
                             function(){
                                 //oops, you didn't flip the page
@@ -129,8 +132,21 @@ angular.module('mining.content')
                 };
 
 
-                $scope.rememberScrollPos = function() {
+                $scope.rememberScrollPos = function(index) {
                     $scope.viewModel.opml.lastPos = $ionicScrollDelegate.getScrollPosition();
+
+                    $scope.viewModel.opml.lastPos.top = (index-5) * 35;
+                    console.log('remember scroll', $scope.viewModel.opml.lastPos)
+                };
+
+                $scope.scrollToLastRemembered = function() {
+                    if (typeof $scope.viewModel.opml.lastPos !== "undefined") {
+                        var lastPos = $scope.viewModel.opml.lastPos;
+                        console.log('scroll to remembered', lastPos);
+                        setTimeout(function() { //has no clue why this is needed
+                            $ionicScrollDelegate.scrollTo(lastPos.left, lastPos.top);
+                        },10);
+                    }
                 };
 
                 //need to bring up current stories when loading the page

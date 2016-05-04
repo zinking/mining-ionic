@@ -13,7 +13,8 @@ angular.module('mining.content')
             model.Updated   = data.Updated;
             model.Published = data.Published;
             model.Author    = data.Author;
-            model.Summary   = data.Summary;
+            //model.Summary   = data.Summary;
+            model.setSummary(data.Summary);
             model.Content   = null;
             model.PublishedTime = new Date(model.Published);
 
@@ -52,7 +53,7 @@ angular.module('mining.content')
         };
 
         StoryModel.prototype.setSummary = function (summary) {
-            //this.Summary   = this.stripSummary(summary);
+            this.SSummary   = this.stripSummary(summary);
             this.Summary   = summary;
         };
 

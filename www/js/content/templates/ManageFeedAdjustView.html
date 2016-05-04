@@ -43,7 +43,7 @@
 
                 <!-- else display its sub feeds-->
                 <!-- feeds feeds feeds -->
-                <div class="item item-text-wrap" ng-repeat="feed in opml.Outline" ng-if="opml.hasOutline && !feed.Deleted">
+                <div class="item item-text-wrap" ng-repeat="feed in opml.Outline" ng-if="opml.isFolder() && !feed.Deleted">
                     <i class="icon ion-checkmark-circled" ng-if="isOpmlModified(feed)" style="color:green">
                         Changed
                     </i>
@@ -51,7 +51,7 @@
 
                     <!--TODO: possibly highlight the unsubscribe after click-->
                     <label class="item item-input" ng-click="markFeedDelete(feed)">
-                        <a><i class="icon ion-android-delete unsubsribe-inactive" ></i></a>
+                        <a><i class="icon ion-android-delete unsubscribe-inactive" ></i></a>
                         <span class="one-line">{{feed.XmlUrl}}</span>
                     </label>
 

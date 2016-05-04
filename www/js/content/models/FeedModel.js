@@ -60,31 +60,9 @@ angular.module('mining.content')
             this.opml.readOneStory();
         };
 
-        FeedModel.prototype.getStoriesByPage = function(pageNumber) {
-            var pageNo = pageNumber || 0,
-                per_page = 10,
-                offset = pageNo * per_page,
-                stories = _.rest(this.stories, offset).slice(0, per_page);
-            if (stories.length < per_page) {
-                //Note: this is a signal to the caller
-                //the feed is in short of stories, need to fetch more
-                return [];
-            } else {
-                return stories;
-            }
-        };
-
         FeedModel.prototype.getStories = function() {
             return this.stories;
-            //return _.sortBy(this.stories, function (s) {
-            //    return -s.Published
-            //});
         };
-
-
-
-
-
 
         FeedModel.prototype.fromJSONObject = function(data) {
             var ret = [];

@@ -67,8 +67,8 @@ angular.module('mining.session')
                 goReadFeed : function ( fo ){
                     $state.go('readFeed',{opml:fo});
                 },
-                goReadStory : function ( s ){
-                    $state.go('readStory',{story:s});
+                goReadStory : function ( s,o ){
+                    $state.go('readStory',{story:s, opml:o});
                 },
                 goReadAddFeed: function(){
                     $state.go('addFeed');
@@ -102,21 +102,14 @@ angular.module('mining.session')
                     $state.go('tab.read');
                 },
                 goReadFeed : function ( fo ){
-                    $state.go('full.readFeed',{
-                        opml:fo,
-                    },
-                    {
+                    $state.go('full.readFeed',{opml:fo}, {
                         reload: true,
                         inherit: false,
                         notify: true
                     });
                 },
                 goReadStory : function ( fo,s ){
-                    $state.go('readStory',
-                    {
-                        story:s
-                    },
-                    {
+                    $state.go('readStory', {story:s}, {
                         reload: true,
                         inherit: false,
                         notify: true

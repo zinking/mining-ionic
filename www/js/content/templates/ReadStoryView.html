@@ -1,7 +1,7 @@
 <ion-footer-bar align-title="left" class="bar-calm">
     <ion-spinner ng-show="viewModel.isBusy" icon="android"></ion-spinner>
     <div class="buttons">
-        <button class='button icon ion-arrow-left-a' ng-click="router.goReadFeed(viewModel.opml)"></button>
+        <button class='button icon ion-arrow-left-a' ng-click="goToFeed(viewModel.opml)"></button>
     </div>
     <h1 class="title">{{viewModel.story.Title}}</h1>
     <div class="buttons">

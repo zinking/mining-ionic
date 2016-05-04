@@ -73,14 +73,14 @@ div.story .spinner svg {
     border-bottom:#ddd solid;
 }
 
-.unsubsribe-inactive {
+.unsubscribe-inactive {
     color:silver;
     font-size:1.5em;
     margin-left:0.5em;
     margin-right:0.5em;
 }
 
-.unsubsribe-active {
+.unsubscribe-active {
     color:red;
     font-size:1.5em;
     margin-left:0.5em;
@@ -131,7 +131,7 @@ b.feedTitle {
 
 }
 
-#storyContainer {
+#story-container {
     padding:3em;
     max-width:100%;
 }
@@ -144,3 +144,15 @@ button.starred {
     float:right;
     margin-top:3px;
 }
+
+.wide .col{
+    padding:0;
+    border:0;
+    padding-left:1em;
+}
+
+#story-container p {
+    overflow:visible;
+    white-space:normal;
+}
+

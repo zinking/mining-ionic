@@ -8,17 +8,23 @@ angular.module('mining.content')
         $scope.viewModel = {
             story : {},
             isBusy : false,
-            startTimeStamp: 0
+            startTimeStamp: 0,
+            opml : null
         };
 
 
-        if (typeof globalUserData === "undefined" || typeof $stateParams.story === "undefined") {
+        if (typeof globalUserData === "undefined" ||
+            typeof $stateParams.story === "undefined" ||
+            typeof $stateParams.opml === "undefined" ) {
             $scope.router.goHome();
             return;
         }
 
         $scope.viewModel.story = $stateParams.story;
-        $scope.viewModel.opml = $stateParams.story.feed.opml;
+
+        //note this opml is different from which story is bound to
+        $scope.viewModel.opml = $stateParams.opml;
+
 
 
         $scope.viewModel.startTimeStamp = new Date().getTime();

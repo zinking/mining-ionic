@@ -28,7 +28,7 @@ angular.module('mining.content')
                     return childOpml;
                 });
             } else {
-                me.parentOpml = me;
+                model.parentOpml = model;
             }
 
             model.filterHasRead = false;
