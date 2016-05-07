@@ -4,8 +4,14 @@ angular.module('mining.content')
         $scope, $ionicLoading,$state,$ionicSideMenuDelegate,$ionicPopup,
         AccountDataService, ContentDataService, SessionService
     ){
-        SessionService.refreshIfExpired();
         $scope.router = SessionService.routeUtil;
+
+        //SessionService.refreshIfExpired();
+        if (typeof globalUserData === "undefined") {
+            $scope.router.goReadTab();
+            return;
+        }
+
         
         $scope.viewModel = {
             currentOpmlFeeds:[],
@@ -13,8 +19,9 @@ angular.module('mining.content')
             folderOptions:[]
         };
 
-        //clone the structure
-        $scope.viewModel.opmlFeeds = JSON.parse(JSON.stringify(globalUserData.Opml));
+        //clone the structur
+        // $scope.viewModel.opmlFeeds = JSON.parse(JSON.stringify(globalUserData.Opml));
+        $scope.viewModel.opmlFeeds = globalUserData.Opml;
 
         $scope.isOpmlModified = function(opml) {
             return !!(opml.Title != opml.OTitle ||
@@ -81,20 +88,20 @@ angular.module('mining.content')
             width: 'resolve'
         };
 
-        //$('.folderPicker').select2({
-        //    data: currentFolders,
-        //    width: 'resolve',
-        //    createSearchChoice: function(term, data) {
-        //        var filteredOptions = _.filter(data,function(option){
-        //            return option.text.indexOf(term) > -1;
-        //        });
-        //        if (filteredOptions.length==0) {
-        //            return { id:term, text:term };
-        //        } else {
-        //            return filteredOptions;
-        //        }
-        //    }
-        //});
+        $('.folderPicker').select2({
+            data: $scope.viewModel.folderOptions,
+            width: 'resolve',
+            createSearchChoice: function(term, data) {
+                var filteredOptions = _.filter(data,function(option){
+                    return option.text.indexOf(term) > -1;
+                });
+                if (filteredOptions.length==0) {
+                    return { id:term, text:term };
+                } else {
+                    return filteredOptions;
+                }
+            }
+        });
 
 
         $scope.applyAllChanges = function() {

@@ -75,7 +75,6 @@ angular.module('mining.session')
                 },
                 goReadImportFeed: function(){
                     $state.go('importFeed');
-                    //$scope.closePopover();
                 },
                 goManageTab: function() {
                     $state.go('tab.manage');
@@ -120,7 +119,6 @@ angular.module('mining.session')
                 },
                 goReadImportFeed: function(){
                     $state.go('importFeed');
-                    //$scope.closePopover();
                 },
                 goManageTab: function() {
                     $state.go('tab.manage');

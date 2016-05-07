@@ -15,35 +15,35 @@
                 </div>
 
                 <!-- if the folder is indeed a feed-->
-                <div class="item item-text-wrap" ng-if="!opml.isFolder() && !opml.Deleted">
-                    <i class="icon ion-checkmark-circled" ng-if="isOpmlModified(opml)" style="color:green">
-                        Changed
-                    </i>
+                <!--<div class="item item-text-wrap" ng-if="!opml.isFolder() && !opml.Deleted">-->
+                    <!--<i class="icon ion-checkmark-circled" ng-if="isOpmlModified(opml)" style="color:green">-->
+                        <!--Changed-->
+                    <!--</i>-->
 
-                    <label class="item item-input" ng-click="markFeedDelete(opml)">
-                        <i class="icon ion-android-delete unsubsribe-inactive" ></i>
-                        <span class="oneline" >{{opml.XmlUrl}}</span>
-                    </label>
+                    <!--<label class="item item-input" ng-click="markFeedDelete(opml)">-->
+                        <!--<i class="icon ion-android-delete unsubsribe-inactive" ></i>-->
+                        <!--<span class="oneline" >{{opml.XmlUrl}}</span>-->
+                    <!--</label>-->
 
-                    <label class="item item-input">
-                        <span class="input-label">Title</span>
-                        <input type="text" placeholder="Feed Title" ng-model="opml.Title"/>
-                    </label>
+                    <!--<label class="item item-input">-->
+                        <!--<span class="input-label">Title</span>-->
+                        <!--<input type="text" placeholder="Feed Title" ng-model="opml.Title"/>-->
+                    <!--</label>-->
 
-                    <label class="item item-input">
-                        <span class="input-label">Folder</span>
-                        <select ui-select2="pickOption" ng-model="opml.Folder" data-placeholder="Pick a folder">
-                            <!--<option value="opml.OFolder">{{opml.OFolder}}</option>-->
-                            <option ng-repeat="folderOption in viewModel.folderOptions"
-                                    value="{{folderOption.text}}">{{folderOption.text}}</option>
-                        </select>
-                    </label>
-                    <!--<input class="folderPicker" ng-model="opml.Folder"/>-->
-                </div>
+                    <!--<label class="item item-input">-->
+                        <!--<span class="input-label">Folder</span>-->
+                        <!--<select ui-select2="pickOption" ng-model="opml.Folder" data-placeholder="Pick a folder">-->
+                            <!--&lt;!&ndash;<option value="opml.OFolder">{{opml.OFolder}}</option>&ndash;&gt;-->
+                            <!--<option ng-repeat="folderOption in viewModel.folderOptions"-->
+                                    <!--value="{{folderOption.text}}">{{folderOption.text}}</option>-->
+                        <!--</select>-->
+                    <!--</label>-->
+                    <!--&lt;!&ndash;<input class="folderPicker" ng-model="opml.Folder"/>&ndash;&gt;-->
+                <!--</div>-->
 
                 <!-- else display its sub feeds-->
                 <!-- feeds feeds feeds -->
-                <div class="item item-text-wrap" ng-repeat="feed in opml.Outline" ng-if="opml.isFolder() && !feed.Deleted">
+                <div class="item item-text-wrap" ng-repeat="feed in opml.getOutlines()" ng-if="!feed.Deleted">
                     <i class="icon ion-checkmark-circled" ng-if="isOpmlModified(feed)" style="color:green">
                         Changed
                     </i>
