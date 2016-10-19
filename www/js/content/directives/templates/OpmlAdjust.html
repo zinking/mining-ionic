@@ -1,0 +1,31 @@
+<div class="card" ng-cloak>
+    <div class="item item-divider" ng-if="opml.isFolder()">
+        {{opml.Title}}
+    </div>
+
+    <div class="item item-text-wrap" ng-repeat="feed in opml.getOutlines()" ng-if="!feed.Deleted">
+        <i class="icon ion-checkmark-circled" ng-if="isOpmlModified(feed)" style="color:green">
+            Changed
+        </i>
+
+        <!--TODO: possibly highlight the unsubscribe after click-->
+        <label class="item item-input" ng-click="markFeedDelete(feed)">
+            <a><i class="icon ion-android-delete unsubscribe-inactive" ></i></a>
+            <span class="one-line">{{feed.XmlUrl}}</span>
+        </label>
+
+        <label class="item item-input">
+            <span class="input-label">Title</span>
+            <input type="text" placeholder="Feed Title" ng-model="feed.Title"/>
+        </label>
+
+        <label class="item item-input">
+            <span class="input-label">Folder</span>
+            <select ui-select2="pickOption" ng-model="feed.Folder" data-placeholder="Pick a folder">
+                <!--<option value="feed.OFolder">{{feed.OFolder}}</option>-->
+                <option ng-repeat="folderOption in viewModel.folderOptions"
+                        value="{{folderOption.text}}">{{folderOption.text}}</option>
+            </select>
+        </label>
+    </div>
+</div>

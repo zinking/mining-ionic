@@ -4,7 +4,10 @@ angular.module('mining.content')
         $scope, $ionicLoading,$state,$ionicSideMenuDelegate,$ionicPopup,
         AccountDataService, ContentDataService, SessionService
     ){
-        SessionService.refreshIfExpired();
+        if (typeof globalUserData === "undefined" ) {
+            $state.go('tab.read');
+            return;
+        }
         $scope.router = SessionService.routeUtil;
 
 

@@ -5,7 +5,10 @@ angular.module('mining.content')
         AccountDataService, ContentDataService, SessionService
     ){
 
-        SessionService.refreshIfExpired();
+        if (typeof globalUserData === "undefined" ) {
+            $state.go('tab.read');
+            return;
+        }
         $scope.router = SessionService.routeUtil;
 
         $scope.viewModel = {

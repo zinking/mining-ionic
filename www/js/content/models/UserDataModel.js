@@ -203,7 +203,7 @@ angular.module('mining.content')
         };
 
         UserDataModel.prototype.getFolderOpmls = function() {
-            return _.filter(this.opml,function(o){ return o.isFolder()});
+            return _.filter(this.Opml,function(o){ return o.isFolder()});
         };
 
         UserDataModel.prototype.updateOpmlUnReadCount = function() {
