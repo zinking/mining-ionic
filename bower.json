@@ -2,7 +2,14 @@
   "name": "Mining ionic",
   "private": true,
   "devDependencies": {
-    "ionic": "driftyco/ionic-bower#1.1.0"
+    "ionic": "driftyco/ionic-bower#1.1.0",
+    "nvd3": "~1.8.5",
+    "angular-nvd3": "~1.0.9",
+    "angular-moment": "~1.0.1",
+    "underscore": "~1.8.3",
+    "ionic-datepicker": "~1.2.1",
+    "jquery": "1.11.1",
+    "lodash": "~4.17.4"
   },
   "homepage": "https://github.com/zinking/mining-ionic",
   "authors": [

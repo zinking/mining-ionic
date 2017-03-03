@@ -7,3 +7,4 @@ plugins/
 .idea/
 .bowerrc
 www/lib
+bower_components/
